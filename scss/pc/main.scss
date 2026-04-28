@@ -194,47 +194,220 @@ body::-webkit-scrollbar {
 	.header-main {
 		position: relative;
 		width: 100%;
-		height: 640px;
-		background-image: url('/img/banner/header1.svg');
-		background-size: cover;
-		background-position: center;
+		min-height: 390px;
+		background: #ffffff;
 
 		.container {
 			position: relative;
-			margin-top: 28px;
+			margin-top: 0;
+			padding: 0 28px 24px;
+			width: 100%;
 			flex-direction: column;
 			align-items: center;
 
-			.compact-hero {
-				position: relative;
-				margin-top: 80px;
-				padding: 22px 26px 26px;
-				width: 1160px;
-				border-radius: 18px;
-				background: rgba(255, 255, 255, 0.88);
-				backdrop-filter: blur(4px);
-				box-shadow: 0 12px 28px rgba(24, 26, 32, 0.18);
+			.hero-drawer-overlay {
+				position: fixed;
+				inset: 0;
+				background: rgba(24, 26, 32, 0.42);
+				opacity: 0;
+				visibility: hidden;
+				transition: 0.2s ease;
+				z-index: 99;
 
-				.hero-header {
-					margin-bottom: 14px;
+				&.open {
+					opacity: 1;
+					visibility: visible;
+				}
+			}
 
-					.brand {
+			.hero-drawer {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 292px;
+				height: 100vh;
+				padding: 28px 18px;
+				background: #f6f7fa;
+				box-shadow: 10px 0 20px rgba(24, 26, 32, 0.16);
+				transform: translateX(-100%);
+				opacity: 0;
+				visibility: hidden;
+				pointer-events: none;
+				transition: transform 0.24s ease, opacity 0.2s ease;
+				z-index: 100;
+
+				&.open {
+					transform: translateX(0);
+					opacity: 1;
+					visibility: visible;
+					pointer-events: auto;
+				}
+
+				.hero-drawer-head {
+					margin-bottom: 20px;
+
+					span {
 						font-family: $font;
 						font-size: 18px;
 						font-weight: 800;
-						letter-spacing: 0.18em;
+						letter-spacing: 0.16em;
 						color: $velora-primary-dark;
 					}
 				}
 
+				.hero-drawer-items {
+					display: flex;
+					flex-direction: column;
+					gap: 8px;
+
+					.hero-drawer-item {
+						height: 50px;
+						padding: 0 14px;
+						text-align: left;
+						border-radius: 10px;
+						border: 1px solid transparent;
+						background: transparent;
+						color: #384055;
+						font-family: $font;
+						font-size: 17px;
+						font-weight: 500;
+						cursor: pointer;
+
+						&.active {
+							background: #e9edf5;
+							border-color: #d8ddea;
+							color: $velora-text-main;
+							font-weight: 600;
+						}
+					}
+				}
+			}
+
+			.velora-shell-topbar {
+				width: 100%;
+				height: 64px;
+				display: flex;
+				flex-direction: row;
+				align-items: center;
+				gap: 14px;
+
+				.menu-button {
+					width: 28px;
+					height: 28px;
+					padding: 0;
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+					align-items: center;
+					gap: 4px;
+					border-radius: 6px;
+					border: none;
+					background: transparent;
+					cursor: pointer;
+
+					span {
+						width: 18px;
+						height: 2px;
+						background: #202532;
+						display: block;
+					}
+				}
+
+				.brand {
+					font-family: $font;
+					font-size: 16px;
+					font-weight: 800;
+					letter-spacing: 0.22em;
+					color: $velora-primary-dark;
+				}
+
+				.hero-actions {
+					margin-left: auto;
+					display: flex;
+					align-items: center;
+					gap: 10px;
+
+					.hero-action-login {
+						height: 36px;
+						padding: 0 18px;
+						border-radius: 20px;
+						border: 1px solid $velora-primary;
+						background: $velora-primary;
+						color: #ffffff;
+						font-family: $font;
+						font-size: 13px;
+						font-weight: 700;
+						cursor: pointer;
+						transition: 0.18s ease;
+
+						&:hover {
+							background: $velora-primary-dark;
+							border-color: $velora-primary-dark;
+						}
+					}
+
+					.hero-action-icon {
+						min-width: 36px;
+						height: 36px;
+						padding: 0 10px;
+						display: inline-flex;
+						align-items: center;
+						justify-content: center;
+						gap: 6px;
+						border-radius: 18px;
+						border: 1px solid #d8dde9;
+						background: #ffffff;
+						color: #424857;
+						font-family: $font;
+						font-size: 12px;
+						font-weight: 700;
+						cursor: pointer;
+						transition: 0.18s ease;
+
+						&:hover {
+							border-color: $velora-primary;
+							color: $velora-primary;
+						}
+
+						svg {
+							display: block;
+						}
+
+						&.lang span {
+							line-height: 1;
+						}
+					}
+				}
+			}
+
+			.compact-hero {
+				position: relative;
+				margin-top: 4px;
+				padding: 32px 36px 36px;
+				width: 100%;
+				max-width: 1600px;
+				min-height: 360px;
+				border-radius: 16px;
+				background: #f4f6fa;
+				backdrop-filter: blur(4px);
+				box-shadow: none;
+				overflow: hidden;
+
+				.hero-layout {
+					display: grid;
+					grid-template-columns: minmax(520px, 0.95fr) minmax(420px, 0.85fr);
+					gap: 32px;
+					align-items: start;
+				}
+
 				.hero-content {
-					gap: 16px;
+					gap: 18px;
 
 					.hero-title {
-						max-width: 620px;
+						max-width: 650px;
 						color: $velora-text-main;
 						font-family: $font;
-						font-size: 44px;
+						font-size: 40px;
 						font-weight: 700;
 						line-height: 1.14;
 					}
@@ -245,13 +418,14 @@ body::-webkit-scrollbar {
 						gap: 10px;
 
 						.hero-tab {
-							padding: 10px 16px;
-							border-radius: 10px;
+							height: 38px;
+							padding: 0 16px;
+							border-radius: 9px;
 							border: 1px solid #d6dcea;
 							background: $velora-surface;
 							color: $velora-text-main;
 							font-family: $font;
-							font-size: 14px;
+							font-size: 13px;
 							font-weight: 600;
 							line-height: 1;
 							cursor: pointer;
@@ -266,31 +440,31 @@ body::-webkit-scrollbar {
 
 					.hero-search-form {
 						display: grid;
-						grid-template-columns: 1.35fr 1fr 1fr 0.85fr auto;
+						grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
 						gap: 10px;
 						align-items: end;
 
 						.field-group {
 							display: flex;
 							flex-direction: column;
-							gap: 6px;
+							gap: 8px;
 
 							label {
 								font-family: $font;
-								font-size: 12px;
+								font-size: 11px;
 								font-weight: 600;
 								color: #5f6575;
 							}
 
 							input {
-								height: 46px;
+								height: 44px;
 								padding: 0 12px;
-								border-radius: 10px;
+								border-radius: 8px;
 								border: 1px solid #d6dcea;
 								background: #fff;
 								color: $velora-text-main;
 								font-family: $font;
-								font-size: 14px;
+								font-size: 13px;
 								outline: none;
 
 								&:focus {
@@ -300,24 +474,78 @@ body::-webkit-scrollbar {
 						}
 
 						.search-submit {
-							height: 46px;
-							padding: 0 18px;
-							border-radius: 10px;
+							height: 44px;
+							padding: 0 22px;
+							border-radius: 8px;
 							border: none;
 							background: $velora-accent;
 							color: #fff;
 							font-family: $font;
-							font-size: 14px;
+							font-size: 13px;
 							font-weight: 700;
 							cursor: pointer;
+						}
+					}
+				}
+
+				.hero-gallery {
+					display: grid;
+					grid-template-columns: repeat(3, minmax(0, 1fr));
+					gap: 12px;
+
+					img {
+						width: 100%;
+						height: 116px;
+						border-radius: 14px;
+						object-fit: cover;
+					}
+				}
+
+				@media (max-width: 1280px) {
+					.hero-layout {
+						grid-template-columns: minmax(520px, 1fr) minmax(360px, 0.75fr);
+					}
+
+					.hero-gallery {
+						img {
+							height: 92px;
+						}
+					}
+
+					.hero-content {
+						.hero-title {
+							max-width: 100%;
+							font-size: 34px;
+						}
+					}
+				}
+
+				@media (max-width: 980px) {
+					padding: 16px;
+
+					.hero-header {
+						.hero-actions {
+							display: none;
+						}
+					}
+
+					.hero-content {
+						.hero-title {
+							font-size: 30px;
+						}
+
+						.hero-search-form {
+							grid-template-columns: 1fr;
 						}
 					}
 				}
 			}
 
 			.compact-hero.mobile {
-				width: calc(100vw - 28px);
+				width: calc(100vw - 18px);
+				max-width: none;
 				padding: 16px;
+				margin-top: 8px;
 
 				.hero-content {
 					.hero-title {
@@ -331,6 +559,20 @@ body::-webkit-scrollbar {
 					.hero-search-form {
 						grid-template-columns: 1fr;
 					}
+				}
+
+				.hero-header {
+					.hero-actions {
+						display: none;
+					}
+				}
+
+				.hero-layout {
+					grid-template-columns: 1fr;
+				}
+
+				.hero-gallery {
+					display: none;
 				}
 			}
 		}

@@ -56,10 +56,68 @@ const TAB_CONFIG: SearchTabConfig[] = [
 	},
 ];
 
+type ThemeMode = 'light' | 'dark';
+type LanguageCode = 'EN' | 'UZ' | 'KO';
+
+const LANGUAGE_CYCLE: LanguageCode[] = ['EN', 'UZ', 'KO'];
+
+const SunIcon = () => (
+	<svg
+		width="16"
+		height="16"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-hidden="true"
+	>
+		<circle cx="12" cy="12" r="4" />
+		<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+	</svg>
+);
+
+const MoonIcon = () => (
+	<svg
+		width="16"
+		height="16"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-hidden="true"
+	>
+		<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+	</svg>
+);
+
+const GlobeIcon = () => (
+	<svg
+		width="14"
+		height="14"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-hidden="true"
+	>
+		<circle cx="12" cy="12" r="10" />
+		<path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+	</svg>
+);
+
 const HeaderFilter = () => {
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const [activeTab, setActiveTab] = useState<SearchTabKey>('flights');
+	const [drawerOpen, setDrawerOpen] = useState(false);
+	const [theme, setTheme] = useState<ThemeMode>('light');
+	const [language, setLanguage] = useState<LanguageCode>('EN');
 	const [form, setForm] = useState({
 		location: '',
 		startDate: '',
@@ -89,77 +147,165 @@ const HeaderFilter = () => {
 		setForm((prev) => ({ ...prev, [name]: value }));
 	};
 
+	const handleSelectTab = (tabKey: SearchTabKey) => {
+		setActiveTab(tabKey);
+		setDrawerOpen(false);
+	};
+
+	const handleToggleTheme = () => {
+		setTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+	};
+
+	const handleCycleLanguage = () => {
+		setLanguage((prev) => {
+			const idx = LANGUAGE_CYCLE.indexOf(prev);
+			return LANGUAGE_CYCLE[(idx + 1) % LANGUAGE_CYCLE.length];
+		});
+	};
+
+	const handleLogin = () => {
+		router.push('/account/join');
+	};
+
 	return (
-		<Stack className={`compact-hero ${device === 'mobile' ? 'mobile' : 'desktop'}`}>
-			<Stack className={'hero-header'}>
-				<span className={'brand'}>VELORA</span>
-			</Stack>
-
-			<Stack className={'hero-content'}>
-				<h1 className={'hero-title'}>{activeConfig.description}</h1>
-
-				<Stack className={'hero-tabs'}>
+		<>
+			<div
+				className={`hero-drawer-overlay ${drawerOpen ? 'open' : ''}`}
+				onClick={() => setDrawerOpen(false)}
+				aria-hidden="true"
+			/>
+			<aside className={`hero-drawer ${drawerOpen ? 'open' : ''}`}>
+				<div className="hero-drawer-head">
+					<span>VELORA</span>
+				</div>
+				<div className="hero-drawer-items">
 					{TAB_CONFIG.map((tab) => (
 						<button
 							type="button"
-							key={tab.key}
-							className={`hero-tab ${activeTab === tab.key ? 'active' : ''}`}
-							onClick={() => setActiveTab(tab.key)}
+							key={`drawer-${tab.key}`}
+							className={`hero-drawer-item ${activeTab === tab.key ? 'active' : ''}`}
+							onClick={() => handleSelectTab(tab.key)}
 						>
 							{tab.label}
 						</button>
 					))}
+				</div>
+			</aside>
+
+			<header className={'velora-shell-topbar'}>
+				<button
+					type="button"
+					className={'menu-button'}
+					onClick={() => setDrawerOpen((prev) => !prev)}
+					aria-label="Toggle travel menu"
+				>
+					<span />
+					<span />
+					<span />
+				</button>
+				<span className={'brand'}>VELORA</span>
+				<div className={'hero-actions'}>
+					<button type="button" className={'hero-action-login'} onClick={handleLogin}>
+						Log in
+					</button>
+					<button
+						type="button"
+						className={'hero-action-icon'}
+						onClick={handleToggleTheme}
+						aria-label={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+					>
+						{theme === 'light' ? <MoonIcon /> : <SunIcon />}
+					</button>
+					<button
+						type="button"
+						className={'hero-action-icon lang'}
+						onClick={handleCycleLanguage}
+						aria-label={`Change language. Current: ${language}`}
+					>
+						<GlobeIcon />
+						<span>{language}</span>
+					</button>
+				</div>
+			</header>
+
+			<Stack className={`compact-hero ${device === 'mobile' ? 'mobile' : 'desktop'}`}>
+			<div className={'hero-layout'}>
+				<Stack className={'hero-content'}>
+					<h1 className={'hero-title'}>{activeConfig.description}</h1>
+
+					<Stack className={'hero-tabs'}>
+						{TAB_CONFIG.map((tab) => (
+							<button
+								type="button"
+								key={tab.key}
+								className={`hero-tab ${activeTab === tab.key ? 'active' : ''}`}
+								onClick={() => handleSelectTab(tab.key)}
+							>
+								{tab.label}
+							</button>
+						))}
+					</Stack>
+
+					<form className={'hero-search-form'} onSubmit={onSubmit}>
+						<div className={'field-group location'}>
+							<label htmlFor="hero-location">{activeConfig.locationLabel}</label>
+							<input
+								id="hero-location"
+								type="text"
+								value={form.location}
+								placeholder={activeConfig.locationPlaceholder}
+								onChange={(event) => handleField('location', event.target.value)}
+							/>
+						</div>
+
+						<div className={'field-group date'}>
+							<label htmlFor="hero-start-date">{activeConfig.startLabel}</label>
+							<input
+								id="hero-start-date"
+								type="date"
+								value={form.startDate}
+								onChange={(event) => handleField('startDate', event.target.value)}
+							/>
+						</div>
+
+						<div className={'field-group date'}>
+							<label htmlFor="hero-end-date">{activeConfig.endLabel}</label>
+							<input
+								id="hero-end-date"
+								type="date"
+								value={form.endDate}
+								onChange={(event) => handleField('endDate', event.target.value)}
+							/>
+						</div>
+
+						<div className={'field-group party'}>
+							<label htmlFor="hero-party">{activeConfig.passengerLabel}</label>
+							<input
+								id="hero-party"
+								type="text"
+								value={form.travelers}
+								placeholder={activeConfig.passengerPlaceholder}
+								onChange={(event) => handleField('travelers', event.target.value)}
+							/>
+						</div>
+
+						<button className={'search-submit'} type="submit">
+							Search
+						</button>
+					</form>
 				</Stack>
 
-				<form className={'hero-search-form'} onSubmit={onSubmit}>
-					<div className={'field-group location'}>
-						<label htmlFor="hero-location">{activeConfig.locationLabel}</label>
-						<input
-							id="hero-location"
-							type="text"
-							value={form.location}
-							placeholder={activeConfig.locationPlaceholder}
-							onChange={(event) => handleField('location', event.target.value)}
-						/>
-					</div>
-
-					<div className={'field-group date'}>
-						<label htmlFor="hero-start-date">{activeConfig.startLabel}</label>
-						<input
-							id="hero-start-date"
-							type="date"
-							value={form.startDate}
-							onChange={(event) => handleField('startDate', event.target.value)}
-						/>
-					</div>
-
-					<div className={'field-group date'}>
-						<label htmlFor="hero-end-date">{activeConfig.endLabel}</label>
-						<input
-							id="hero-end-date"
-							type="date"
-							value={form.endDate}
-							onChange={(event) => handleField('endDate', event.target.value)}
-						/>
-					</div>
-
-					<div className={'field-group party'}>
-						<label htmlFor="hero-party">{activeConfig.passengerLabel}</label>
-						<input
-							id="hero-party"
-							type="text"
-							value={form.travelers}
-							placeholder={activeConfig.passengerPlaceholder}
-							onChange={(event) => handleField('travelers', event.target.value)}
-						/>
-					</div>
-
-					<button className={'search-submit'} type="submit">
-						Search
-					</button>
-				</form>
+				<div className={'hero-gallery'} aria-hidden="true">
+					<img src="/img/banner/header1.svg" alt="" />
+					<img src="/img/banner/header2.svg" alt="" />
+					<img src="/img/banner/header3.svg" alt="" />
+					<img src="/img/banner/header3.svg" alt="" />
+					<img src="/img/banner/header2.svg" alt="" />
+					<img src="/img/banner/header1.svg" alt="" />
+				</div>
+			</div>
 			</Stack>
-		</Stack>
+		</>
 	);
 };
 
