@@ -644,6 +644,155 @@ export const GET_AGENT_TOURS = gql`
 	}
 `;
 
+export const GET_TOURS = gql`
+	query GetTours($input: ToursInquiry!) {
+		getTours(input: $input) {
+			list {
+				_id
+				tourTitle
+				tourLocation
+				tourDays
+				tourNights
+				tourPrice
+				tourImages
+				tourStatus
+				tourSoldCount
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_TOUR_DETAIL = gql`
+	query GetTourDetail($tourId: ID!) {
+		getTourDetail(tourId: $tourId) {
+			_id
+			tourTitle
+			tourLocation
+			tourDays
+			tourNights
+			tourPrice
+			tourImages
+			tourDesc
+			tourStatus
+			tourSoldCount
+			memberId
+		}
+	}
+`;
+
+/**************************
+ *       DISCOVERY        *
+ *************************/
+
+export const GET_FLIGHTS = gql`
+	query GetFlights($input: FlightsInquiry!) {
+		getFlights(input: $input) {
+			list {
+				_id
+				airline
+				flightNumber
+				departureAirport
+				arrivalAirport
+				basePrice
+				flightStatus
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_FLIGHT_DETAIL = gql`
+	query GetFlightDetail($flightId: ID!) {
+		getFlightDetail(flightId: $flightId) {
+			_id
+			airline
+			flightNumber
+			departureAirport
+			arrivalAirport
+			departureTime
+			arrivalTime
+			basePrice
+			flightStatus
+		}
+	}
+`;
+
+export const GET_HOTELS = gql`
+	query GetHotels($input: HotelsInquiry!) {
+		getHotels(input: $input) {
+			list {
+				_id
+				hotelName
+				hotelLocation
+				hotelPrice
+				hotelStars
+				hotelStatus
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_HOTEL_DETAIL = gql`
+	query GetHotelDetail($hotelId: ID!) {
+		getHotelDetail(hotelId: $hotelId) {
+			_id
+			hotelName
+			hotelLocation
+			hotelAddress
+			hotelPrice
+			hotelStars
+			hotelImages
+			hotelDesc
+			hotelStatus
+		}
+	}
+`;
+
+export const GET_RENTCARS = gql`
+	query GetRentcars($input: RentcarsInquiry!) {
+		getRentcars(input: $input) {
+			list {
+				_id
+				carTitle
+				carLocation
+				carCategory
+				transmission
+				seats
+				dailyPrice
+				rentcarStatus
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_RENTCAR_DETAIL = gql`
+	query GetRentcarDetail($rentcarId: ID!) {
+		getRentcarDetail(rentcarId: $rentcarId) {
+			_id
+			carTitle
+			carLocation
+			carCategory
+			transmission
+			seats
+			dailyPrice
+			carImages
+			carDesc
+			rentcarStatus
+		}
+	}
+`;
+
 /**************************
  *        BOOKING         *
  *************************/
