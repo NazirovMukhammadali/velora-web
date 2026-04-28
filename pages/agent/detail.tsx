@@ -2,24 +2,21 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { NextPage } from 'next';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
-import PropertyBigCard from '../../libs/components/common/PropertyBigCard';
 import ReviewCard from '../../libs/components/agent/ReviewCard';
 import { Box, Button, Pagination, Stack, Typography } from '@mui/material';
 import StarIcon from '@mui/icons-material/Star';
 import { useMutation, useQuery, useReactiveVar } from '@apollo/client';
 import { useRouter } from 'next/router';
-import { Property } from '../../libs/types/property/property';
 import { Member } from '../../libs/types/member/member';
 import { sweetErrorHandling, sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
 import { userVar } from '../../apollo/store';
-import { PropertiesInquiry } from '../../libs/types/property/property.input';
 import { CommentInput, CommentsInquiry } from '../../libs/types/comment/comment.input';
 import { Comment } from '../../libs/types/comment/comment';
 import { CommentGroup } from '../../libs/enums/comment.enum';
 import { Messages, REACT_APP_API_URL } from '../../libs/config';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { CREATE_COMMENT, LIKE_TARGET_PROPERTY } from '../../apollo/user/mutation';
-import { GET_COMMENTS, GET_MEMBER, GET_PROPERTIES } from '../../apollo/user/query';
+import { CREATE_COMMENT, CREATE_TOUR_BOOKING } from '../../apollo/user/mutation';
+import { GET_AGENT_TOURS, GET_COMMENTS, GET_MEMBER } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import { Message } from '../../libs/enums/common.enum';
 
@@ -36,9 +33,9 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 	const user = useReactiveVar(userVar);
 	const [agentId, setAgentId] = useState<string | null>(null);
 	const [agent, setAgent] = useState<Member | null>(null);
-	const [searchFilter, setSearchFilter] = useState<PropertiesInquiry>(initialInput);
-	const [agentProperties, setAgentProperties] = useState<Property[]>([]);
-	const [propertyTotal, setPropertyTotal] = useState<number>(0);
+	const [tourInquiry, setTourInquiry] = useState<any>(initialInput);
+	const [agentTours, setAgentTours] = useState<any[]>([]);
+	const [tourTotal, setTourTotal] = useState<number>(0);
 	const [commentInquiry, setCommentInquiry] = useState<CommentsInquiry>(initialComment);
 	const [agentComments, setAgentComments] = useState<Comment[]>([]);
 	const [commentTotal, setCommentTotal] = useState<number>(0);
@@ -50,14 +47,9 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 
 	/** APOLLO REQUESTS **/
 	const [createComment] = useMutation(CREATE_COMMENT);
-	const [likeTargetProperty] = useMutation(LIKE_TARGET_PROPERTY);
+	const [createTourBooking] = useMutation(CREATE_TOUR_BOOKING);
 
-	const {
-		loading: getAgentsLoading,
-		data: getAgentsData,
-		error: getAgentsError,
-		refetch: getAgentsRefetch,
-	} = useQuery(GET_MEMBER, {
+	const { refetch: getAgentsRefetch } = useQuery(GET_MEMBER, {
 		fetchPolicy: "network-only",
 		variables: { input: agentId },
 		skip: !agentId,
@@ -65,12 +57,6 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		onCompleted: (data: T) => {
 			console.log("data", data);
 			setAgent(data?.getMember);
-			setSearchFilter({
-				...searchFilter,
-				search: {
-					memberId: data?.getMember?._id,
-				},
-			});
 			setCommentInquiry({
 				...commentInquiry,
 				search: {
@@ -84,30 +70,21 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		},
 	});
 
-	const {
-		loading: getPropertiesLoading,
-		data: getPropertiesData,
-		error: getPropertiesError,
-		refetch: getPropertiesRefetch,
-	} = useQuery(GET_PROPERTIES, {
+	const { refetch: getToursRefetch } = useQuery(GET_AGENT_TOURS, {
 		fetchPolicy: "network-only",
 		variables: {
-			input: searchFilter,
+			agentId,
+			input: tourInquiry,
 		},
-		skip: !searchFilter.search.memberId,
+		skip: !agentId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setAgentProperties(data?.getProperties?.list);
-			setPropertyTotal(data?.getProperties?.metaCounter[0]?.total ?? 0);
+			setAgentTours(data?.getAgentTours?.list ?? []);
+			setTourTotal(data?.getAgentTours?.metaCounter[0]?.total ?? 0);
 		},
 	});
 
-	const {
-		loading: getComentsLoading,
-		data: getComentsData,
-		error: getComentsError,
-		refetch: getComentsRefetch,
-	} = useQuery(GET_COMMENTS, {
+	const { refetch: getComentsRefetch } = useQuery(GET_COMMENTS, {
 		fetchPolicy: "network-only",
 		variables: {
 			input: commentInquiry,
@@ -126,10 +103,10 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 	}, [router]);
 
 	useEffect(() => {
-		if (searchFilter.search.memberId) {
-			getPropertiesRefetch({ variables: { input: searchFilter } }).then();
+		if (agentId) {
+			getToursRefetch({ agentId, input: tourInquiry }).then();
 		}
-	}, [searchFilter]);
+	}, [agentId, tourInquiry]);
 	useEffect(() => {
 		if (commentInquiry.search.commentRefId) {
 			getComentsRefetch({ variables: { input: commentInquiry } }).then();
@@ -151,8 +128,8 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		event: ChangeEvent<unknown>,
 		value: number
 	) => {
-		searchFilter.page = value;
-		setSearchFilter({ ...searchFilter });
+		tourInquiry.page = value;
+		setTourInquiry({ ...tourInquiry });
 	};
 
 	const commentPaginationChangeHandler = async (
@@ -178,22 +155,14 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		}
 	};
 
-	const likePropertyHandler = async (user: T, id: string) => {
+	const createBookingHandler = async (tourId: string) => {
 		try {
-			if (!id) return;
 			if (!user._id) throw new Error(Messages.error2);
-
-			await likeTargetProperty({
-				variables: { input: id },
-			});
-			await getPropertiesRefetch({ variables: { input: id } });
-			await getPropertiesRefetch({
-				input: searchFilter,
-			});
-
+			await createTourBooking({ variables: { input: { tourId } } });
 			await sweetTopSmallSuccessAlert("success", 800);
+			await router.push('/bookings');
 		} catch (err: any) {
-			console.log("ERROR, likePropertyHandler:", err.message);
+			console.log("ERROR, createBookingHandler:", err.message);
 			sweetMixinErrorAlert(err.message).then();
 		}
 	};
@@ -219,34 +188,58 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 					</Stack>
 					<Stack className={'agent-home-list'}>
 						<Stack className={'card-wrap'}>
-							{agentProperties.map((property: Property) => {
+							{agentTours.map((tour: any) => {
 								return (
-									<div className={'wrap-main'} key={property?._id}>
-										<PropertyBigCard property={property} key={property?._id} likePropertyHandler={likePropertyHandler} />
+									<div className={'wrap-main'} key={tour?._id}>
+										<Stack
+											sx={{
+												border: '1px solid #e5e7eb',
+												borderRadius: '12px',
+												padding: '16px',
+												gap: '12px',
+												backgroundColor: '#fff',
+											}}
+										>
+											<img
+												src={tour?.tourImages?.[0] || '/img/property/bigImage.png'}
+												alt={tour?.tourTitle || 'Tour'}
+												style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }}
+											/>
+											<Typography variant="h6">{tour?.tourTitle}</Typography>
+											<Typography variant="body2">
+												{tour?.tourLocation} | {tour?.tourDays}D/{tour?.tourNights ?? 0}N
+											</Typography>
+											<Typography variant="body1" sx={{ fontWeight: 700 }}>
+												${tour?.tourPrice}
+											</Typography>
+											<Button variant="contained" onClick={() => createBookingHandler(tour?._id)}>
+												Book Tour
+											</Button>
+										</Stack>
 									</div>
 								);
 							})}
 						</Stack>
 						<Stack className={'pagination'}>
-							{propertyTotal ? (
+							{tourTotal ? (
 								<>
 									<Stack className="pagination-box">
 										<Pagination
-											page={searchFilter.page}
-											count={Math.ceil(propertyTotal / searchFilter.limit) || 1}
+											page={tourInquiry.page}
+											count={Math.ceil(tourTotal / tourInquiry.limit) || 1}
 											onChange={propertyPaginationChangeHandler}
 											shape="circular"
 											color="primary"
 										/>
 									</Stack>
 									<span>
-										Total {propertyTotal} propert{propertyTotal > 1 ? 'ies' : 'y'} available
+										Total {tourTotal} tour package{tourTotal > 1 ? 's' : ''} available
 									</span>
 								</>
 							) : (
 								<div className={'no-data'}>
 									<img src="/img/icons/icoAlert.svg" alt="" />
-									<p>No properties found!</p>
+									<p>No tour packages found!</p>
 								</div>
 							)}
 						</Stack>
@@ -321,10 +314,9 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 AgentDetail.defaultProps = {
 	initialInput: {
 		page: 1,
-		limit: 9,
-		search: {
-			memberId: '',
-		},
+		limit: 6,
+		sort: 'createdAt',
+		direction: 'DESC',
 	},
 	initialComment: {
 		page: 1,

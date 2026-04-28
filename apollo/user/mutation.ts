@@ -328,3 +328,24 @@ export const UNSUBSCRIBE = gql`
 		}
 	}
 `;
+
+/**************************
+ *        BOOKING         *
+ *************************/
+
+export const CREATE_TOUR_BOOKING = gql`
+	mutation CreateTourBooking($input: CreateTourBookingInput!) {
+		createTourBooking(input: $input) {
+			_id
+			bookingType
+			bookingStatus
+			bookingRefId
+			bookingTitle
+			bookingPrice
+			agentId
+			memberId
+			createdAt
+			updatedAt
+		}
+	}
+`;

@@ -145,6 +145,15 @@ const Top = () => {
 				<Link href={'/'}>
 					<div>{t('Home')}</div>
 				</Link>
+				<Link href={'/flights'}>
+					<div>Flights</div>
+				</Link>
+				<Link href={'/hotels'}>
+					<div>Hotels</div>
+				</Link>
+				<Link href={'/rentcar'}>
+					<div>Rentcar</div>
+				</Link>
 				<Link href={'/property'}>
 					<div>{t('Properties')}</div>
 				</Link>
@@ -153,6 +162,9 @@ const Top = () => {
 				</Link>
 				<Link href={'/community?articleCategory=FREE'}>
 					<div> {t('Community')} </div>
+				</Link>
+				<Link href={'/bookings'}>
+					<div>Bookings</div>
 				</Link>
 				<Link href={'/cs'}>
 					<div> {t('CS')} </div>
@@ -173,6 +185,15 @@ const Top = () => {
 							<Link href={'/'}>
 								<div>{t('Home')}</div>
 							</Link>
+							<Link href={'/flights'}>
+								<div>Flights</div>
+							</Link>
+							<Link href={'/hotels'}>
+								<div>Hotels</div>
+							</Link>
+							<Link href={'/rentcar'}>
+								<div>Rentcar</div>
+							</Link>
 							<Link href={'/property'}>
 								<div>{t('Properties')}</div>
 							</Link>
@@ -181,6 +202,9 @@ const Top = () => {
 							</Link>
 							<Link href={'/community?articleCategory=FREE'}>
 								<div> {t('Community')} </div>
+							</Link>
+							<Link href={'/bookings'}>
+								<div>Bookings</div>
 							</Link>
 							{user?._id && (
 								<Link href={'/mypage'}>

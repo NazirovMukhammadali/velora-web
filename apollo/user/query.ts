@@ -616,3 +616,56 @@ export const GET_MEMBER_FOLLOWINGS = gql`
 		}
 	}
 `;
+
+/**************************
+ *          TOUR          *
+ *************************/
+
+export const GET_AGENT_TOURS = gql`
+	query GetAgentTours($agentId: String!, $input: AgentToursInquiry!) {
+		getAgentTours(agentId: $agentId, input: $input) {
+			list {
+				_id
+				tourTitle
+				tourLocation
+				tourDays
+				tourNights
+				tourPrice
+				tourImages
+				tourDesc
+				tourLikes
+				tourViews
+				tourSoldCount
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
+ *        BOOKING         *
+ *************************/
+
+export const GET_MY_TOUR_BOOKINGS = gql`
+	query GetMyTourBookings($input: BookingInquiry!) {
+		getMyTourBookings(input: $input) {
+			list {
+				_id
+				bookingType
+				bookingStatus
+				bookingRefId
+				bookingTitle
+				bookingPrice
+				agentId
+				memberId
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
