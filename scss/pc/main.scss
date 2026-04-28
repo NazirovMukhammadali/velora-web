@@ -194,366 +194,142 @@ body::-webkit-scrollbar {
 	.header-main {
 		position: relative;
 		width: 100%;
-		height: 860px;
+		height: 640px;
 		background-image: url('/img/banner/header1.svg');
 		background-size: cover;
+		background-position: center;
 
 		.container {
 			position: relative;
-			margin-top: 20px;
+			margin-top: 28px;
 			flex-direction: column;
 			align-items: center;
 
-			.hero-showcase {
+			.compact-hero {
 				position: relative;
-				margin-top: 86px;
-				width: 1240px;
-				height: 430px;
-				border-radius: 24px;
-				overflow: hidden;
-				box-shadow: 0 16px 42px rgba(24, 26, 32, 0.26);
+				margin-top: 80px;
+				padding: 22px 26px 26px;
+				width: 1160px;
+				border-radius: 18px;
+				background: rgba(255, 255, 255, 0.88);
+				backdrop-filter: blur(4px);
+				box-shadow: 0 12px 28px rgba(24, 26, 32, 0.18);
 
-				.hero-background {
-					position: absolute;
-					inset: 0;
-					background-position: center;
-					background-size: cover;
-				}
+				.hero-header {
+					margin-bottom: 14px;
 
-				.hero-overlay {
-					position: absolute;
-					inset: 0;
-					background: linear-gradient(90deg, rgba(14, 19, 34, 0.78) 0%, rgba(14, 19, 34, 0.34) 48%, rgba(14, 19, 34, 0.18) 100%);
+					.brand {
+						font-family: $font;
+						font-size: 18px;
+						font-weight: 800;
+						letter-spacing: 0.18em;
+						color: $velora-primary-dark;
+					}
 				}
 
 				.hero-content {
-					position: relative;
-					z-index: 2;
-					padding: 84px 78px;
-					width: 620px;
-					gap: 10px;
-
-					.hero-kicker {
-						font-family: $font;
-						font-size: 14px;
-						font-weight: 500;
-						color: $velora-text-muted;
-						letter-spacing: 0.5px;
-						text-transform: uppercase;
-					}
+					gap: 16px;
 
 					.hero-title {
+						max-width: 620px;
+						color: $velora-text-main;
 						font-family: $font;
-						font-size: 54px;
+						font-size: 44px;
 						font-weight: 700;
-						line-height: 1.08;
-						color: #ffffff;
+						line-height: 1.14;
 					}
 
-					.hero-subtitle {
-						font-family: $font;
-						font-size: 16px;
-						font-weight: 400;
-						line-height: 1.45;
-						color: rgba(255, 255, 255, 0.92);
-					}
+					.hero-tabs {
+						flex-direction: row;
+						align-items: center;
+						gap: 10px;
 
-					.hero-price {
-						font-family: $font;
-						font-size: 18px;
-						font-weight: 500;
-						color: #ffffff;
+						.hero-tab {
+							padding: 10px 16px;
+							border-radius: 10px;
+							border: 1px solid #d6dcea;
+							background: $velora-surface;
+							color: $velora-text-main;
+							font-family: $font;
+							font-size: 14px;
+							font-weight: 600;
+							line-height: 1;
+							cursor: pointer;
 
-						strong {
-							font-size: 31px;
-							font-weight: 700;
+							&.active {
+								border-color: $velora-primary;
+								background: $velora-primary;
+								color: #fff;
+							}
 						}
 					}
 
-					.hero-cta {
-						margin-top: 10px;
-						width: 190px;
-						height: 50px;
-						border-radius: 12px;
-						text-transform: uppercase;
-						font-family: $font;
-						font-size: 13px;
-						font-weight: 700;
-						background: linear-gradient(90deg, $velora-primary 0%, $velora-primary-dark 100%);
-					}
-				}
+					.hero-search-form {
+						display: grid;
+						grid-template-columns: 1.35fr 1fr 1fr 0.85fr auto;
+						gap: 10px;
+						align-items: end;
 
-				.hero-controls {
-					position: absolute;
-					z-index: 2;
-					left: 34px;
-					right: 34px;
-					top: 50%;
-					transform: translateY(-50%);
-					flex-direction: row;
-					justify-content: space-between;
-					align-items: center;
+						.field-group {
+							display: flex;
+							flex-direction: column;
+							gap: 6px;
 
-					.hero-nav-btn {
-						width: 46px;
-						height: 46px;
-						background: rgba(255, 255, 255, 0.92);
-						color: $velora-text-main;
+							label {
+								font-family: $font;
+								font-size: 12px;
+								font-weight: 600;
+								color: #5f6575;
+							}
 
-						svg {
-							font-size: 16px;
+							input {
+								height: 46px;
+								padding: 0 12px;
+								border-radius: 10px;
+								border: 1px solid #d6dcea;
+								background: #fff;
+								color: $velora-text-main;
+								font-family: $font;
+								font-size: 14px;
+								outline: none;
+
+								&:focus {
+									border-color: $velora-primary;
+								}
+							}
+						}
+
+						.search-submit {
+							height: 46px;
+							padding: 0 18px;
+							border-radius: 10px;
+							border: none;
+							background: $velora-accent;
+							color: #fff;
+							font-family: $font;
+							font-size: 14px;
+							font-weight: 700;
+							cursor: pointer;
 						}
 					}
 				}
 			}
 
-			.search-box {
-				position: relative;
-				margin-top: 56px;
-				padding: 16px 29px;
-				width: 1094px;
-				height: 96px;
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-				background: rgba(255, 255, 255, 0.28);
-				border-radius: 12px;
+			.compact-hero.mobile {
+				width: calc(100vw - 28px);
+				padding: 16px;
 
-				.select-box {
-					width: 712px;
-					display: flex;
-					flex-direction: row;
-					justify-content: space-between;
-
-					.box {
-						padding: 24px 22px;
-						width: 213px;
-						height: 56px;
-						display: flex;
-						flex-direction: row;
-						align-items: center;
-						justify-content: space-between;
-						border-radius: 12px;
-						background: rgba(255, 255, 255, 0.575);
-						box-sizing: border-box;
-						cursor: pointer;
-
-						&.on {
-							background: #ffffff;
-							border: 1px solid #000;
-							color: #181a20;
-						}
-
-						span {
-							color: #181a20;
-							font-family: $font;
-							font-size: 14px;
-							font-style: normal;
-							font-weight: 400;
-							line-height: 26px;
-						}
-
-						svg {}
-					}
-				}
-
-				.search-box-other {
-					display: flex;
-					flex-direction: row;
-					align-items: center;
-
-					.advanced-filter {
-						display: flex;
-						flex-direction: row;
-						align-items: center;
-
-						img {
-							margin-right: 10px;
-							width: 25px;
-							height: 22px;
-							cursor: pointer;
-						}
-
-						span {
-							color: #fff;
-							font-family: $font;
-							font-size: 20px;
-							font-style: normal;
-							font-weight: 600;
-							line-height: normal;
-							cursor: pointer;
-						}
+				.hero-content {
+					.hero-title {
+						font-size: 28px;
 					}
 
-					.search-btn {
-						margin-left: 12px;
-						width: 62px;
-						height: 62px;
-						display: flex;
-						align-items: center;
-						justify-content: center;
-						border-radius: 55px;
-						background: #f17742;
-						cursor: pointer;
-
-						svg {
-							width: 20px;
-							height: 20px;
-							color: #ffffff;
-						}
-					}
-				}
-
-				.filter-location {
-					position: absolute;
-					padding: 40px 60px;
-					width: 1094px;
-					min-height: 120px;
-					height: auto;
-					top: 96px;
-					right: 0px;
-					display: flex;
-					flex-direction: row;
-					flex-wrap: wrap;
-					gap: 40px;
-					visibility: hidden;
-					border-radius: 12px;
-					background: #ffffff;
-					box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-					box-sizing: border-box;
-					z-index: 2;
-
-					&.on {
-						visibility: visible;
-						transition: 0.2s ease-out;
-						background: #fffdfd;
+					.hero-tabs {
+						flex-wrap: wrap;
 					}
 
-					div {
-						width: 295px;
-						display: flex;
-						flex-direction: row;
-						align-items: center;
-
-						img {
-							width: 122px;
-							height: 85px;
-							border-radius: 15px;
-							cursor: pointer;
-						}
-
-						span {
-							margin-left: 22px;
-							color: #181a20;
-							font-family: $font;
-							font-size: 20px;
-							font-style: normal;
-							font-weight: 400;
-							line-height: 26px;
-							cursor: pointer;
-							text-transform: capitalize;
-						}
-
-						label {
-							line-height: 13px;
-						}
-					}
-				}
-
-				.filter-type {
-					position: absolute;
-					padding: 50px;
-					width: 1094px;
-					min-height: 120px;
-					height: auto;
-					top: 96px;
-					right: 0px;
-					display: flex;
-					flex-direction: row;
-					justify-content: space-between;
-					visibility: hidden;
-					border-radius: 12px;
-					background: #fff;
-					box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-					box-sizing: border-box;
-					z-index: 1;
-
-					&.on {
-						visibility: visible;
-						transition: 0.2s ease-out;
-						background: #fffdfd;
-					}
-
-					div {
-						position: relative;
-						width: 272px;
-						height: 168px;
-						border-radius: 15px;
-						cursor: pointer;
-						background-size: cover;
-
-						span {
-							position: absolute;
-							top: 13px;
-							right: 12px;
-							padding: 1px 5px 5px 5px;
-							border-radius: 2px 2px 0px 0px;
-							font-family: $font;
-							font-size: 20px;
-							font-style: normal;
-							font-weight: 700;
-							line-height: 26px;
-							background: linear-gradient(180deg, #fff 0%, rgba(255, 255, 255, 0) 100%);
-							// -webkit-background-clip: text;
-							// -webkit-text-fill-color: transparent;
-							text-transform: capitalize;
-						}
-					}
-				}
-
-				.filter-rooms {
-					position: absolute;
-					padding: 10px 92px;
-					width: 1094px;
-					min-height: 120px;
-					height: auto;
-					top: 96px;
-					right: 0px;
-					display: flex;
-					flex-direction: row;
-					justify-content: space-between;
-					align-items: center;
-					visibility: hidden;
-					border-radius: 12px;
-					background: #fff;
-					box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-					box-sizing: border-box;
-					z-index: 1;
-
-					&.on {
-						visibility: visible;
-						transition: 0.2s ease-out;
-						background: #fffdfd;
-					}
-
-					span {
-						display: flex;
-						align-items: center;
-						padding: 10px 30px;
-						border: 1px solid #fffdfd;
-						color: #181a20;
-						font-family: $font;
-						font-size: 20px;
-						font-style: normal;
-						font-weight: 400;
-						line-height: 26px;
-						cursor: pointer;
-
-						&:hover {
-							border-radius: 5px;
-							border: 1px solid #b9b9b9;
-							box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
-						}
+					.hero-search-form {
+						grid-template-columns: 1fr;
 					}
 				}
 			}
