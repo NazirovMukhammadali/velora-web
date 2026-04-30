@@ -145,6 +145,9 @@ const Top = () => {
 				<Link href={'/'}>
 					<div>{t('Home')}</div>
 				</Link>
+				<Link href={'/tours'}>
+					<div>Tours</div>
+				</Link>
 				<Link href={'/flights'}>
 					<div>Flights</div>
 				</Link>
@@ -153,9 +156,6 @@ const Top = () => {
 				</Link>
 				<Link href={'/rentcar'}>
 					<div>Rentcar</div>
-				</Link>
-				<Link href={'/property'}>
-					<div>{t('Properties')}</div>
 				</Link>
 				<Link href={'/agent'}>
 					<div> {t('Agents')} </div>
@@ -185,6 +185,9 @@ const Top = () => {
 							<Link href={'/'}>
 								<div>{t('Home')}</div>
 							</Link>
+							<Link href={'/tours'}>
+								<div>Tours</div>
+							</Link>
 							<Link href={'/flights'}>
 								<div>Flights</div>
 							</Link>
@@ -193,9 +196,6 @@ const Top = () => {
 							</Link>
 							<Link href={'/rentcar'}>
 								<div>Rentcar</div>
-							</Link>
-							<Link href={'/property'}>
-								<div>{t('Properties')}</div>
 							</Link>
 							<Link href={'/agent'}>
 								<div> {t('Agents')} </div>

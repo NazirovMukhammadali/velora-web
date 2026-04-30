@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 
 type HeroSlide = {
 	id: string;
@@ -61,7 +62,9 @@ const HeroShowcase = () => {
 				<p className="hero-price">
 					Booking starts from <strong>{activeSlide.priceLabel}</strong>
 				</p>
-				<button className="hero-cta">Take a tour</button>
+				<Link href="/tours" className="hero-cta">
+					Take a tour
+				</Link>
 			</div>
 
 			<div className="hero-controls">
