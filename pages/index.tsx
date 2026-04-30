@@ -1,10 +1,10 @@
 import { NextPage } from 'next';
-import useDeviceDetect from '../libs/hooks/useDeviceDetect';
 import withLayoutMain from '../libs/components/layout/LayoutHome';
 import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import TourPackages from '../libs/components/homepage/TourPackages';
 import TravelExperts from '../libs/components/homepage/TravelExperts';
+import PopularDestinations from '../libs/components/homepage/PopularDestinations';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -12,24 +12,12 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
-const Home: NextPage = () => {
-	const device = useDeviceDetect();
-
-	if (device === 'mobile') {
-		return (
-			<Stack className={'home-page'}>
-				<TourPackages />
-				<TravelExperts />
-			</Stack>
-		);
-	} else {
-		return (
-			<Stack className={'home-page'}>
-				<TourPackages />
-				<TravelExperts />
-			</Stack>
-		);
-	}
-};
+const Home: NextPage = () => (
+	<Stack className={'home-page'}>
+		<TourPackages />
+		<TravelExperts />
+		<PopularDestinations />
+	</Stack>
+);
 
 export default withLayoutMain(Home);
