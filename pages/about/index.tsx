@@ -50,7 +50,10 @@ const About: NextPage = () => {
 				<Stack className={'statistics'}>
 					<Stack className={'container'}>
 						<Stack className={'banner'}>
-							<img src="/img/banner/header1.svg" alt="" />
+							<img
+								src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80"
+								alt=""
+							/>
 						</Stack>
 						<Stack className={'info'}>
 							<Box component={'div'}>
@@ -80,7 +83,11 @@ const About: NextPage = () => {
 					</Stack>
 				</Stack>
 				<Stack className={'options'}>
-					<img src="/img/banner/aboutBanner.svg" alt="" className={'about-banner'} />
+					<img
+						src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1600&q=80"
+						alt=""
+						className={'about-banner'}
+					/>
 					<Stack className={'container'}>
 						<strong>Let’s find the right selling option for you</strong>
 						<Stack>
@@ -118,13 +125,13 @@ const About: NextPage = () => {
 				</Stack>
 				<Stack className={'partners'}>
 					<Stack className={'container'}>
-						<span>Trusted bu the world's best</span>
-						<Stack className={'wrap'}>
-							<img src="/img/icons/brands/amazon.svg" alt="" />
-							<img src="/img/icons/brands/amd.svg" alt="" />
-							<img src="/img/icons/brands/cisco.svg" alt="" />
-							<img src="/img/icons/brands/dropcam.svg" alt="" />
-							<img src="/img/icons/brands/spotify.svg" alt="" />
+						<span>Trusted by leading travel brands</span>
+						<Stack className={'wrap partners-text'}>
+							<strong>Booking.com</strong>
+							<strong>Airbnb</strong>
+							<strong>Expedia</strong>
+							<strong>Trip.com</strong>
+							<strong>Agoda</strong>
 						</Stack>
 					</Stack>
 				</Stack>

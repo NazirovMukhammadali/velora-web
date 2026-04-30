@@ -10,30 +10,30 @@ interface EventData {
 }
 const eventsData: EventData[] = [
 	{
-		eventTitle: 'Paradise City Theme Park',
-		city: 'Incheon',
+		eventTitle: 'Carnival On The Canals',
+		city: 'Venice, Italy',
 		description:
-			'Experience magic and wonder in Incheon with a visit to the night-themed indoor theme park Wonderbox at Paradise City!',
-		imageSrc: '/img/events/INCHEON.webp',
+			'Catch the historical Carnival of Venice with masked balls, gondola parades and street performances along the iconic canals.',
+		imageSrc: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=1200&q=80',
 	},
 	{
-		eventTitle: 'Taebaeksan Snow Festival',
-		city: 'Seoul',
-		description: 'If you have the opportunity to travel to South Korea, do not miss the Taebaeksan Snow Festival!',
-		imageSrc: '/img/events/SEOUL.webp',
-	},
-	{
-		eventTitle: 'Suseong Lake Event',
-		city: 'Daegu',
-		description: 'The Suseong Lake Festival is a culture and arts festival held alongside Suseongmot Lake!',
-		imageSrc: '/img/events/DAEGU.webp',
-	},
-	{
-		eventTitle: 'Sand Festival',
-		city: 'Busan',
+		eventTitle: 'Cherry Blossom Festival',
+		city: 'Tokyo, Japan',
 		description:
-			'Haeundae Sand Festival, the nation’s largest eco-friendly exhibition on sand, is held at Haeundae Beach!',
-		imageSrc: '/img/events/BUSAN.webp',
+			'Walk under blooming sakura tunnels, enjoy hanami picnics and traditional matsuri food across central Tokyo parks.',
+		imageSrc: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=1200&q=80',
+	},
+	{
+		eventTitle: 'Northern Lights Nights',
+		city: 'Rovaniemi, Finland',
+		description: 'Chase the auroras above snowy fells and warm up in a glass igloo with private guides and reindeer rides.',
+		imageSrc: 'https://images.unsplash.com/photo-1551867633-194f125bddfa?auto=format&fit=crop&w=1200&q=80',
+	},
+	{
+		eventTitle: 'Bali Cultural Week',
+		city: 'Bali, Indonesia',
+		description: 'Sunrise temple ceremonies, beach yoga, traditional dance shows and chef-led food tours in Ubud and Seminyak.',
+		imageSrc: 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=1200&q=80',
 	},
 ];
 

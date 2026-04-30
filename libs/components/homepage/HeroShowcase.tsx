@@ -14,21 +14,21 @@ const slides: HeroSlide[] = [
 		title: 'Amalfi Coast Escape',
 		subtitle: 'Curated premium travel routes with flexible bookings',
 		priceLabel: '$329 / night',
-		image: '/img/banner/header1.svg',
+		image: 'https://images.unsplash.com/photo-1533165850316-2d4ff4f0a4d4?auto=format&fit=crop&w=1600&q=80',
 	},
 	{
 		id: 'alps',
 		title: 'Swiss Alps Journey',
 		subtitle: 'Mountain adventures and comfort stays in one flow',
 		priceLabel: '$289 / night',
-		image: '/img/banner/header2.svg',
+		image: 'https://images.unsplash.com/photo-1527668752968-14dc70a27c95?auto=format&fit=crop&w=1600&q=80',
 	},
 	{
 		id: 'santorini',
 		title: 'Santorini Summer',
 		subtitle: 'Romantic island views with trusted local guides',
 		priceLabel: '$349 / night',
-		image: '/img/banner/header3.svg',
+		image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=1600&q=80',
 	},
 ];
 

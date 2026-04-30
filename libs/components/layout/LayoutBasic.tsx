@@ -31,68 +31,68 @@ const withLayoutBasic = (Component: any) => {
 				case '/property':
 					title = 'Property Search';
 					desc = 'We are glad to see you again!';
-					bgImage = '/img/banner/properties.png';
+					bgImage = 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/flights':
 					title = 'Flights';
 					desc = 'Search and compare flight options';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/hotels':
 					title = 'Hotels';
 					desc = 'Browse hotel options for your trip';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/rentcar':
 					title = 'Rentcar';
 					desc = 'Find rental cars for your schedule';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = 'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/bookings':
 					title = 'My Bookings';
 					desc = 'Track your tour booking statuses';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/agent':
 					title = 'Agents';
-					desc = 'Home / For Rent';
-					bgImage = '/img/banner/agents.webp';
+					desc = 'Meet certified travel experts';
+					bgImage = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/agent/detail':
 					title = 'Agent Page';
-					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header2.svg';
+					desc = 'Travel expert profile';
+					bgImage = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/mypage':
 					title = 'my page';
-					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header1.svg';
+					desc = 'Your trips at a glance';
+					bgImage = 'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/community':
 					title = 'Community';
-					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header2.svg';
+					desc = 'Stories from fellow travelers';
+					bgImage = 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/community/detail':
 					title = 'Community Detail';
-					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header2.svg';
+					desc = 'Stories from fellow travelers';
+					bgImage = 'https://images.unsplash.com/photo-1522199755839-a2bacb67c546?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/cs':
 					title = 'CS';
 					desc = 'We are glad to see you again!';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/account/join':
 					title = 'Login/Signup';
 					desc = 'Authentication Process';
-					bgImage = '/img/banner/header2.svg';
+					bgImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
 					setAuthHeader(true);
 					break;
 				case '/member':
 					title = 'Member Page';
-					desc = 'Home / For Rent';
-					bgImage = '/img/banner/header1.svg';
+					desc = 'Member profile';
+					bgImage = 'https://images.unsplash.com/photo-1539635278303-d4002c07eae3?auto=format&fit=crop&w=1600&q=80';
 					break;
 				default:
 					break;

@@ -25,7 +25,7 @@ const PropertyCard = (props: PropertyCardType) => {
 	const user = useReactiveVar(userVar);
 	const imagePath: string = property?.propertyImages[0]
 		? `${REACT_APP_API_URL}/${property?.propertyImages[0]}`
-		: '/img/banner/header1.svg';
+		: 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=900&q=80';
 
 	if (device === 'mobile') {
 		return <div>PROPERTY CARD</div>;

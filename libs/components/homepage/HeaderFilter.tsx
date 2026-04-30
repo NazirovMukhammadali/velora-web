@@ -296,12 +296,12 @@ const HeaderFilter = () => {
 				</Stack>
 
 				<div className={'hero-gallery'} aria-hidden="true">
-					<img src="/img/banner/header1.svg" alt="" />
-					<img src="/img/banner/header2.svg" alt="" />
-					<img src="/img/banner/header3.svg" alt="" />
-					<img src="/img/banner/header3.svg" alt="" />
-					<img src="/img/banner/header2.svg" alt="" />
-					<img src="/img/banner/header1.svg" alt="" />
+					<img src="https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=600&q=80" alt="" />
+					<img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80" alt="" />
+					<img src="https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=600&q=80" alt="" />
+					<img src="https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80" alt="" />
+					<img src="https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=600&q=80" alt="" />
+					<img src="https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=600&q=80" alt="" />
 				</div>
 			</div>
 			</Stack>
