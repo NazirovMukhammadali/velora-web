@@ -1,195 +1,163 @@
 #pc-wrap {
-  .join-page {
-    position: relative;
-    padding: 90px 0px;
-    width: 100%;
-    height: auto;
-   .container {
-     align-items: center;
-     .main {
-       width: 1200px;
-       height: 900px;
-       display: flex;
-       flex-direction: row;
-       border-radius: 12px 0px 0px 12px;
-       background: #FFF;
-       box-shadow: 0px 1px 4px 0px rgba(24, 26, 32, 0.07);
-       .left {
-         width: 50%;
-         height: 100%;
-         display: flex;
-         flex-direction: column;
-         align-items: center;
-         justify-content: center;
-         .logo {
-           display: flex;
-           flex-direction: row;
-           align-items: center;
-           img {
-             width: 40px;
-             height: 40px;
-           }
-           span {
-             margin-left: 10px;
-             font-family: $font ;
-             font-size: 22px;
-             font-style: normal;
-             font-weight: 600;
-             line-height: normal;
-             letter-spacing: 0.44px;
-             color:#181A20;
-           }
-         }
-         .info {
-           margin-top: 30px;
-           display: flex;
-           flex-direction: column;
-           align-items: center;
-           span {
-             font-family: $font;
-             font-size: 20px;
-             font-style: normal;
-             font-weight: 600;
-             line-height: normal;
-             text-transform: uppercase;
-             color:  #181A20;
-           }
-           p {
-             margin-top: 5px;
-             font-family: $font;
-             font-size: 14px;
-             font-style: normal;
-             font-weight: 400;
-             line-height: 26px;
-             color: #181A20;
+	.join-page.velora-auth {
+		position: relative;
+		padding: 48px 20px 72px;
+		width: 100%;
+		min-height: calc(100vh - 200px);
+		display: flex;
+		justify-content: center;
+		align-items: flex-start;
+		background: $velora-background-soft;
 
-           }
-         }
-         .input-wrap {
-           margin-top: 45px;
-           width: 470px;
-           display: flex;
-           flex-direction: column;
+		.velora-auth-card {
+			width: 100%;
+			max-width: 460px;
+			padding: 40px 40px 44px;
+			background: #ffffff;
+			border-radius: 16px;
+			box-shadow: 0 12px 40px rgba(24, 26, 32, 0.08);
+		}
 
-          .input-box {
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            &:first-child {
-              margin-top: 0px;
-            }
-            span {
-              margin-bottom: 8px;
-              font-family: $font;
-              font-size: 14px;
-              font-style: normal;
-              font-weight: 600;
-              line-height: normal;
-              color:  #181A20;
-            }
-            input {
-              padding: 0px 15px;
-              width: 100%;
-              height: 55px;
-              border-radius: 8px;
-              border: 1px solid #DDD;
-              background:  #FFF;
-              font-family: $font;
-              font-size: 14px;
-              font-style: normal;
-              font-weight: 400;
-              line-height: 26px;
-              color: #717171;
-            }
-          }
-         }
-         .register {
-           margin-top: 45px;
-           width: 470px;
-           display: flex;
-           flex-direction: column;
-           align-items: center;
-           .type-option {
-             display: flex;
-             flex-direction: row;
-             align-items: center;
-             span.text {
-               font-family: $font;
-               font-size: 14px;
-               font-style: normal;
-               font-weight: 600;
-               line-height: normal;
-               color:  #181A20;
-             }
-             div {
-               margin-left: 20px;
-               display: flex;
-               flex-direction: row;
-               &:nth-child(1){
-                 margin-right: 25px;
-               }
-             }
-           }
-           .remember-info {
-             width: 100%;
-             display: flex;
-             flex-direction: row;
-             justify-content: space-between;
-             align-items: center;
-             a {
-               font-family: $font;
-               font-size: 14px;
-               font-style: normal;
-               font-weight: 400;
-               line-height: 26px;
-               cursor: pointer;
-               color:  #181A20;
-             }
-           }
-           button {
-             margin-top: 25px;
-             width: 100%;
-             height: 55px;
-             border-radius: 12px;
-             background:  #EB6753;
-             font-family: $font;
-             font-size: 15px;
-             font-style: normal;
-             font-weight: 600;
-             line-height: normal;
-             color:  #FFF;
-             img {
-               filter: brightness(0) invert(1);
-             }
-           }
-         }
-         .ask-info {
-           margin-top: 90px;
-           p {
-             font-family: $font;
-             font-size: 20px;
-             font-style: normal;
-             line-height: normal;
-             font-weight: 400;
-             color:  #181A20;
-             b {
-               margin-left: 10px;
-               font-weight: 600;
-               font-size: 32px;
-               cursor: pointer;
-               text-decoration: underline;
-             }
-           }
-         }
-       }
-       .right {
-         width: 50%;
-         height: 100%;
-         background-image: url("https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80");
-         background-size: cover;
-         background-position: center;
-       }
-     }
-   }
-  }
+		.velora-auth-title {
+			margin: 0;
+			font-family: $font;
+			font-size: 28px;
+			font-weight: 700;
+			color: $velora-text-main;
+			line-height: 1.2;
+			text-align: center;
+		}
+
+		.velora-auth-sub {
+			margin: 12px 0 0;
+			font-family: $font;
+			font-size: 14px;
+			font-weight: 400;
+			color: #5d6577;
+			line-height: 1.55;
+			text-align: center;
+		}
+
+		.velora-auth-fields {
+			margin-top: 28px;
+			display: flex;
+			flex-direction: column;
+			gap: 14px;
+		}
+
+		.velora-auth-input {
+			width: 100%;
+			height: 52px;
+			padding: 0 16px;
+			border: none;
+			border-radius: 10px;
+			background: #f0f2f7;
+			font-family: $font;
+			font-size: 14px;
+			color: $velora-text-main;
+			outline: none;
+			box-sizing: border-box;
+
+			&::placeholder {
+				color: #8b92a3;
+			}
+
+			&:focus {
+				box-shadow: 0 0 0 2px rgba($velora-primary, 0.35);
+				background: #ffffff;
+			}
+		}
+
+		.velora-auth-row {
+			margin-top: 18px;
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			justify-content: space-between;
+			gap: 12px;
+
+			.MuiFormControlLabel-root {
+				margin: 0;
+			}
+
+			.MuiFormControlLabel-label {
+				font-family: $font;
+				font-size: 13px;
+				color: #5d6577;
+			}
+		}
+
+		.velora-auth-inline-link {
+			font-family: $font;
+			font-size: 13px;
+			font-weight: 600;
+			color: $velora-primary;
+			text-decoration: underline;
+			text-underline-offset: 3px;
+		}
+
+		.velora-auth-type {
+			margin-top: 20px;
+
+			> span {
+				display: block;
+				margin-bottom: 8px;
+				font-family: $font;
+				font-size: 13px;
+				font-weight: 600;
+				color: #5d6577;
+			}
+
+			.velora-auth-radio {
+				gap: 8px;
+			}
+
+			.MuiFormControlLabel-label {
+				font-family: $font;
+				font-size: 13px;
+			}
+		}
+
+		.velora-auth-submit {
+			margin-top: 28px;
+			width: 100%;
+			height: 52px;
+			border: none;
+			border-radius: 10px;
+			background: $velora-primary;
+			color: #ffffff;
+			font-family: $font;
+			font-size: 15px;
+			font-weight: 700;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			cursor: pointer;
+			transition: background 0.2s ease, opacity 0.2s ease;
+
+			&:hover:not(:disabled) {
+				background: $velora-primary-dark;
+			}
+
+			&:disabled {
+				opacity: 0.45;
+				cursor: not-allowed;
+			}
+		}
+	}
+}
+
+#mobile-wrap {
+	.join-page.velora-auth {
+		padding: 24px 16px 48px;
+		min-height: auto;
+		background: $velora-background-soft;
+
+		.velora-auth-card {
+			padding: 28px 22px 32px;
+		}
+
+		.velora-auth-title {
+			font-size: 24px;
+		}
+	}
 }

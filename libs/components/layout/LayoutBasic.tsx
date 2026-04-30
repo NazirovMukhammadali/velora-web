@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Head from 'next/head';
@@ -7,8 +7,6 @@ import Footer from '../Footer';
 import { Stack } from '@mui/material';
 import { getJwtToken, updateUserInfo } from '../../auth';
 import Chat from '../Chat';
-import { useReactiveVar } from '@apollo/client';
-import { userVar } from '../../../apollo/store';
 import { useTranslation } from 'next-i18next';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -17,10 +15,10 @@ import 'swiper/css/navigation';
 const withLayoutBasic = (Component: any) => {
 	return (props: any) => {
 		const router = useRouter();
-		const { t, i18n } = useTranslation('common');
+		const { t } = useTranslation('common');
 		const device = useDeviceDetect();
-		const [authHeader, setAuthHeader] = useState<boolean>(false);
-		const user = useReactiveVar(userVar);
+
+		const hideHeroBanner = ['/account/join', '/login', '/register'].includes(router.pathname);
 
 		const memoizedValues = useMemo(() => {
 			let title = '',
@@ -84,10 +82,19 @@ const withLayoutBasic = (Component: any) => {
 					bgImage = 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/account/join':
-					title = 'Login/Signup';
-					desc = 'Authentication Process';
+					title = 'Sign in';
+					desc = 'Access your Velora account';
 					bgImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
-					setAuthHeader(true);
+					break;
+				case '/login':
+					title = 'Sign in';
+					desc = 'Access your Velora account';
+					bgImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
+					break;
+				case '/register':
+					title = 'Create account';
+					desc = 'Join Velora to plan and book smarter';
+					bgImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/member':
 					title = 'Member Page';
@@ -143,19 +150,21 @@ const withLayoutBasic = (Component: any) => {
 							<Top />
 						</Stack>
 
-						<Stack
-							className={`header-basic ${authHeader && 'auth'}`}
-							style={{
-								backgroundImage: `url(${memoizedValues.bgImage})`,
-								backgroundSize: 'cover',
-								boxShadow: 'inset 10px 40px 150px 40px rgb(24 22 36)',
-							}}
-						>
-							<Stack className={'container'}>
-								<strong>{t(memoizedValues.title)}</strong>
-								<span>{t(memoizedValues.desc)}</span>
+						{!hideHeroBanner && (
+							<Stack
+								className={'header-basic'}
+								style={{
+									backgroundImage: `url(${memoizedValues.bgImage})`,
+									backgroundSize: 'cover',
+									boxShadow: 'inset 10px 40px 150px 40px rgb(24 22 36)',
+								}}
+							>
+								<Stack className={'container'}>
+									<strong>{t(memoizedValues.title)}</strong>
+									<span>{t(memoizedValues.desc)}</span>
+								</Stack>
 							</Stack>
-						</Stack>
+						)}
 
 						<Stack id={'main'}>
 							<Component {...props} />
