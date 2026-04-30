@@ -1,12 +1,14 @@
 import React from 'react';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
-import { Stack, Box, Typography } from '@mui/material';
 import Link from 'next/link';
 import { REACT_APP_API_URL } from '../../config';
 import IconButton from '@mui/material/IconButton';
-import RemoveRedEyeIcon from '@mui/icons-material/RemoveRedEye';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import LinkedInIcon from '@mui/icons-material/LinkedIn';
+import LanguageIcon from '@mui/icons-material/Language';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
 
@@ -23,61 +25,73 @@ const AgentCard = (props: AgentCardProps) => {
 		? `${REACT_APP_API_URL}/${agent?.memberImage}`
 		: '/img/profile/defaultUser.svg';
 
+	const detailHref = {
+		pathname: '/agent/detail',
+		query: { agentId: agent?._id },
+	} as const;
+
+	const displayName = agent?.memberFullName ?? agent?.memberNick ?? 'Travel expert';
+
 	if (device === 'mobile') {
 		return <div>AGENT CARD</div>;
-	} else {
-		return (
-			<Stack className="agent-general-card">
-				<Link
-					href={{
-						pathname: '/agent/detail',
-						query: { agentId: agent?._id },
-					}}
+	}
+
+	return (
+		<article className="agent-guide-card">
+			<div className="agent-guide-photo-wrap">
+				<Link href={detailHref} className="agent-guide-photo-link">
+					<img src={imagePath} alt="" className="agent-guide-photo" />
+				</Link>
+				<div
+					className="agent-guide-social"
+					role="group"
+					aria-label="Social links"
+					onClick={(e) => e.stopPropagation()}
 				>
-					<Box
-						component={'div'}
-						className={'agent-img'}
-						style={{
-							backgroundImage: `url(${imagePath})`,
-							backgroundSize: 'cover',
-							backgroundPosition: 'center',
-							backgroundRepeat: 'no-repeat',
+					<a href="#" aria-label="Facebook" onClick={(e) => e.preventDefault()}>
+						<FacebookIcon sx={{ fontSize: 18 }} />
+					</a>
+					<a href="#" aria-label="Twitter" onClick={(e) => e.preventDefault()}>
+						<TwitterIcon sx={{ fontSize: 18 }} />
+					</a>
+					<a href="#" aria-label="LinkedIn" onClick={(e) => e.preventDefault()}>
+						<LinkedInIcon sx={{ fontSize: 18 }} />
+					</a>
+					<a href="#" aria-label="Website" onClick={(e) => e.preventDefault()}>
+						<LanguageIcon sx={{ fontSize: 18 }} />
+					</a>
+				</div>
+				<div className="agent-guide-like">
+					<IconButton
+						size="small"
+						aria-label="Like expert"
+						onClick={(e) => {
+							e.preventDefault();
+							e.stopPropagation();
+							likeMemberHandler(user, agent?._id);
+						}}
+						sx={{
+							color: agent?.meLiked?.[0]?.myFavorite ? '#ff6b2c' : '#424857',
+							background: 'rgba(255,255,255,0.92)',
+							'&:hover': { background: '#fff' },
 						}}
 					>
-						<div>{agent?.memberProperties} properties</div>
-					</Box>
-				</Link>
+						{agent?.meLiked?.[0]?.myFavorite ? (
+							<FavoriteIcon fontSize="small" color="inherit" />
+						) : (
+							<FavoriteBorderIcon fontSize="small" />
+						)}
+					</IconButton>
+				</div>
+			</div>
 
-				<Stack className={'agent-desc'}>
-					<Box component={'div'} className={'agent-info'}>
-						<Link
-							href={{
-								pathname: '/agent/detail',
-								query: { agentId: 'id' },
-							}}
-						>
-							<strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
-						</Link>
-						<span>Agent</span>
-					</Box>
-					<Box component={'div'} className={'buttons'}>
-						<IconButton color={'default'}>
-							<RemoveRedEyeIcon />
-						</IconButton>
-						<Typography className="view-cnt">{agent?.memberViews}</Typography>
-						<IconButton color={'default'} onClick={() => likeMemberHandler(user, agent?._id)}>
-							{agent?.meLiked && agent?.meLiked[0]?.myFavorite ? (
-								<FavoriteIcon color={'primary'} />
-							) : (
-								<FavoriteBorderIcon />
-							)}
-						</IconButton>
-						<Typography className="view-cnt">{agent?.memberLikes}</Typography>
-					</Box>
-				</Stack>
-			</Stack>
-		);
-	}
+			<div className="agent-guide-badge">Tourist guide</div>
+
+			<Link href={detailHref} className="agent-guide-name-link">
+				<strong className="agent-guide-name">{displayName}</strong>
+			</Link>
+		</article>
+	);
 };
 
 export default AgentCard;

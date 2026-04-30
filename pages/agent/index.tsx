@@ -5,6 +5,7 @@ import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { Stack, Box, Button, Pagination } from '@mui/material';
 import { Menu, MenuItem } from '@mui/material';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
 import AgentCard from '../../libs/components/common/AgentCard';
 import { useRouter } from 'next/router';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -129,9 +130,16 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 	if (device === 'mobile') {
 		return <h1>AGENTS PAGE MOBILE</h1>;
 	} else {
+		const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
 		return (
 			<Stack className={'agent-list-page'}>
 				<Stack className={'container'}>
+					<Stack className={'agent-experts-head'}>
+						<span className={'agent-experts-eyebrow'}>Meet with guide</span>
+						<h1 className={'agent-experts-title'}>Meet our travel experts</h1>
+					</Stack>
+
 					<Stack className={'filter'}>
 						<Box component={'div'} className={'left'}>
 							<input
@@ -172,7 +180,7 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 							</div>
 						</Box>
 					</Stack>
-					<Stack className={'card-wrap'}>
+					<Stack className={'card-wrap agent-experts-grid'}>
 						{agents?.length === 0 ? (
 							<div className={'no-data'}>
 								<img src="/img/icons/icoAlert.svg" alt="" />
@@ -205,6 +213,10 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 							</span>
 						)}
 					</Stack>
+
+					<button type="button" className="agent-back-top" onClick={scrollToTop} aria-label="Back to top">
+						<KeyboardArrowUpRoundedIcon fontSize="small" />
+					</button>
 				</Stack>
 			</Stack>
 		);
