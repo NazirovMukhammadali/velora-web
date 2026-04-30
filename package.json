@@ -4,9 +4,11 @@
 	"private": true,
 	"license": "ITC",
 	"scripts": {
-		"dev": "next dev",
+		"dev": "NEXT_TELEMETRY_DISABLED=1 next dev",
 		"build": "next build",
-		"start": "next start",
+		"start": "NEXT_TELEMETRY_DISABLED=1 next dev -p 3000",
+		"start:prod": "NEXT_TELEMETRY_DISABLED=1 next start -p 3000",
+		"prod": "NEXT_TELEMETRY_DISABLED=1 next build && NEXT_TELEMETRY_DISABLED=1 next start -p 3000",
 		"lint": "next lint",
 		"changelog": "standard-version --skip.tag"
 	},
@@ -72,7 +74,6 @@
 		"@types/three": "0.150.0",
 		"three": "0.150.1",
 		"valtio": "1.10.3",
-		"react-scripts": "4.0.3",
 		"numeral": "^2.0.6",
 		"react-scrollable-feed": "^1.3.2"
 	},
