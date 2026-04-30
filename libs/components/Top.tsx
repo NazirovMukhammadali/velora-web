@@ -243,7 +243,7 @@ const Top = () => {
 									</Menu>
 								</>
 							) : (
-								<Link href={'/account/join'}>
+								<Link href={'/login'}>
 									<div className={'join-box'}>
 										<AccountCircleOutlinedIcon />
 										<span>

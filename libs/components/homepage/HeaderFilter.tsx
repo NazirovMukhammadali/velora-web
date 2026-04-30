@@ -164,7 +164,7 @@ const HeaderFilter = () => {
 	};
 
 	const handleLogin = () => {
-		router.push('/account/join');
+		router.push('/login');
 	};
 
 	return (

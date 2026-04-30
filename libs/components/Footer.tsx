@@ -5,9 +5,19 @@ import TwitterIcon from '@mui/icons-material/Twitter';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import { Stack, Box } from '@mui/material';
 import moment from 'moment';
+import Link from 'next/link';
+
+const FooterBrand = () => (
+	<Link href={'/'} className={'footer-brand'} aria-label={'Velora home'}>
+		<span className={'footer-brand-mark'} aria-hidden />
+		<span className={'footer-brand-name'}>VELORA</span>
+	</Link>
+);
 
 const Footer = () => {
 	const device = useDeviceDetect();
+
+	const linkClass = 'footer-link';
 
 	if (device == 'mobile') {
 		return (
@@ -15,14 +25,15 @@ const Footer = () => {
 				<Stack className={'main'}>
 					<Stack className={'left'}>
 						<Box component={'div'} className={'footer-box'}>
-							<img src="/img/logo/logoWhite.svg" alt="" className={'logo'} />
+							<FooterBrand />
+							<p className={'footer-tagline'}>Compare flights, stays, and tours in one calm place.</p>
 						</Box>
 						<Box component={'div'} className={'footer-box'}>
-							<span>total free customer care</span>
+							<span>24/7 customer care</span>
 							<p>+82 10 4867 2909</p>
 						</Box>
 						<Box component={'div'} className={'footer-box'}>
-							<span>nee live</span>
+							<span>Need help live</span>
 							<p>+82 10 4867 2909</p>
 							<span>Support?</span>
 						</Box>
@@ -39,101 +50,164 @@ const Footer = () => {
 					<Stack className={'right'}>
 						<Box component={'div'} className={'bottom'}>
 							<div>
-								<strong>Popular Search</strong>
-								<span>Property for Rent</span>
-								<span>Property Low to hide</span>
+								<strong>Explore</strong>
+								<Link className={linkClass} href={'/tours'}>
+									Tour packages
+								</Link>
+								<Link className={linkClass} href={'/flights'}>
+									Flights
+								</Link>
+								<Link className={linkClass} href={'/hotels'}>
+									Hotels
+								</Link>
+								<Link className={linkClass} href={'/agent'}>
+									Travel experts
+								</Link>
 							</div>
 							<div>
-								<strong>Quick Links</strong>
-								<span>Terms of Use</span>
-								<span>Privacy Policy</span>
-								<span>Pricing Plans</span>
-								<span>Our Services</span>
-								<span>Contact Support</span>
-								<span>FAQs</span>
+								<strong>Quick links</strong>
+								<Link className={linkClass} href={'/about'}>
+									About Velora
+								</Link>
+								<Link className={linkClass} href={'/login'}>
+									Sign in
+								</Link>
+								<Link className={linkClass} href={'/register'}>
+									Create account
+								</Link>
+								<Link className={linkClass} href={'/cs'}>
+									Help &amp; contact
+								</Link>
 							</div>
 							<div>
-								<strong>Discover</strong>
-								<span>Seoul</span>
-								<span>Gyeongido</span>
-								<span>Busan</span>
-								<span>Jejudo</span>
+								<strong>Popular cities</strong>
+								<Link className={linkClass} href={'/tours'}>
+									Paris
+								</Link>
+								<Link className={linkClass} href={'/tours'}>
+									Tokyo
+								</Link>
+								<Link className={linkClass} href={'/tours'}>
+									Dubai
+								</Link>
+								<Link className={linkClass} href={'/tours'}>
+									New York
+								</Link>
 							</div>
 						</Box>
 					</Stack>
 				</Stack>
 				<Stack className={'second'}>
-					<span>© Velora - All rights reserved. Velora {moment().year()}</span>
-				</Stack>
-			</Stack>
-		);
-	} else {
-		return (
-			<Stack className={'footer-container'}>
-				<Stack className={'main'}>
-					<Stack className={'left'}>
-						<Box component={'div'} className={'footer-box'}>
-							<img src="/img/logo/logoWhite.svg" alt="" className={'logo'} />
-						</Box>
-						<Box component={'div'} className={'footer-box'}>
-							<span>total free customer care</span>
-							<p>+82 10 4867 2909</p>
-						</Box>
-						<Box component={'div'} className={'footer-box'}>
-							<span>nee live</span>
-							<p>+82 10 4867 2909</p>
-							<span>Support?</span>
-						</Box>
-						<Box component={'div'} className={'footer-box'}>
-							<p>follow us on social media</p>
-							<div className={'media-box'}>
-								<FacebookOutlinedIcon />
-								<TelegramIcon />
-								<InstagramIcon />
-								<TwitterIcon />
-							</div>
-						</Box>
-					</Stack>
-					<Stack className={'right'}>
-						<Box component={'div'} className={'top'}>
-							<strong>keep yourself up to date</strong>
-							<div>
-								<input type="text" placeholder={'Your Email'} />
-								<span>Subscribe</span>
-							</div>
-						</Box>
-						<Box component={'div'} className={'bottom'}>
-							<div>
-								<strong>Popular Search</strong>
-								<span>Property for Rent</span>
-								<span>Property Low to hide</span>
-							</div>
-							<div>
-								<strong>Quick Links</strong>
-								<span>Terms of Use</span>
-								<span>Privacy Policy</span>
-								<span>Pricing Plans</span>
-								<span>Our Services</span>
-								<span>Contact Support</span>
-								<span>FAQs</span>
-							</div>
-							<div>
-								<strong>Discover</strong>
-								<span>Seoul</span>
-								<span>Gyeongido</span>
-								<span>Busan</span>
-								<span>Jejudo</span>
-							</div>
-						</Box>
-					</Stack>
-				</Stack>
-				<Stack className={'second'}>
-					<span>© Velora - All rights reserved. Velora {moment().year()}</span>
-					<span>Privacy · Terms · Sitemap</span>
+					<span>© Velora · {moment().year()} · All rights reserved</span>
 				</Stack>
 			</Stack>
 		);
 	}
+
+	return (
+		<Stack className={'footer-container'}>
+			<Stack className={'main'}>
+				<Stack className={'left'}>
+					<Box component={'div'} className={'footer-box'}>
+						<FooterBrand />
+						<p className={'footer-tagline'}>Compare flights, stays, and tours in one calm place.</p>
+					</Box>
+					<Box component={'div'} className={'footer-box'}>
+						<span>24/7 customer care</span>
+						<p>+82 10 4867 2909</p>
+					</Box>
+					<Box component={'div'} className={'footer-box'}>
+						<span>Need help live</span>
+						<p>+82 10 4867 2909</p>
+						<span>Support?</span>
+					</Box>
+					<Box component={'div'} className={'footer-box'}>
+						<p>follow us on social media</p>
+						<div className={'media-box'}>
+							<FacebookOutlinedIcon />
+							<TelegramIcon />
+							<InstagramIcon />
+							<TwitterIcon />
+						</div>
+					</Box>
+				</Stack>
+				<Stack className={'right'}>
+					<Box component={'div'} className={'top'}>
+						<strong>Keep yourself up to date</strong>
+						<div>
+							<input type="email" placeholder={'Your email'} aria-label={'Newsletter email'} />
+							<span role={'button'} tabIndex={0}>
+								Subscribe
+							</span>
+						</div>
+					</Box>
+					<Box component={'div'} className={'bottom'}>
+						<div>
+							<strong>Explore</strong>
+							<Link className={linkClass} href={'/tours'}>
+								Tour packages
+							</Link>
+							<Link className={linkClass} href={'/flights'}>
+								Flights
+							</Link>
+							<Link className={linkClass} href={'/hotels'}>
+								Hotels
+							</Link>
+							<Link className={linkClass} href={'/agent'}>
+								Travel experts
+							</Link>
+						</div>
+						<div>
+							<strong>Quick links</strong>
+							<Link className={linkClass} href={'/about'}>
+								About Velora
+							</Link>
+							<Link className={linkClass} href={'/login'}>
+								Sign in
+							</Link>
+							<Link className={linkClass} href={'/register'}>
+								Create account
+							</Link>
+							<Link className={linkClass} href={'/cs'}>
+								Help &amp; contact
+							</Link>
+						</div>
+						<div>
+							<strong>Popular cities</strong>
+							<Link className={linkClass} href={'/tours'}>
+								Paris
+							</Link>
+							<Link className={linkClass} href={'/tours'}>
+								Tokyo
+							</Link>
+							<Link className={linkClass} href={'/tours'}>
+								Dubai
+							</Link>
+							<Link className={linkClass} href={'/tours'}>
+								New York
+							</Link>
+						</div>
+					</Box>
+				</Stack>
+			</Stack>
+			<Stack className={'second'}>
+				<span>© Velora · {moment().year()} · All rights reserved</span>
+				<span className={'footer-legal'}>
+					<Link href={'/about'} className={linkClass}>
+						Privacy
+					</Link>
+					·
+					<Link href={'/about'} className={linkClass}>
+						Terms
+					</Link>
+					·
+					<Link href={'/tours'} className={linkClass}>
+						Sitemap
+					</Link>
+				</span>
+			</Stack>
+		</Stack>
+	);
 };
 
 export default Footer;

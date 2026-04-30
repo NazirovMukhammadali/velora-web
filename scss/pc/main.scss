@@ -202,7 +202,7 @@ body::-webkit-scrollbar {
 		.container {
 			position: relative;
 			margin-top: 0;
-			padding: 0 28px 24px;
+			padding: 0 40px 32px;
 			width: 100%;
 			flex-direction: column;
 			align-items: center;
@@ -287,15 +287,15 @@ body::-webkit-scrollbar {
 
 			.velora-shell-topbar {
 				width: 100%;
-				height: 64px;
+				height: 76px;
 				display: flex;
 				flex-direction: row;
 				align-items: center;
-				gap: 14px;
+				gap: 18px;
 
 				.menu-button {
-					width: 28px;
-					height: 28px;
+					width: 36px;
+					height: 36px;
 					padding: 0;
 					display: flex;
 					flex-direction: column;
@@ -308,7 +308,7 @@ body::-webkit-scrollbar {
 					cursor: pointer;
 
 					span {
-						width: 18px;
+						width: 20px;
 						height: 2px;
 						background: #202532;
 						display: block;
@@ -317,7 +317,7 @@ body::-webkit-scrollbar {
 
 				.brand {
 					font-family: $font;
-					font-size: 16px;
+					font-size: 17px;
 					font-weight: 800;
 					letter-spacing: 0.22em;
 					color: $velora-primary-dark;
@@ -327,17 +327,17 @@ body::-webkit-scrollbar {
 					margin-left: auto;
 					display: flex;
 					align-items: center;
-					gap: 10px;
+					gap: 16px;
 
 					.hero-action-login {
-						height: 36px;
-						padding: 0 18px;
-						border-radius: 20px;
+						height: 40px;
+						padding: 0 22px;
+						border-radius: 22px;
 						border: 1px solid $velora-primary;
 						background: $velora-primary;
 						color: #ffffff;
 						font-family: $font;
-						font-size: 13px;
+						font-size: 14px;
 						font-weight: 700;
 						cursor: pointer;
 						transition: 0.18s ease;
@@ -349,14 +349,14 @@ body::-webkit-scrollbar {
 					}
 
 					.hero-action-icon {
-						min-width: 36px;
-						height: 36px;
-						padding: 0 10px;
+						min-width: 40px;
+						height: 40px;
+						padding: 0 12px;
 						display: inline-flex;
 						align-items: center;
 						justify-content: center;
-						gap: 6px;
-						border-radius: 18px;
+						gap: 8px;
+						border-radius: 20px;
 						border: 1px solid #d8dde9;
 						background: #ffffff;
 						color: #424857;
@@ -384,12 +384,12 @@ body::-webkit-scrollbar {
 
 			.compact-hero {
 				position: relative;
-				margin-top: 4px;
-				padding: 32px 36px 36px;
+				margin-top: 8px;
+				padding: 44px 48px 52px;
 				width: 100%;
 				max-width: 1600px;
-				min-height: 360px;
-				border-radius: 16px;
+				min-height: 400px;
+				border-radius: 20px;
 				background: #f4f6fa;
 				backdrop-filter: blur(4px);
 				box-shadow: none;
@@ -398,12 +398,12 @@ body::-webkit-scrollbar {
 				.hero-layout {
 					display: grid;
 					grid-template-columns: minmax(520px, 0.95fr) minmax(420px, 0.85fr);
-					gap: 32px;
+					gap: 48px;
 					align-items: start;
 				}
 
 				.hero-content {
-					gap: 18px;
+					gap: 26px;
 
 					.hero-title {
 						max-width: 650px;
@@ -411,18 +411,18 @@ body::-webkit-scrollbar {
 						font-family: $font;
 						font-size: 40px;
 						font-weight: 700;
-						line-height: 1.14;
+						line-height: 1.18;
 					}
 
 					.hero-tabs {
 						flex-direction: row;
 						align-items: center;
-						gap: 10px;
+						gap: 12px;
 
 						.hero-tab {
-							height: 38px;
-							padding: 0 16px;
-							border-radius: 9px;
+							height: 42px;
+							padding: 0 18px;
+							border-radius: 10px;
 							border: 1px solid #d6dcea;
 							background: $velora-surface;
 							color: $velora-text-main;
@@ -443,13 +443,13 @@ body::-webkit-scrollbar {
 					.hero-search-form {
 						display: grid;
 						grid-template-columns: 1.5fr 1fr 1fr 1fr auto;
-						gap: 10px;
+						gap: 14px;
 						align-items: end;
 
 						.field-group {
 							display: flex;
 							flex-direction: column;
-							gap: 8px;
+							gap: 10px;
 
 							label {
 								font-family: $font;
@@ -459,9 +459,9 @@ body::-webkit-scrollbar {
 							}
 
 							input {
-								height: 44px;
-								padding: 0 12px;
-								border-radius: 8px;
+								height: 48px;
+								padding: 0 14px;
+								border-radius: 12px;
 								border: 1px solid #d6dcea;
 								background: #fff;
 								color: $velora-text-main;
@@ -476,9 +476,9 @@ body::-webkit-scrollbar {
 						}
 
 						.search-submit {
-							height: 44px;
-							padding: 0 22px;
-							border-radius: 8px;
+							height: 48px;
+							padding: 0 24px;
+							border-radius: 12px;
 							border: none;
 							background: $velora-accent;
 							color: #fff;
@@ -493,12 +493,12 @@ body::-webkit-scrollbar {
 				.hero-gallery {
 					display: grid;
 					grid-template-columns: repeat(3, minmax(0, 1fr));
-					gap: 12px;
+					gap: 16px;
 
 					img {
 						width: 100%;
-						height: 116px;
-						border-radius: 14px;
+						height: 124px;
+						border-radius: 20px;
 						object-fit: cover;
 					}
 				}
@@ -510,7 +510,7 @@ body::-webkit-scrollbar {
 
 					.hero-gallery {
 						img {
-							height: 92px;
+							height: 100px;
 						}
 					}
 
@@ -885,6 +885,42 @@ body::-webkit-scrollbar {
 							cursor: pointer;
 						}
 
+						.footer-brand {
+							display: inline-flex;
+							align-items: center;
+							gap: 12px;
+							text-decoration: none;
+							cursor: pointer;
+						}
+
+						.footer-brand-mark {
+							flex-shrink: 0;
+							width: 40px;
+							height: 40px;
+							border-radius: 12px;
+							background: linear-gradient(135deg, #ff6b26 0%, #ff9f5a 100%);
+						}
+
+						.footer-brand-name {
+							color: #ffffff;
+							font-family: $font;
+							font-size: 20px;
+							font-weight: 800;
+							letter-spacing: 0.18em;
+							line-height: 1;
+						}
+
+						.footer-tagline {
+							margin: 14px 0 0;
+							max-width: 280px;
+							color: #9ea2ae;
+							font-family: $font;
+							font-size: 13px;
+							font-weight: 400;
+							line-height: 1.55;
+							text-transform: none;
+						}
+
 						span {
 							color: #bebdbd;
 							font-family: $font;
@@ -1008,6 +1044,21 @@ body::-webkit-scrollbar {
 									text-decoration-line: underline;
 								}
 							}
+
+							a.footer-link {
+								margin-top: 14px;
+								color: #bebdbd;
+								font-family: $font;
+								font-size: 14px;
+								font-weight: 400;
+								text-decoration: none;
+								cursor: pointer;
+
+								&:hover {
+									color: #ffffff;
+									text-decoration: underline;
+								}
+							}
 						}
 					}
 				}
@@ -1030,12 +1081,30 @@ body::-webkit-scrollbar {
 					font-weight: 400;
 					line-height: normal;
 				}
+
+				.footer-legal {
+					display: inline-flex;
+					flex-wrap: wrap;
+					align-items: center;
+					gap: 6px 10px;
+
+					a.footer-link {
+						margin-top: 0;
+						color: #bebdbd;
+						font-size: 14px;
+						text-decoration: none;
+
+						&:hover {
+							color: #ffffff;
+							text-decoration: underline;
+						}
+					}
+				}
 			}
 		}
 	}
-}
 
-.MuiPaper-root.MuiMenu-paper {
+	.MuiPaper-root.MuiMenu-paper {
 	padding: 8px;
 	box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 }
@@ -1277,6 +1346,7 @@ body::-webkit-scrollbar {
 			line-height: normal;
 		}
 	}
+}
 }
 
 .no-data {

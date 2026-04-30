@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 type TravelExpert = {
 	name: string;
@@ -77,9 +78,9 @@ const TravelExperts = () => {
 							<span className={'rating'}>★ {expert.rating}</span>
 							<span className={'tours'}>{expert.tours}</span>
 						</div>
-						<button type={'button'} className={'expert-cta'}>
+						<Link href={'/agent'} className={'expert-cta-link'}>
 							View Profile
-						</button>
+						</Link>
 					</article>
 				))}
 			</div>
