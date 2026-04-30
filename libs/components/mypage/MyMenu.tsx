@@ -5,8 +5,6 @@ import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Link from 'next/link';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
-import PortraitIcon from '@mui/icons-material/Portrait';
-import IconButton from '@mui/material/IconButton';
 import { REACT_APP_API_URL } from '../../config';
 import { logOut } from '../../auth';
 import { sweetConfirmAlert, sweetMixinErrorAlert } from '../../sweetAlert';
@@ -28,7 +26,11 @@ const MyMenu = () => {
 	};
 
 	if (device === 'mobile') {
-		return <div>MY MENU</div>;
+		return (
+			<Stack sx={{ p: 2 }} alignItems="center">
+				<Typography variant="body2">Velora — account menu (mobile)</Typography>
+			</Stack>
+		);
 	} else {
 		return (
 			<Stack width={'100%'} padding={'30px 24px'}>
@@ -55,103 +57,11 @@ const MyMenu = () => {
 					</Stack>
 				</Stack>
 				<Stack className={'sections'}>
-					<Stack className={'section'} style={{ height: user.memberType === 'AGENT' ? '228px' : '153px' }}>
+					<Stack className={'section'}>
 						<Typography className="title" variant={'h5'}>
-							MANAGE LISTINGS
+							Network
 						</Typography>
 						<List className={'sub-section'}>
-							{user.memberType === 'AGENT' && (
-								<>
-									<ListItem className={pathname === 'addProperty' ? 'focus' : ''}>
-										<Link
-											href={{
-												pathname: '/mypage',
-												query: { category: 'addProperty' },
-											}}
-											scroll={false}
-										>
-											<div className={'flex-box'}>
-												{category === 'addProperty' ? (
-													<img className={'com-icon'} src={'/img/icons/whiteTab.svg'} alt={'com-icon'} />
-												) : (
-													<img className={'com-icon'} src={'/img/icons/newTab.svg'} alt={'com_icon'} />
-												)}
-												<Typography className={'sub-title'} variant={'subtitle1'} component={'p'}>
-													Add Property
-												</Typography>
-												<IconButton aria-label="delete" sx={{ ml: '40px' }}>
-													<PortraitIcon style={{ color: 'red' }} />
-												</IconButton>
-											</div>
-										</Link>
-									</ListItem>
-									<ListItem className={pathname === 'myProperties' ? 'focus' : ''}>
-										<Link
-											href={{
-												pathname: '/mypage',
-												query: { category: 'myProperties' },
-											}}
-											scroll={false}
-										>
-											<div className={'flex-box'}>
-												{category === 'myProperties' ? (
-													<img className={'com-icon'} src={'/img/icons/homeWhite.svg'} alt={'com-icon'} />
-												) : (
-													<img className={'com-icon'} src={'/img/icons/home.svg'} alt={'com-icon'} />
-												)}
-												<Typography className={'sub-title'} variant={'subtitle1'} component={'p'}>
-													My Properties
-												</Typography>
-												<IconButton aria-label="delete" sx={{ ml: '36px' }}>
-													<PortraitIcon style={{ color: 'red' }} />
-												</IconButton>
-											</div>
-										</Link>
-									</ListItem>
-								</>
-							)}
-							<ListItem className={pathname === 'myFavorites' ? 'focus' : ''}>
-								<Link
-									href={{
-										pathname: '/mypage',
-										query: { category: 'myFavorites' },
-									}}
-									scroll={false}
-								>
-									<div className={'flex-box'}>
-										{category === 'myFavorites' ? (
-											<img className={'com-icon'} src={'/img/icons/likeWhite.svg'} alt={'com-icon'} />
-										) : (
-											<img className={'com-icon'} src={'/img/icons/like.svg'} alt={'com-icon'} />
-										)}
-
-										<Typography className={'sub-title'} variant={'subtitle1'} component={'p'}>
-											My Favorites
-										</Typography>
-									</div>
-								</Link>
-							</ListItem>
-							<ListItem className={pathname === 'recentlyVisited' ? 'focus' : ''}>
-								<Link
-									href={{
-										pathname: '/mypage',
-										query: { category: 'recentlyVisited' },
-									}}
-									scroll={false}
-								>
-									<div className={'flex-box'}>
-										{category === 'recentlyVisited' ? (
-											<img className={'com-icon'} src={'/img/icons/searchWhite.svg'} alt={'com-icon'} />
-										) : (
-											<img className={'com-icon'} src={'/img/icons/search.svg'} alt={'com-icon'} />
-										)}
-
-										<Typography className={'sub-title'} variant={'subtitle1'} component={'p'}>
-											Recently Visited
-										</Typography>
-									</div>
-								</Link>
-							</ListItem>
 							<ListItem className={pathname === 'followers' ? 'focus' : ''}>
 								<Link
 									href={{

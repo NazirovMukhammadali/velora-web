@@ -39,7 +39,11 @@ const MemberMenu = (props: MemberMenuProps) => {
 	});
 
 	if (device === "mobile") {
-		return <div>MEMBER MENU MOBILE</div>;
+		return (
+			<Stack sx={{ p: 2 }} alignItems="center">
+				<Typography variant="body2">Velora — member menu (mobile)</Typography>
+			</Stack>
+		);
 	} else {
 		return (
 			<Stack width={"100%"} padding={"30px 24px"}>
@@ -100,44 +104,6 @@ const MemberMenu = (props: MemberMenuProps) => {
 							Details
 						</Typography>
 						<List className={"sub-section"}>
-							{member?.memberType === "AGENT" && (
-								<ListItem className={category === "properties" ? "focus" : ""}>
-									<Link
-										href={{
-											pathname: "/member",
-											query: { ...router.query, category: "properties" },
-										}}
-										scroll={false}
-										style={{ width: "100%" }}
-									>
-										<div className={"flex-box"}>
-											{category === "properties" ? (
-												<img
-													className={"com-icon"}
-													src={"/img/icons/homeWhite.svg"}
-													alt={"com-icon"}
-												/>
-											) : (
-												<img
-													className={"com-icon"}
-													src={"/img/icons/home.svg"}
-													alt={"com-icon"}
-												/>
-											)}
-											<Typography
-												className={"sub-title"}
-												variant={"subtitle1"}
-												component={"p"}
-											>
-												Properties
-											</Typography>
-											<Typography className="count-title" variant="subtitle1">
-												{member?.memberProperties}
-											</Typography>
-										</div>
-									</Link>
-								</ListItem>
-							)}
 							<ListItem className={category === "followers" ? "focus" : ""}>
 								<Link
 									href={{

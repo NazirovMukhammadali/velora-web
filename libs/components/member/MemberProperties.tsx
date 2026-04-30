@@ -56,7 +56,11 @@ const MyProperties: NextPage = ({ initialInput, ...props }: any) => {
 	};
 
 	if (device === "mobile") {
-		return <div>NESTAR PROPERTIES MOBILE</div>;
+		return (
+			<Stack sx={{ p: 3 }} alignItems={'center'}>
+				<Typography>Velora — member listings (mobile layout coming soon)</Typography>
+			</Stack>
+		);
 	} else {
 		return (
 			<div id="member-properties-page">

@@ -61,7 +61,11 @@ const MyFavorites: NextPage = () => {
 	};
 
 	if (device === "mobile") {
-		return <div>NESTAR MY FAVORITES MOBILE</div>;
+		return (
+			<Stack sx={{ p: 3 }} alignItems={'center'}>
+				<Typography>Velora — my favorites (mobile layout coming soon)</Typography>
+			</Stack>
+		);
 	} else {
 		return (
 			<div id="my-favorites-page">

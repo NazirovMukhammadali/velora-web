@@ -26,10 +26,10 @@ const withLayoutBasic = (Component: any) => {
 				bgImage = '';
 
 			switch (router.pathname) {
-				case '/property':
-					title = 'Property Search';
-					desc = 'We are glad to see you again!';
-					bgImage = 'https://images.unsplash.com/photo-1564501049412-61c2a3083791?auto=format&fit=crop&w=1600&q=80';
+				case '/about':
+					title = 'About';
+					desc = 'Learn more about Velora';
+					bgImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/flights':
 					title = 'Flights';

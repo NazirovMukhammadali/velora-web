@@ -201,7 +201,7 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 											}}
 										>
 											<img
-												src={tour?.tourImages?.[0] || '/img/property/bigImage.png'}
+												src={tour?.tourImages?.[0] || 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=800&q=80'}
 												alt={tour?.tourTitle || 'Tour'}
 												style={{ width: '100%', height: '220px', objectFit: 'cover', borderRadius: '10px' }}
 											/>

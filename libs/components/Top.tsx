@@ -29,7 +29,6 @@ const Top = () => {
 	const [colorChange, setColorChange] = useState(false);
 	const [anchorEl, setAnchorEl] = React.useState<any | HTMLElement>(null);
 	let open = Boolean(anchorEl);
-	const [bgColor, setBgColor] = useState<boolean>(false);
 	const [logoutAnchor, setLogoutAnchor] = React.useState<null | HTMLElement>(null);
 	const logoutOpen = Boolean(logoutAnchor);
 
@@ -40,16 +39,6 @@ const Top = () => {
 			setLang('en');
 		} else {
 			setLang(localStorage.getItem('locale'));
-		}
-	}, [router]);
-
-	useEffect(() => {
-		switch (router.pathname) {
-			case '/property/detail':
-				setBgColor(true);
-				break;
-			default:
-				break;
 		}
 	}, [router]);
 
@@ -174,11 +163,12 @@ const Top = () => {
 	} else {
 		return (
 			<Stack className={'navbar'}>
-				<Stack className={`navbar-main ${colorChange ? 'transparent' : ''} ${bgColor ? 'transparent' : ''}`}>
+				<Stack className={`navbar-main ${colorChange ? 'transparent' : ''}`}>
 					<Stack className={'container'}>
 						<Box component={'div'} className={'logo-box'}>
-							<Link href={'/'}>
-								<img src="/img/logo/logoWhite.svg" alt="" />
+							<Link href={'/'} className={'top-nav-brand'} aria-label={'Velora home'}>
+								<span className={'top-nav-brand-mark'} aria-hidden />
+								<span className={'top-nav-brand-name'}>VELORA</span>
 							</Link>
 						</Box>
 						<Box component={'div'} className={'router-box'}>

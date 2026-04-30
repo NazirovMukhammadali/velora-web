@@ -1,13 +1,9 @@
 import React, { useEffect } from "react";
 import { useRouter } from "next/router";
 import { NextPage } from "next";
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import useDeviceDetect from "../../libs/hooks/useDeviceDetect";
 import withLayoutBasic from "../../libs/components/layout/LayoutBasic";
-import MyProperties from "../../libs/components/mypage/MyProperties";
-import MyFavorites from "../../libs/components/mypage/MyFavorites";
-import RecentlyVisited from "../../libs/components/mypage/RecentlyVisited";
-import AddProperty from "../../libs/components/mypage/AddNewProperty";
 import MyProfile from "../../libs/components/mypage/MyProfile";
 import MyArticles from "../../libs/components/mypage/MyArticles";
 import { useMutation, useReactiveVar } from "@apollo/client";
@@ -50,6 +46,13 @@ const MyPage: NextPage = () => {
 	useEffect(() => {
 		if (!user._id) router.push("/").then();
 	}, [user]);
+
+	const legacyCategories = ["addProperty", "myProperties", "myFavorites", "recentlyVisited"];
+	useEffect(() => {
+		if (legacyCategories.includes(String(category))) {
+			router.replace({ pathname: "/mypage", query: { category: "myProfile" } }, undefined, { shallow: true });
+		}
+	}, [category, router]);
 
 	/** HANDLERS **/
 	const subscribeHandler = async (id: string, refetch: any, query: any) => {
@@ -116,7 +119,11 @@ const MyPage: NextPage = () => {
 	};
 
 	if (device === "mobile") {
-		return <div>MY PAGE</div>;
+		return (
+			<Stack sx={{ p: 3 }} alignItems="center">
+				<Typography>Velora — my account (mobile view coming soon)</Typography>
+			</Stack>
+		);
 	} else {
 		return (
 			<div id="my-page" style={{ position: "relative" }}>
@@ -128,10 +135,6 @@ const MyPage: NextPage = () => {
 							</Stack>
 							<Stack className="main-config" mb={"76px"}>
 								<Stack className={"list-config"}>
-									{category === "addProperty" && <AddProperty />}
-									{category === "myProperties" && <MyProperties />}
-									{category === "myFavorites" && <MyFavorites />}
-									{category === "recentlyVisited" && <RecentlyVisited />}
 									{category === "myArticles" && <MyArticles />}
 									{category === "writeArticle" && <WriteArticle />}
 									{category === "myProfile" && <MyProfile />}

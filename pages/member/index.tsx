@@ -2,9 +2,8 @@ import React, { useEffect } from "react";
 import { NextPage } from "next";
 import useDeviceDetect from "../../libs/hooks/useDeviceDetect";
 import withLayoutBasic from "../../libs/components/layout/LayoutBasic";
-import { Stack } from "@mui/material";
+import { Stack, Typography } from "@mui/material";
 import MemberMenu from "../../libs/components/member/MemberMenu";
-import MemberProperties from "../../libs/components/member/MemberProperties";
 import { useRouter } from "next/router";
 import MemberFollowers from "../../libs/components/member/MemberFollowers";
 import MemberArticles from "../../libs/components/member/MemberArticles";
@@ -48,7 +47,21 @@ const MemberPage: NextPage = () => {
 			router.replace(
 				{
 					pathname: router.pathname,
-					query: { ...router.query, category: "properties" },
+					query: { ...router.query, category: "articles" },
+				},
+				undefined,
+				{ shallow: true }
+			);
+		}
+	}, [category, router]);
+
+	useEffect(() => {
+		if (!router.isReady) return;
+		if (category === "properties") {
+			void router.replace(
+				{
+					pathname: router.pathname,
+					query: { ...router.query, category: "articles" },
 				},
 				undefined,
 				{ shallow: true }
@@ -121,7 +134,11 @@ const MemberPage: NextPage = () => {
 	};
 
 	if (device === "mobile") {
-		return <>MEMBER PAGE MOBILE</>;
+		return (
+			<Stack sx={{ p: 3 }} alignItems="center">
+				<Typography>Velora — member profile (mobile view coming soon)</Typography>
+			</Stack>
+		);
 	} else {
 		return (
 			<div id="member-page" style={{ position: "relative" }}>
@@ -136,7 +153,6 @@ const MemberPage: NextPage = () => {
 							</Stack>
 							<Stack className="main-config" mb={"76px"}>
 								<Stack className={"list-config"}>
-									{category === "properties" && <MemberProperties />}
 									{category === "followers" && (
 										<MemberFollowers
 											subscribeHandler={subscribeHandler}

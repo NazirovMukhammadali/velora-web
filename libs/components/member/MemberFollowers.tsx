@@ -82,7 +82,11 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 	};
 
 	if (device === "mobile") {
-		return <div>NESTAR FOLLOWS MOBILE</div>;
+		return (
+			<Stack sx={{ p: 3 }} alignItems={'center'}>
+				<Typography>Velora — followers (mobile layout coming soon)</Typography>
+			</Stack>
+		);
 	} else {
 		return (
 			<div id="member-follows-page">

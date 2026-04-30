@@ -36,7 +36,11 @@ const RecentlyVisited: NextPage = () => {
 	};
 
 	if (device === "mobile") {
-		return <div>NESTAR MY FAVORITES MOBILE</div>;
+		return (
+			<Stack sx={{ p: 3 }} alignItems={'center'}>
+				<Typography>Velora — recently visited (mobile layout coming soon)</Typography>
+			</Stack>
+		);
 	} else {
 		return (
 			<div id="my-favorites-page">
