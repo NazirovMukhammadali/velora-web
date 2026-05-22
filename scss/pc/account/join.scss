@@ -1,21 +1,46 @@
-#pc-wrap {
+$velora-auth-bg-image: 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1920&q=80';
+
+#pc-wrap.pc-wrap--auth #main,
+#mobile-wrap.mobile-wrap--auth #main {
+	min-height: 100vh;
+	background: transparent;
+}
+
+#pc-wrap,
+#mobile-wrap {
 	.join-page.velora-auth {
 		position: relative;
-		padding: 48px 20px 72px;
+		padding: 32px 20px;
 		width: 100%;
-		min-height: calc(100vh - 200px);
+		min-height: 100vh;
 		display: flex;
 		justify-content: center;
-		align-items: flex-start;
-		background: $velora-background-soft;
+		align-items: center;
+		background-color: #1a1d28;
+		background-image:
+			linear-gradient(135deg, rgba(24, 26, 32, 0.82) 0%, rgba(91, 61, 245, 0.35) 55%, rgba(24, 26, 32, 0.88) 100%),
+			url($velora-auth-bg-image);
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+
+		&::before {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+			pointer-events: none;
+		}
 
 		.velora-auth-card {
+			position: relative;
+			z-index: 1;
 			width: 100%;
 			max-width: 460px;
 			padding: 40px 40px 44px;
 			background: #ffffff;
 			border-radius: 16px;
-			box-shadow: 0 12px 40px rgba(24, 26, 32, 0.08);
+			box-shadow: 0 20px 60px rgba(0, 0, 0, 0.28);
 		}
 
 		.velora-auth-title {
@@ -146,18 +171,14 @@
 	}
 }
 
-#mobile-wrap {
-	.join-page.velora-auth {
-		padding: 24px 16px 48px;
-		min-height: auto;
-		background: $velora-background-soft;
+#mobile-wrap .join-page.velora-auth {
+	padding: 24px 16px;
 
-		.velora-auth-card {
-			padding: 28px 22px 32px;
-		}
+	.velora-auth-card {
+		padding: 28px 22px 32px;
+	}
 
-		.velora-auth-title {
-			font-size: 24px;
-		}
+	.velora-auth-title {
+		font-size: 24px;
 	}
 }

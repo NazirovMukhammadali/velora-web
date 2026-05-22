@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Head from 'next/head';
-import Top from '../Top';
+import VeloraNavbar from './VeloraNavbar';
 import Footer from '../Footer';
 import { Stack } from '@mui/material';
 import { getJwtToken, updateUserInfo } from '../../auth';
@@ -36,7 +36,7 @@ const withLayoutFull = (Component: any) => {
 					</Head>
 					<Stack id="mobile-wrap">
 						<Stack id={'top'}>
-							<Top />
+							<VeloraNavbar contrast />
 						</Stack>
 
 						<Stack id={'main'}>
@@ -58,7 +58,7 @@ const withLayoutFull = (Component: any) => {
 					</Head>
 					<Stack id="pc-wrap">
 						<Stack id={'top'}>
-							<Top />
+							<VeloraNavbar contrast />
 						</Stack>
 
 						<Stack id={'main'}>

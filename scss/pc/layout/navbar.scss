@@ -1,0 +1,448 @@
+@import '/scss/variables.scss';
+
+$velora-nav-height: 80px;
+
+.velora-nav-drawer-overlay {
+	position: fixed;
+	inset: 0;
+	background: rgba(24, 26, 32, 0.45);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.2s ease, visibility 0.2s ease;
+	z-index: 220;
+
+	&.open {
+		opacity: 1;
+		visibility: visible;
+	}
+}
+
+.velora-nav-drawer {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: min(300px, 88vw);
+	height: 100vh;
+	padding: 24px 18px;
+	background: $velora-surface;
+	box-shadow: 12px 0 24px rgba(24, 26, 32, 0.12);
+	transform: translateX(-100%);
+	transition: transform 0.24s ease;
+	z-index: 221;
+	pointer-events: none;
+
+	&.open {
+		transform: translateX(0);
+		pointer-events: auto;
+	}
+
+	.velora-nav-drawer-head {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		margin-bottom: 20px;
+
+		span {
+			font-family: $font;
+			font-size: 13px;
+			font-weight: 700;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: #6b7588;
+		}
+	}
+
+	.velora-nav-drawer-close {
+		width: 36px;
+		height: 36px;
+		border: none;
+		border-radius: 8px;
+		background: $velora-background-soft;
+		font-size: 22px;
+		line-height: 1;
+		cursor: pointer;
+		color: $velora-text-main;
+	}
+
+	.velora-nav-drawer-links {
+		display: flex;
+		flex-direction: column;
+		gap: 6px;
+
+		a {
+			padding: 12px 14px;
+			border-radius: 10px;
+			font-family: $font;
+			font-size: 16px;
+			font-weight: 600;
+			color: $velora-text-main;
+			text-decoration: none;
+
+			&.active,
+			&:hover {
+				background: $velora-background-soft;
+				color: $velora-primary;
+			}
+		}
+	}
+}
+
+.velora-navbar {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: $velora-nav-height;
+	z-index: 200;
+	background: $velora-surface;
+	border-bottom: 1px solid rgba(24, 26, 32, 0.08);
+	transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+
+	.velora-navbar-shell {
+		position: relative;
+		height: 100%;
+		max-width: 1320px;
+		margin: 0 auto;
+		padding: 0 32px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.velora-navbar-left {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+		flex-shrink: 0;
+		z-index: 2;
+	}
+
+	.velora-navbar-menu-btn {
+		display: none;
+		width: 40px;
+		height: 40px;
+		padding: 0;
+		border: none;
+		border-radius: 8px;
+		background: transparent;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 5px;
+		cursor: pointer;
+
+		span {
+			display: block;
+			width: 20px;
+			height: 2px;
+			background: $velora-text-main;
+			border-radius: 1px;
+		}
+	}
+
+	.velora-navbar-brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		text-decoration: none;
+	}
+
+	.velora-navbar-brand-mark {
+		width: 38px;
+		height: 38px;
+		border-radius: 50%;
+		background: linear-gradient(135deg, $velora-accent 0%, #ff9f5a 100%);
+		flex-shrink: 0;
+	}
+
+	.velora-navbar-brand-name {
+		font-family: $font;
+		font-size: 18px;
+		font-weight: 800;
+		letter-spacing: 0.14em;
+		color: $velora-primary-dark;
+		line-height: 1;
+	}
+
+	.velora-navbar-center {
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 32px;
+		z-index: 1;
+	}
+
+	.velora-navbar-link {
+		font-family: $font;
+		font-size: 15px;
+		font-weight: 600;
+		color: $velora-text-main;
+		text-decoration: none;
+		padding: 8px 2px;
+		white-space: nowrap;
+		transition: color 0.15s ease, opacity 0.15s ease;
+
+		&:hover {
+			opacity: 0.85;
+		}
+
+		&.is-active {
+			color: $velora-primary;
+		}
+	}
+
+	.velora-navbar-right {
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 16px;
+		flex-shrink: 0;
+		z-index: 2;
+	}
+
+	.velora-navbar-join {
+		display: inline-flex;
+		align-items: center;
+		gap: 10px;
+		height: 46px;
+		padding: 0 22px 0 8px;
+		border-radius: 999px;
+		border: 1px solid $velora-primary;
+		background: transparent;
+		text-decoration: none;
+		transition: background 0.18s ease, border-color 0.18s ease;
+
+		.velora-navbar-join-icon {
+			width: 32px;
+			height: 32px;
+			border-radius: 50%;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			background: rgba(91, 61, 245, 0.12);
+			color: $velora-primary;
+
+			svg {
+				font-size: 20px;
+			}
+		}
+
+		.velora-navbar-join-text {
+			font-family: $font;
+			font-size: 14px;
+			font-weight: 600;
+			color: $velora-primary;
+			white-space: nowrap;
+		}
+
+		&:hover {
+			background: rgba(91, 61, 245, 0.08);
+		}
+	}
+
+	.velora-navbar-avatar {
+		padding: 0;
+		border: none;
+		background: transparent;
+		cursor: pointer;
+
+		img {
+			width: 42px;
+			height: 42px;
+			border-radius: 50%;
+			object-fit: cover;
+			border: 2px solid rgba(255, 255, 255, 0.35);
+		}
+	}
+
+	.velora-navbar-lang {
+		display: inline-flex;
+		align-items: center;
+		gap: 4px;
+		padding: 6px 4px;
+		border: none;
+		background: transparent;
+		cursor: pointer;
+
+		img {
+			border-radius: 2px;
+			display: block;
+		}
+
+		svg {
+			color: inherit;
+		}
+	}
+
+	.velora-navbar-lang img {
+		width: 24px;
+		height: 17px;
+		max-width: 24px;
+		object-fit: cover;
+	}
+
+	&.velora-navbar--overlay {
+		background: rgba(58, 62, 72, 0.55);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+		backdrop-filter: blur(6px);
+	}
+
+	&.velora-navbar--overlay,
+	&.velora-navbar--contrast {
+		.velora-navbar-brand-name {
+			color: #ffffff;
+		}
+
+		.velora-navbar-link {
+			color: #ffffff;
+			text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+
+			&:hover {
+				color: #ffffff;
+				opacity: 0.88;
+			}
+
+			&.is-active {
+				color: $velora-accent;
+				opacity: 1;
+				text-shadow: none;
+			}
+		}
+
+		.velora-navbar-menu-btn span {
+			background: #ffffff;
+		}
+
+		.velora-navbar-join {
+			border-color: rgba(255, 255, 255, 0.9);
+			background: transparent;
+
+			.velora-navbar-join-icon {
+				background: rgba(255, 255, 255, 0.14);
+				color: #ffffff;
+			}
+
+			.velora-navbar-join-text {
+				color: #ffffff;
+			}
+
+			&:hover {
+				background: rgba(255, 255, 255, 0.1);
+				border-color: #ffffff;
+			}
+		}
+
+		.velora-navbar-lang svg {
+			color: #ffffff;
+		}
+
+		&.velora-navbar--scrolled {
+			background: rgba(43, 48, 58, 0.94);
+			border-bottom-color: rgba(255, 255, 255, 0.12);
+			backdrop-filter: blur(12px);
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18);
+		}
+	}
+
+	&.velora-navbar--contrast {
+		background: rgba(58, 62, 72, 0.88);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+		backdrop-filter: blur(8px);
+	}
+}
+
+/* MUI Menu renders in portal — global styles required */
+.velora-lang-menu {
+	.MuiMenuItem-root {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-height: 44px;
+		font-family: $font;
+		font-size: 14px;
+		font-weight: 500;
+	}
+
+	.MuiMenuItem-root img,
+	.img-flag {
+		width: 24px !important;
+		height: 17px !important;
+		max-width: 24px !important;
+		flex-shrink: 0;
+		object-fit: cover;
+		border-radius: 2px;
+		margin-right: 0;
+	}
+}
+
+#pc-wrap #top,
+#mobile-wrap #top {
+	width: 100%;
+	flex-shrink: 0;
+	background: transparent;
+}
+
+#pc-wrap #top:has(.velora-navbar--contrast),
+#mobile-wrap #top:has(.velora-navbar--contrast) {
+	height: $velora-nav-height;
+}
+
+#pc-wrap #top:has(.velora-navbar--overlay),
+#mobile-wrap #top:has(.velora-navbar--overlay) {
+	height: 0;
+}
+
+#pc-wrap #top:has(.velora-navbar--contrast) ~ .header-basic .container {
+	margin-top: 175px;
+}
+
+@media (max-width: 980px) {
+	.velora-navbar {
+		height: 72px;
+
+		.velora-navbar-shell {
+			padding: 0 16px;
+		}
+
+		.velora-navbar-menu-btn {
+			display: flex;
+		}
+
+		.velora-navbar-center {
+			display: none;
+		}
+
+		.velora-navbar-join-text {
+			display: none;
+		}
+
+		.velora-navbar-join {
+			width: 46px;
+			height: 46px;
+			padding: 0;
+			justify-content: center;
+
+			.velora-navbar-join-icon {
+				width: 36px;
+				height: 36px;
+			}
+		}
+	}
+
+	#pc-wrap #top:has(.velora-navbar--contrast),
+	#mobile-wrap #top:has(.velora-navbar--contrast) {
+		height: 72px;
+	}
+}
+
+@media (max-width: 480px) {
+	.velora-navbar .velora-navbar-brand-name {
+		font-size: 15px;
+		letter-spacing: 0.1em;
+	}
+}

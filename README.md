@@ -1,38 +1,48 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Velora Web
 
-## Getting Started
+Travel booking frontend — flights, hotels, rent-a-car, tours, agents, and community.  
+Backend: Nestar GraphQL API (see `.env.example`).
 
-First, run the development server:
+## Quick start
 
 ```bash
-npm run dev
-# or
+yarn install
+cp .env.example .env   # adjust API URLs if needed
 yarn dev
-# or
-pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- **Development:** `yarn dev` (hot reload)
+- **Production build:** `yarn build` then `yarn start:prod`
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+Default API: `http://127.0.0.1:3007/graphql`
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## For AI agents / contributors
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+Read these before changing UI or layout:
 
-## Learn More
+- **[AGENTS.md](./AGENTS.md)** — workflow, design rules, file map, common mistakes
+- **[docs/DESIGN.md](./docs/DESIGN.md)** — full UI spec (Nestar + Kayak + Tourex mix)
 
-To learn more about Next.js, take a look at the following resources:
+### Workflow (required)
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. One phase = one focused change
+2. Tell the user: *"Bosqich tugadi. Commit qiling va keyingi bosqichga ruxsat bering"*
+3. Next phase only after user commits and approves
+4. Do not commit unless the user asks
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Project structure (high level)
 
-## Deploy on Vercel
+| Area | Path |
+|------|------|
+| Pages | `pages/` |
+| Components | `libs/components/` |
+| Layouts | `libs/components/layout/` (`LayoutHome`, `LayoutBasic`, `VeloraNavbar`) |
+| Home hero | `libs/components/homepage/HeaderFilter.tsx` |
+| Styles | `scss/pc/`, `scss/mobile/` |
+| GraphQL | `apollo/` |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Version
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+See [CHANGELOG.md](./CHANGELOG.md).

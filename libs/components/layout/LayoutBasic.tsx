@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { useRouter } from 'next/router';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Head from 'next/head';
-import Top from '../Top';
+import VeloraNavbar from './VeloraNavbar';
 import Footer from '../Footer';
 import { Stack } from '@mui/material';
 import { getJwtToken, updateUserInfo } from '../../auth';
@@ -18,7 +18,10 @@ const withLayoutBasic = (Component: any) => {
 		const { t } = useTranslation('common');
 		const device = useDeviceDetect();
 
-		const hideHeroBanner = ['/account/join', '/login', '/register'].includes(router.pathname);
+		const authPaths = ['/account/join', '/login', '/register'];
+		const hideHeroBanner = authPaths.includes(router.pathname);
+		const hideNavbar = hideHeroBanner;
+		const hideFooter = hideHeroBanner;
 
 		const memoizedValues = useMemo(() => {
 			let title = '',
@@ -123,18 +126,22 @@ const withLayoutBasic = (Component: any) => {
 						<title>Velora</title>
 						<meta name={'title'} content={`Velora`} />
 					</Head>
-					<Stack id="mobile-wrap">
-						<Stack id={'top'}>
-							<Top />
-						</Stack>
+					<Stack id="mobile-wrap" className={hideNavbar ? 'mobile-wrap--auth' : undefined}>
+						{!hideNavbar && (
+							<Stack id={'top'}>
+								<VeloraNavbar contrast />
+							</Stack>
+						)}
 
 						<Stack id={'main'}>
 							<Component {...props} />
 						</Stack>
 
-						<Stack id={'footer'}>
-							<Footer />
-						</Stack>
+						{!hideFooter && (
+							<Stack id={'footer'}>
+								<Footer />
+							</Stack>
+						)}
 					</Stack>
 				</>
 			);
@@ -145,10 +152,12 @@ const withLayoutBasic = (Component: any) => {
 						<title>Velora</title>
 						<meta name={'title'} content={`Velora`} />
 					</Head>
-					<Stack id="pc-wrap">
-						<Stack id={'top'}>
-							<Top />
-						</Stack>
+					<Stack id="pc-wrap" className={hideNavbar ? 'pc-wrap--auth' : undefined}>
+						{!hideNavbar && (
+							<Stack id={'top'}>
+								<VeloraNavbar contrast />
+							</Stack>
+						)}
 
 						{!hideHeroBanner && (
 							<Stack
@@ -170,11 +179,13 @@ const withLayoutBasic = (Component: any) => {
 							<Component {...props} />
 						</Stack>
 
-						<Chat />
+						{!hideNavbar && <Chat />}
 
-						<Stack id={'footer'}>
-							<Footer />
-						</Stack>
+						{!hideFooter && (
+							<Stack id={'footer'}>
+								<Footer />
+							</Stack>
+						)}
 					</Stack>
 				</>
 			);

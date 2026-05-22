@@ -1,0 +1,253 @@
+@import '/scss/variables.scss';
+
+#pc-wrap .header-main--immersive,
+#mobile-wrap .header-main--immersive {
+	position: relative;
+	width: 100%;
+	margin-top: 0;
+	padding: 0;
+	background: transparent;
+	overflow: visible;
+
+	.container {
+		padding: 0;
+		width: 100%;
+		max-width: none;
+		margin: 0;
+	}
+}
+
+.velora-hero {
+	position: relative;
+	width: 100%;
+	min-height: clamp(560px, 82vh, 760px);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	padding: calc(80px + 24px) 24px 100px;
+	box-sizing: border-box;
+}
+
+.velora-hero-backdrops {
+	position: absolute;
+	inset: 0;
+	z-index: 0;
+	overflow: hidden;
+}
+
+.velora-hero-backdrop {
+	position: absolute;
+	inset: 0;
+	background-size: cover;
+	background-position: center;
+	opacity: 0;
+	transition: opacity 1s ease;
+
+	&.is-active {
+		opacity: 1;
+	}
+}
+
+.velora-hero-scrim {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	background: linear-gradient(
+		180deg,
+		rgba(15, 17, 24, 0.4) 0%,
+		rgba(15, 17, 24, 0.15) 50%,
+		rgba(15, 17, 24, 0.35) 100%
+	);
+	pointer-events: none;
+}
+
+.velora-hero-bottom {
+	position: relative;
+	z-index: 2;
+	width: 100%;
+	max-width: 1180px;
+	margin: 0 auto;
+	padding-bottom: 0;
+	transform: translateY(50%);
+}
+
+.velora-hero-search-card {
+	background: $velora-surface;
+	border-radius: 16px;
+	box-shadow: 0 18px 48px rgba(24, 26, 32, 0.18);
+	padding: 0 20px 20px;
+}
+
+.velora-hero-search-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	border-bottom: 1px solid #e8ebf3;
+	padding-top: 8px;
+	margin: 0 -4px 16px;
+}
+
+.velora-hero-search-tab {
+	position: relative;
+	height: 48px;
+	padding: 0 22px;
+	border: none;
+	background: transparent;
+	color: #5d6577;
+	font-family: $font;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	transition: color 0.15s ease;
+
+	&:hover {
+		color: $velora-primary;
+	}
+
+	&.is-active {
+		color: $velora-primary;
+
+		&::after {
+			content: '';
+			position: absolute;
+			left: 12px;
+			right: 12px;
+			bottom: 0;
+			height: 3px;
+			border-radius: 3px 3px 0 0;
+			background: $velora-primary;
+		}
+	}
+}
+
+.velora-hero-search-form {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+	gap: 14px;
+	align-items: end;
+
+	.field-group {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+
+		label {
+			font-family: $font;
+			font-size: 11px;
+			font-weight: 600;
+			color: #5f6575;
+		}
+
+		input {
+			height: 48px;
+			padding: 0 14px;
+			border-radius: 10px;
+			border: 1px solid #d6dcea;
+			background: #fff;
+			color: $velora-text-main;
+			font-family: $font;
+			font-size: 13px;
+			outline: none;
+
+			&:focus {
+				border-color: $velora-primary;
+			}
+		}
+	}
+
+	.velora-hero-search-submit {
+		height: 48px;
+		padding: 0 28px;
+		border: none;
+		border-radius: 10px;
+		background: $velora-accent;
+		color: #fff;
+		font-family: $font;
+		font-size: 14px;
+		font-weight: 700;
+		cursor: pointer;
+		white-space: nowrap;
+		transition: background 0.18s ease;
+
+		&:hover {
+			background: #e85f24;
+		}
+	}
+}
+
+#pc-wrap .main-after-hero,
+#mobile-wrap .main-after-hero {
+	position: relative;
+	z-index: 3;
+}
+
+#pc-wrap .main-after-hero .home-page .tour-packages-section,
+#mobile-wrap .main-after-hero .home-page .tour-packages-section {
+	padding-top: calc(56px + 88px);
+	margin-top: 0;
+}
+
+@media (max-width: 980px) {
+	.velora-hero {
+		min-height: clamp(480px, 68vh, 620px);
+		padding: calc(72px + 20px) 16px 0;
+	}
+
+	.velora-hero-bottom {
+		transform: translateY(42%);
+	}
+
+	.velora-hero-search-form {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.velora-hero-search-submit {
+		grid-column: 1 / -1;
+		width: 100%;
+	}
+
+	#pc-wrap .main-after-hero .home-page .tour-packages-section,
+	#mobile-wrap .main-after-hero .home-page .tour-packages-section {
+		padding-top: calc(48px + 120px);
+	}
+}
+
+@media (max-width: 560px) {
+	.velora-hero {
+		min-height: 520px;
+	}
+
+	.velora-hero-bottom {
+		transform: translateY(38%);
+		padding: 0 4px;
+	}
+
+	.velora-hero-search-card {
+		padding: 0 14px 16px;
+	}
+
+	.velora-hero-search-tabs {
+		justify-content: space-between;
+	}
+
+	.velora-hero-search-tab {
+		flex: 1;
+		padding: 0 8px;
+		font-size: 13px;
+	}
+
+	.velora-hero-search-form {
+		grid-template-columns: 1fr;
+	}
+
+	#pc-wrap .main-after-hero .home-page .tour-packages-section,
+	#mobile-wrap .main-after-hero .home-page .tour-packages-section {
+		padding-top: calc(40px + 200px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.velora-hero-backdrop {
+		transition: none;
+	}
+}
