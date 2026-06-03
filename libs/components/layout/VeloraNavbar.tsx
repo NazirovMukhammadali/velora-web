@@ -189,7 +189,7 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 							<span />
 						</button>
 						<Link href="/" className="velora-navbar-brand" aria-label="Velora home">
-							<span className="velora-navbar-brand-mark" aria-hidden />
+							<img className="velora-navbar-brand-mark" src="/img/logo/velora-mark.svg" alt="" aria-hidden />
 							<span className="velora-navbar-brand-name">VELORA</span>
 						</Link>
 					</div>

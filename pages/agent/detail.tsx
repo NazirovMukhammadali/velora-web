@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { NextPage } from 'next';
 import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
@@ -19,6 +19,7 @@ import { CREATE_COMMENT, CREATE_TOUR_BOOKING } from '../../apollo/user/mutation'
 import { GET_AGENT_TOURS, GET_COMMENTS, GET_MEMBER } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import { Message } from '../../libs/enums/common.enum';
+import { getShowcaseAgentById, showcaseAgentToMember } from '../../libs/data/agents';
 
 
 export const getStaticProps = async ({ locale }: any) => ({
@@ -31,8 +32,8 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 	const device = useDeviceDetect();
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
-	const [agentId, setAgentId] = useState<string | null>(null);
-	const [agent, setAgent] = useState<Member | null>(null);
+	const agentId = typeof router.query.agentId === 'string' ? router.query.agentId : null;
+	const [apiAgent, setApiAgent] = useState<Member | null>(null);
 	const [tourInquiry, setTourInquiry] = useState<any>(initialInput);
 	const [agentTours, setAgentTours] = useState<any[]>([]);
 	const [tourTotal, setTourTotal] = useState<number>(0);
@@ -45,38 +46,65 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		commentRefId: '',
 	});
 
-	/** APOLLO REQUESTS **/
+	const showcaseAgent = useMemo(
+		() => (agentId ? getShowcaseAgentById(agentId) : undefined),
+		[agentId],
+	);
+
+	const showcaseMember = useMemo(
+		() => (showcaseAgent ? showcaseAgentToMember(showcaseAgent) : null),
+		[showcaseAgent],
+	);
+
+	const usingShowcase = Boolean(showcaseMember);
+	const agent = showcaseMember ?? apiAgent;
+
+	/** APOLLO REQUESTS — skipped for curated demo experts (no backend fetch) **/
 	const [createComment] = useMutation(CREATE_COMMENT);
 	const [createTourBooking] = useMutation(CREATE_TOUR_BOOKING);
 
-	const { refetch: getAgentsRefetch } = useQuery(GET_MEMBER, {
-		fetchPolicy: "network-only",
+	const { data: memberData, loading: memberLoading } = useQuery(GET_MEMBER, {
+		fetchPolicy: 'network-only',
+		errorPolicy: 'all',
 		variables: { input: agentId },
-		skip: !agentId,
+		skip: !agentId || usingShowcase,
 		notifyOnNetworkStatusChange: true,
-		onCompleted: (data: T) => {
-			console.log("data", data);
-			setAgent(data?.getMember);
-			setCommentInquiry({
-				...commentInquiry,
-				search: {
-					commentRefId: data?.getMember?._id,
-				},
-			});
-			setInsertCommentData({
-				...insertCommentData,
-				commentRefId: data?.getMember?._id,
-			});
-		},
 	});
 
-	const { refetch: getToursRefetch } = useQuery(GET_AGENT_TOURS, {
-		fetchPolicy: "network-only",
+	useEffect(() => {
+		if (!memberData?.getMember || usingShowcase) return;
+		const member = memberData.getMember as Member;
+		setApiAgent(member);
+		setCommentInquiry((prev) => ({
+			...prev,
+			search: { commentRefId: member._id },
+		}));
+		setInsertCommentData((prev) => ({
+			...prev,
+			commentRefId: member._id,
+		}));
+	}, [memberData, usingShowcase]);
+
+	useEffect(() => {
+		if (!showcaseMember) return;
+		setCommentInquiry((prev) => ({
+			...prev,
+			search: { commentRefId: showcaseMember._id },
+		}));
+		setInsertCommentData((prev) => ({
+			...prev,
+			commentRefId: showcaseMember._id,
+		}));
+	}, [showcaseMember]);
+
+	useQuery(GET_AGENT_TOURS, {
+		fetchPolicy: 'network-only',
+		errorPolicy: 'all',
 		variables: {
 			agentId,
 			input: tourInquiry,
 		},
-		skip: !agentId,
+		skip: !agentId || usingShowcase,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
 			setAgentTours(data?.getAgentTours?.list ?? []);
@@ -84,34 +112,19 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		},
 	});
 
-	const { refetch: getComentsRefetch } = useQuery(GET_COMMENTS, {
-		fetchPolicy: "network-only",
+	const { refetch: refetchComments } = useQuery(GET_COMMENTS, {
+		fetchPolicy: 'network-only',
+		errorPolicy: 'all',
 		variables: {
 			input: commentInquiry,
 		},
-		skip: !commentInquiry.search.commentRefId,
+		skip: usingShowcase || !commentInquiry.search.commentRefId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
 			setAgentComments(data?.getComments?.list);
 			setCommentTotal(data?.getComments?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
-
-	/** LIFECYCLES **/
-	useEffect(() => {
-		if (router.query.agentId) setAgentId(router.query.agentId as string);
-	}, [router]);
-
-	useEffect(() => {
-		if (agentId) {
-			getToursRefetch({ agentId, input: tourInquiry }).then();
-		}
-	}, [agentId, tourInquiry]);
-	useEffect(() => {
-		if (commentInquiry.search.commentRefId) {
-			getComentsRefetch({ variables: { input: commentInquiry } }).then();
-		}
-	}, [commentInquiry]);
 
 	/** HANDLERS **/
 	const redirectToMemberPageHandler = async (memberId: string) => {
@@ -142,14 +155,12 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 
 	const createCommentHandler = async () => {
 		try {
+			if (usingShowcase) throw new Error('Reviews are available when the Nestar backend is connected.');
 			if (!user._id) throw new Error(Message.NOT_AUTHENTICATED);
-			if (user._id === agentId)
-				throw new Error("Cannot write a review for yourself");
+			if (user._id === agentId) throw new Error('Cannot write a review for yourself');
 			await createComment({ variables: { input: insertCommentData } });
-
-			setInsertCommentData({ ...insertCommentData, commentContent: "" });
-
-			await getComentsRefetch({ input: commentInquiry });
+			setInsertCommentData({ ...insertCommentData, commentContent: '' });
+			await refetchComments();
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		}
@@ -169,15 +180,47 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 
 	if (device === 'mobile') {
 		return <div>AGENT DETAIL PAGE MOBILE</div>;
-	} else {
+	}
+
+	const agentImage = usingShowcase
+		? agent?.memberImage || '/img/profile/defaultUser.svg'
+		: agent?.memberImage
+			? `${REACT_APP_API_URL}/${agent.memberImage}`
+			: '/img/profile/defaultUser.svg';
+
+	if ((!router.isReady || (memberLoading && !usingShowcase)) && !agent) {
 		return (
 			<Stack className={'agent-detail-page'}>
 				<Stack className={'container'}>
+					<p style={{ padding: '48px 0', textAlign: 'center', color: '#6b7280' }}>Loading expert…</p>
+				</Stack>
+			</Stack>
+		);
+	}
+
+	if (!agent) {
+		return (
+			<Stack className={'agent-detail-page'}>
+				<Stack className={'container'}>
+					<div className={'no-data'}>
+						<img src="/img/icons/icoAlert.svg" alt="" />
+						<p>Expert not found.</p>
+					</div>
+				</Stack>
+			</Stack>
+		);
+	}
+
+	return (
+			<Stack className={'agent-detail-page'}>
+				<Stack className={'container'}>
+					{usingShowcase && (
+						<p className={'agent-demo-note'} style={{ marginBottom: 20 }}>
+							Demo expert profile — connect Nestar backend for live agent data and tours.
+						</p>
+					)}
 					<Stack className={'agent-info'}>
-						<img
-							src={agent?.memberImage ? `${REACT_APP_API_URL}/${agent?.memberImage}` : '/img/profile/defaultUser.svg'}
-							alt=""
-						/>
+						<img src={agentImage} alt={agent.memberFullName ?? agent.memberNick ?? 'Agent'} />
 						<Box component={'div'} className={'info'} onClick={() => redirectToMemberPageHandler(agent?._id as string)}>
 							<strong>{agent?.memberFullName ?? agent?.memberNick}</strong>
 							<div>
@@ -307,8 +350,7 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 					</Stack>
 				</Stack>
 			</Stack>
-		);
-	}
+	);
 };
 
 AgentDetail.defaultProps = {

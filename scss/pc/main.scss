@@ -7,6 +7,8 @@
 @import '/scss/pc/homepage/homepage';
 
 @import '/scss/pc/tours/tours';
+@import '/scss/pc/packages/cards.scss';
+@import '/scss/pc/packages/detail.scss';
 
 @import '/scss/pc/property/property';
 @import '/scss/pc/property/detail.scss';
@@ -511,7 +513,9 @@ body::-webkit-scrollbar {
 		height: auto;
 		display: flex;
 		flex-direction: row;
-		background: #181a20;
+		background: $velora-text-main;
+		border-top: 3px solid transparent;
+		border-image: linear-gradient(90deg, $velora-accent 0%, $velora-primary 100%) 1;
 
 		.footer-container {
 			width: 1300px;
@@ -551,8 +555,8 @@ body::-webkit-scrollbar {
 							flex-shrink: 0;
 							width: 40px;
 							height: 40px;
-							border-radius: 12px;
-							background: linear-gradient(135deg, #ff6b26 0%, #ff9f5a 100%);
+							display: block;
+							object-fit: contain;
 						}
 
 						.footer-brand-name {
@@ -602,6 +606,11 @@ body::-webkit-scrollbar {
 								font-size: 32px;
 								margin-right: 22px;
 								cursor: pointer;
+								transition: color 0.2s ease;
+
+								&:hover {
+									color: $velora-accent;
+								}
 							}
 						}
 					}
@@ -652,6 +661,9 @@ body::-webkit-scrollbar {
 							}
 
 							span {
+								padding: 10px 22px;
+								border-radius: 10px;
+								background: $velora-accent;
 								color: #fff;
 								font-family: $font;
 								font-size: 15px;
@@ -659,6 +671,11 @@ body::-webkit-scrollbar {
 								font-weight: 600;
 								line-height: normal;
 								cursor: pointer;
+								transition: background 0.2s ease;
+
+								&:hover {
+									background: darken($velora-accent, 8%);
+								}
 							}
 						}
 					}
@@ -694,7 +711,7 @@ body::-webkit-scrollbar {
 								cursor: pointer;
 
 								&:hover {
-									color: #ffffff;
+									color: $velora-accent;
 									text-decoration-line: underline;
 								}
 							}
@@ -709,7 +726,7 @@ body::-webkit-scrollbar {
 								cursor: pointer;
 
 								&:hover {
-									color: #ffffff;
+									color: $velora-accent;
 									text-decoration: underline;
 								}
 							}
@@ -749,7 +766,7 @@ body::-webkit-scrollbar {
 						text-decoration: none;
 
 						&:hover {
-							color: #ffffff;
+							color: $velora-accent;
 							text-decoration: underline;
 						}
 					}

@@ -1,0 +1,501 @@
+import type { PackageExtra, PackagePlanDay, PackageType, VeloraPackage } from '../types/package';
+
+type PackageSeed = Omit<
+	VeloraPackage,
+	'gallery' | 'about' | 'highlights' | 'included' | 'excluded' | 'plan' | 'locationNote' | 'mapQuery' | 'durationLabel' | 'experienceType' | 'groupSize' | 'languages' | 'extras' | 'timeSlots' | 'youthPrice' | 'childPrice'
+> & {
+	planDays?: number;
+	mapCity?: string;
+};
+
+const DEFAULT_EXTRAS: PackageExtra[] = [
+	{ id: 'pickup', label: 'Airport pickup', price: 35 },
+	{ id: 'insurance', label: 'Travel insurance', price: 25, perPerson: true },
+	{ id: 'guide', label: 'Private guide upgrade', price: 45, perPerson: true },
+];
+
+const buildPlan = (days: number, location: string): PackagePlanDay[] => {
+	const items: PackagePlanDay[] = [];
+	for (let i = 1; i <= Math.min(days, 4); i += 1) {
+		items.push({
+			day: `Day-${String(i).padStart(2, '0')}`,
+			title: i === 1 ? `Arrival & welcome in ${location}` : `Explore ${location} · Day ${i}`,
+			body:
+				i === 1
+					? 'Meet your host, check in, and enjoy a relaxed orientation walk with local tips for food and transport.'
+					: 'Guided highlights, free time for photos, and optional add-ons you can book from the sidebar.',
+		});
+	}
+	return items;
+};
+
+const enrich = (seed: PackageSeed): VeloraPackage => {
+	const days = seed.planDays ?? 3;
+	const city = seed.mapCity ?? seed.location.split(',')[0]?.trim() ?? seed.location;
+	const typeCopy =
+		seed.type === 'tours'
+			? { unit: 'experience', verb: 'tour', group: '25 People' }
+			: seed.type === 'hotels'
+				? { unit: 'stay', verb: 'stay', group: '2–6 Guests' }
+				: { unit: 'rental', verb: 'rental', group: '5 Seats' };
+
+	return {
+		...seed,
+		gallery: [
+			seed.image,
+			'https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=1200&q=80',
+			'https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=1200&q=80',
+			'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?auto=format&fit=crop&w=1200&q=80',
+		],
+		about: `Discover ${seed.title} with Velora. This ${typeCopy.unit} is curated for travelers who want comfort, clear pricing, and flexible add-ons. ${seed.subtitle} · ${seed.location}.`,
+		highlights: [
+			`Top-rated ${typeCopy.verb} in ${city}`,
+			'Flexible date and time selection',
+			'Transparent pricing with optional extras',
+			'24/7 Velora support before and during your trip',
+		],
+		included: [
+			'Digital confirmation & itinerary',
+			'Local support contact',
+			seed.type === 'tours' ? 'Professional guide (where applicable)' : 'Standard package inclusions',
+			'Best-price guarantee on Velora',
+		],
+		excluded: [
+			'Personal expenses & meals (unless stated)',
+			'Travel insurance (optional add-on)',
+			'Visa fees and international flights',
+			'Gratuities',
+		],
+		plan: buildPlan(days, city),
+		locationNote: `${seed.title} is based in ${seed.location}. Use the map below for directions and nearby points of interest.`,
+		mapQuery: encodeURIComponent(`${city} city center`),
+		durationLabel:
+			seed.type === 'cars'
+				? 'Per day'
+				: seed.type === 'hotels'
+					? seed.subtitle
+					: `${days} ${days === 1 ? 'Day' : 'Days'}`,
+		experienceType:
+			seed.type === 'hotels' ? 'Boutique Stay' : seed.type === 'cars' ? 'Car Rental' : seed.category ?? 'Adventure',
+		groupSize: typeCopy.group,
+		languages: 'English',
+		extras: DEFAULT_EXTRAS,
+		timeSlots: ['09:00', '12:00', '15:00', '19:00'],
+		youthPrice: Math.round(seed.priceAmount * 0.85),
+		childPrice: Math.round(seed.priceAmount * 0.65),
+	};
+};
+
+const TOUR_SEEDS: PackageSeed[] = [
+	{
+		id: 'venice-canals',
+		type: 'tours',
+		title: 'Romantic Gondolas And Hidden Canals',
+		location: 'Venice, Italy',
+		subtitle: '7 Days',
+		priceAmount: 320,
+		oldPriceAmount: 380,
+		priceUnit: '/ Person',
+		rating: 4.9,
+		reviewCount: 128,
+		image: 'https://images.unsplash.com/photo-1523906834658-6e24ef2386f9?auto=format&fit=crop&w=900&q=80',
+		badge: 'New',
+		category: 'Culture',
+		planDays: 7,
+		mapCity: 'Venice',
+	},
+	{
+		id: 'dubai-eternal',
+		type: 'tours',
+		title: 'When You Visit The Eternal Dubai City',
+		location: 'Dubai, Emirates',
+		subtitle: '2 Days',
+		priceAmount: 149,
+		oldPriceAmount: 299,
+		priceUnit: '/ Person',
+		rating: 4.7,
+		reviewCount: 96,
+		image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=900&q=80',
+		badge: 'Offer',
+		category: 'City',
+		planDays: 2,
+		mapCity: 'Dubai',
+	},
+	{
+		id: 'phuket-phi-phi',
+		type: 'tours',
+		title: 'Phi Phi Islands Speedboat Adventure',
+		location: 'Phuket, Thailand',
+		subtitle: '5 Days',
+		priceAmount: 349,
+		oldPriceAmount: 399,
+		priceUnit: '/ Person',
+		rating: 4.8,
+		reviewCount: 142,
+		image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=900&q=80',
+		badge: 'New',
+		category: 'Beach',
+		planDays: 5,
+		mapCity: 'Phuket',
+	},
+	{
+		id: 'new-york-skyline',
+		type: 'tours',
+		title: 'Manhattan Skyline And Liberty Cruise',
+		location: 'New York, USA',
+		subtitle: '3 Days',
+		priceAmount: 255,
+		oldPriceAmount: 280,
+		priceUnit: '/ Person',
+		rating: 4.6,
+		reviewCount: 88,
+		image: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?auto=format&fit=crop&w=900&q=80',
+		badge: 'Featured',
+		category: 'City',
+		planDays: 3,
+		mapCity: 'New York',
+	},
+	{
+		id: 'swiss-alps-train',
+		type: 'tours',
+		title: 'Swiss Alps Panorama Train Journey',
+		location: 'Zermatt, Switzerland',
+		subtitle: '6 Days',
+		priceAmount: 289,
+		oldPriceAmount: 320,
+		priceUnit: '/ Person',
+		rating: 4.9,
+		reviewCount: 175,
+		image: 'https://images.unsplash.com/photo-1527668752968-14dc70a27c95?auto=format&fit=crop&w=900&q=80',
+		category: 'Mountain',
+		planDays: 6,
+		mapCity: 'Zermatt',
+	},
+	{
+		id: 'norway-aurora',
+		type: 'tours',
+		title: 'Northern Fjords And Aurora Lights',
+		location: 'Bergen, Norway',
+		subtitle: '4 Days',
+		priceAmount: 199,
+		oldPriceAmount: 240,
+		priceUnit: '/ Person',
+		rating: 4.8,
+		reviewCount: 110,
+		image: 'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?auto=format&fit=crop&w=900&q=80',
+		badge: 'Featured',
+		category: 'Nature',
+		planDays: 4,
+		mapCity: 'Bergen',
+	},
+	{
+		id: 'rome-vatican',
+		type: 'tours',
+		title: 'Vatican Museums And Sistine Chapel Tour',
+		location: 'Rome, Italy',
+		subtitle: '1 Day',
+		priceAmount: 119,
+		oldPriceAmount: 150,
+		priceUnit: '/ Person',
+		rating: 4.7,
+		reviewCount: 64,
+		image: 'https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=900&q=80',
+		category: 'Culture',
+		planDays: 1,
+		mapCity: 'Rome',
+	},
+	{
+		id: 'sydney-harbour',
+		type: 'tours',
+		title: 'Sydney Harbour And Opera House Sail',
+		location: 'Sydney, Australia',
+		subtitle: '3 Days',
+		priceAmount: 255,
+		oldPriceAmount: 300,
+		priceUnit: '/ Person',
+		rating: 4.8,
+		reviewCount: 92,
+		image: 'https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=900&q=80',
+		category: 'City',
+		planDays: 3,
+		mapCity: 'Sydney',
+	},
+];
+
+const HOTEL_SEEDS: PackageSeed[] = [
+	{
+		id: 'marina-bay-suites',
+		type: 'hotels',
+		title: 'The Grand Marina Bay Suites',
+		location: 'Singapore, Singapore',
+		subtitle: '5★ Hotel',
+		priceAmount: 210,
+		oldPriceAmount: 260,
+		priceUnit: '/ Night',
+		rating: 4.9,
+		reviewCount: 212,
+		image: 'https://images.unsplash.com/photo-1565967511849-76a60a516170?auto=format&fit=crop&w=900&q=80',
+		badge: 'Featured',
+		planDays: 3,
+		mapCity: 'Singapore',
+	},
+	{
+		id: 'riviera-bloom',
+		type: 'hotels',
+		title: 'Riviera Bloom Boutique Hotel',
+		location: 'Nice, France',
+		subtitle: '4★ Hotel',
+		priceAmount: 135,
+		oldPriceAmount: 180,
+		priceUnit: '/ Night',
+		rating: 4.7,
+		reviewCount: 98,
+		image: 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?auto=format&fit=crop&w=900&q=80',
+		badge: 'Offer',
+		planDays: 2,
+		mapCity: 'Nice',
+	},
+	{
+		id: 'mountain-pine',
+		type: 'hotels',
+		title: 'Mountain Pine Lodge & Spa',
+		location: 'Aspen, Colorado',
+		subtitle: 'Resort',
+		priceAmount: 182,
+		oldPriceAmount: 210,
+		priceUnit: '/ Night',
+		rating: 4.8,
+		reviewCount: 74,
+		image: 'https://images.unsplash.com/photo-1455587734955-081b22074882?auto=format&fit=crop&w=900&q=80',
+		badge: 'New',
+		planDays: 4,
+		mapCity: 'Aspen',
+	},
+	{
+		id: 'skyline-loft',
+		type: 'hotels',
+		title: 'Skyline Loft Downtown',
+		location: 'Tokyo, Japan',
+		subtitle: 'Boutique',
+		priceAmount: 175,
+		oldPriceAmount: 200,
+		priceUnit: '/ Night',
+		rating: 4.8,
+		reviewCount: 156,
+		image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=900&q=80',
+		planDays: 2,
+		mapCity: 'Tokyo',
+	},
+	{
+		id: 'coastal-pearl',
+		type: 'hotels',
+		title: 'Coastal Pearl Beach Resort',
+		location: 'Bali, Indonesia',
+		subtitle: 'Resort',
+		priceAmount: 165,
+		oldPriceAmount: 190,
+		priceUnit: '/ Night',
+		rating: 4.9,
+		reviewCount: 201,
+		image: 'https://images.unsplash.com/photo-1537953773345-d172ccf13cf1?auto=format&fit=crop&w=900&q=80',
+		badge: 'Featured',
+		planDays: 5,
+		mapCity: 'Bali',
+	},
+	{
+		id: 'heritage-riad',
+		type: 'hotels',
+		title: 'Heritage Garden Riad',
+		location: 'Marrakech, Morocco',
+		subtitle: 'Boutique',
+		priceAmount: 98,
+		oldPriceAmount: 130,
+		priceUnit: '/ Night',
+		rating: 4.6,
+		reviewCount: 67,
+		image: 'https://images.unsplash.com/photo-1539020140153-e479b8c22e70?auto=format&fit=crop&w=900&q=80',
+		planDays: 3,
+		mapCity: 'Marrakech',
+	},
+	{
+		id: 'aurora-igloo',
+		type: 'hotels',
+		title: 'Aurora Glass Igloo Retreat',
+		location: 'Rovaniemi, Finland',
+		subtitle: 'Lodge',
+		priceAmount: 245,
+		oldPriceAmount: 290,
+		priceUnit: '/ Night',
+		rating: 4.9,
+		reviewCount: 54,
+		image: 'https://images.unsplash.com/photo-1551867633-194f125bddfa?auto=format&fit=crop&w=900&q=80',
+		badge: 'New',
+		planDays: 2,
+		mapCity: 'Rovaniemi',
+	},
+	{
+		id: 'old-town-plaza',
+		type: 'hotels',
+		title: 'Old Town Plaza Hotel',
+		location: 'Prague, Czechia',
+		subtitle: '4★ Hotel',
+		priceAmount: 112,
+		oldPriceAmount: 140,
+		priceUnit: '/ Night',
+		rating: 4.7,
+		reviewCount: 103,
+		image: 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=900&q=80',
+		planDays: 2,
+		mapCity: 'Prague',
+	},
+];
+
+const CAR_SEEDS: PackageSeed[] = [
+	{
+		id: 'toyota-corolla',
+		type: 'cars',
+		title: 'Toyota Corolla Hybrid',
+		location: 'Los Angeles, USA',
+		subtitle: 'Compact · 5 Seats',
+		priceAmount: 48,
+		oldPriceAmount: 60,
+		priceUnit: '/ Day',
+		rating: 4.8,
+		reviewCount: 134,
+		image: 'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80',
+		badge: 'New',
+		planDays: 1,
+		mapCity: 'Los Angeles',
+	},
+	{
+		id: 'bmw-3-series',
+		type: 'cars',
+		title: 'BMW 3 Series Sedan',
+		location: 'Munich, Germany',
+		subtitle: 'Sedan · 5 Seats',
+		priceAmount: 92,
+		oldPriceAmount: 110,
+		priceUnit: '/ Day',
+		rating: 4.7,
+		reviewCount: 89,
+		image: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=900&q=80',
+		badge: 'Featured',
+		planDays: 1,
+		mapCity: 'Munich',
+	},
+	{
+		id: 'tesla-model-y',
+		type: 'cars',
+		title: 'Tesla Model Y Long Range',
+		location: 'San Francisco, USA',
+		subtitle: 'Electric SUV',
+		priceAmount: 135,
+		oldPriceAmount: 160,
+		priceUnit: '/ Day',
+		rating: 4.9,
+		reviewCount: 112,
+		image: 'https://images.unsplash.com/photo-1560958089-b8a1929cea89?auto=format&fit=crop&w=900&q=80',
+		badge: 'Offer',
+		planDays: 1,
+		mapCity: 'San Francisco',
+	},
+	{
+		id: 'mercedes-v-class',
+		type: 'cars',
+		title: 'Mercedes-Benz V-Class Van',
+		location: 'Vienna, Austria',
+		subtitle: 'Van · 8 Seats',
+		priceAmount: 148,
+		oldPriceAmount: 180,
+		priceUnit: '/ Day',
+		rating: 4.6,
+		reviewCount: 61,
+		image: 'https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?auto=format&fit=crop&w=900&q=80',
+		planDays: 1,
+		mapCity: 'Vienna',
+	},
+	{
+		id: 'jeep-wrangler',
+		type: 'cars',
+		title: 'Jeep Wrangler 4x4',
+		location: 'Denver, USA',
+		subtitle: 'SUV · Off-road',
+		priceAmount: 118,
+		oldPriceAmount: 140,
+		priceUnit: '/ Day',
+		rating: 4.8,
+		reviewCount: 97,
+		image: 'https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80',
+		badge: 'Featured',
+		planDays: 1,
+		mapCity: 'Denver',
+	},
+	{
+		id: 'porsche-911',
+		type: 'cars',
+		title: 'Porsche 911 Carrera',
+		location: 'Stuttgart, Germany',
+		subtitle: 'Sports Coupe',
+		priceAmount: 310,
+		oldPriceAmount: 360,
+		priceUnit: '/ Day',
+		rating: 4.9,
+		reviewCount: 48,
+		image: 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=80',
+		badge: 'New',
+		planDays: 1,
+		mapCity: 'Stuttgart',
+	},
+	{
+		id: 'range-rover-velar',
+		type: 'cars',
+		title: 'Range Rover Velar',
+		location: 'London, UK',
+		subtitle: 'Luxury SUV',
+		priceAmount: 172,
+		oldPriceAmount: 200,
+		priceUnit: '/ Day',
+		rating: 4.8,
+		reviewCount: 72,
+		image: 'https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80',
+		planDays: 1,
+		mapCity: 'London',
+	},
+	{
+		id: 'vw-golf-gti',
+		type: 'cars',
+		title: 'Volkswagen Golf GTI',
+		location: 'Berlin, Germany',
+		subtitle: 'Hatchback',
+		priceAmount: 74,
+		oldPriceAmount: 90,
+		priceUnit: '/ Day',
+		rating: 4.7,
+		reviewCount: 121,
+		image: 'https://images.unsplash.com/photo-1583121274602-3e2820c69888?auto=format&fit=crop&w=900&q=80',
+		planDays: 1,
+		mapCity: 'Berlin',
+	},
+];
+
+export const PACKAGES: VeloraPackage[] = [...TOUR_SEEDS, ...HOTEL_SEEDS, ...CAR_SEEDS].map(enrich);
+
+export const PACKAGE_TABS = [
+	{ key: 'tours' as PackageType, label: 'Popular Tours', eyebrow: 'Most Popular Tour Packages', headline: 'Something Amazing Waiting For You' },
+	{ key: 'hotels' as PackageType, label: 'Popular Hotels', eyebrow: 'Most Booked Stays', headline: 'Stay In Comfort, Wake Up Inspired' },
+	{ key: 'cars' as PackageType, label: 'Popular Cars', eyebrow: 'Top Rental Cars', headline: 'Drive The Trip Of Your Dreams' },
+];
+
+export const formatPackagePrice = (amount: number) => `$${amount.toLocaleString('en-US')}`;
+
+export const packageDetailHref = (type: PackageType, id: string) => `/package/detail?type=${type}&id=${id}`;
+
+export const getPackagesByType = (type: PackageType) => PACKAGES.filter((p) => p.type === type);
+
+export const getPackage = (type: PackageType, id: string) =>
+	PACKAGES.find((p) => p.type === type && p.id === id);
+
+export const getPackageReviewsLabel = (count: number) => {
+	if (count >= 100) return `${Math.round(count / 10)} Reviews`;
+	return `${Math.max(4, Math.round(count / 15))} Reviews`;
+};

@@ -1,10 +1,9 @@
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/client';
-import { Stack, Typography, Button } from '@mui/material';
-import Link from 'next/link';
-import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
+import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { GET_HOTELS } from '../../apollo/user/query';
+import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
+import PackageCard from '../../libs/components/packages/PackageCard';
+import { getPackagesByType } from '../../libs/data/packages';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -13,32 +12,20 @@ export const getStaticProps = async ({ locale }: any) => ({
 });
 
 const HotelsPage: NextPage = () => {
-	const { data, error } = useQuery(GET_HOTELS, {
-		fetchPolicy: 'network-only',
-		variables: {
-			input: { page: 1, limit: 12, sort: 'createdAt', direction: 'DESC' },
-		},
-	});
-	const hotels = data?.getHotels?.list ?? [];
+	const hotels = getPackagesByType('hotels');
 
 	return (
-		<Stack className={'agent-list-page'}>
-			<Stack className={'container'} sx={{ py: 8, gap: 2 }}>
-				<Typography variant="h4">Hotels</Typography>
-				{error && <Typography color="error">Failed to load hotels.</Typography>}
-				{!error && hotels.length === 0 && <Typography>No hotels found.</Typography>}
-				{hotels.map((hotel: any) => (
-					<div key={hotel._id} style={{ border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' }}>
-						<Typography sx={{ fontWeight: 700 }}>{hotel.hotelName}</Typography>
-						<Typography variant="body2">{hotel.hotelLocation}</Typography>
-						<Typography variant="body2">
-							${hotel.hotelPrice} | {hotel.hotelStars} stars
-						</Typography>
-					</div>
-				))}
-				<Link href="/" passHref legacyBehavior>
-					<Button variant="contained">Back to home</Button>
-				</Link>
+		<Stack className={'tours-page'}>
+			<Stack className={'container'} sx={{ py: 4 }}>
+				<h2 style={{ margin: 0, fontSize: 28, fontWeight: 800 }}>Popular Hotels</h2>
+				<p style={{ marginTop: 8, color: '#6b7280' }}>Browse stays and open any card for full details and booking.</p>
+			</Stack>
+			<Stack className={'tours-page-cards tour-packages-section'}>
+				<div className={'tour-grid'}>
+					{hotels.map((pkg) => (
+						<PackageCard key={pkg.id} pkg={pkg} />
+					))}
+				</div>
 			</Stack>
 		</Stack>
 	);

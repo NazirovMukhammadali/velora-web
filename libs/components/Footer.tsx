@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 const FooterBrand = () => (
 	<Link href={'/'} className={'footer-brand'} aria-label={'Velora home'}>
-		<span className={'footer-brand-mark'} aria-hidden />
+		<img className={'footer-brand-mark'} src={'/img/logo/velora-mark.svg'} alt={''} aria-hidden />
 		<span className={'footer-brand-name'}>VELORA</span>
 	</Link>
 );

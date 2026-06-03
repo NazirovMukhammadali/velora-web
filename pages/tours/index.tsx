@@ -1,10 +1,11 @@
 import React, { useMemo, useState } from 'react';
 import { NextPage } from 'next';
-import Link from 'next/link';
 import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
-import { TOURS, TOUR_CATEGORIES, Tour, TourCategory } from '../../libs/data/tours';
+import PackageCard from '../../libs/components/packages/PackageCard';
+import { getPackagesByType } from '../../libs/data/packages';
+import type { TourCategory } from '../../libs/data/tours';
 
 type SortKey = 'recommended' | 'priceAsc' | 'priceDesc' | 'rating';
 
@@ -14,15 +15,13 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
-const formatPrice = (value: number) => `$${value.toLocaleString('en-US')}`;
-
-const sortTours = (tours: Tour[], sort: SortKey): Tour[] => {
-	const cloned = [...tours];
+const sortPackages = (list: ReturnType<typeof getPackagesByType>, sort: SortKey) => {
+	const cloned = [...list];
 	switch (sort) {
 		case 'priceAsc':
-			return cloned.sort((a, b) => a.pricePerPerson - b.pricePerPerson);
+			return cloned.sort((a, b) => a.priceAmount - b.priceAmount);
 		case 'priceDesc':
-			return cloned.sort((a, b) => b.pricePerPerson - a.pricePerPerson);
+			return cloned.sort((a, b) => b.priceAmount - a.priceAmount);
 		case 'rating':
 			return cloned.sort((a, b) => b.rating - a.rating);
 		default:
@@ -31,23 +30,31 @@ const sortTours = (tours: Tour[], sort: SortKey): Tour[] => {
 };
 
 const ToursPage: NextPage = () => {
+	const tours = getPackagesByType('tours');
+	const categories = useMemo(() => {
+		const set = new Set<TourCategory>();
+		tours.forEach((t) => {
+			if (t.category) set.add(t.category as TourCategory);
+		});
+		return Array.from(set);
+	}, [tours]);
+
 	const [activeCategory, setActiveCategory] = useState<TourCategory | 'All'>('All');
 	const [sort, setSort] = useState<SortKey>('recommended');
 	const [search, setSearch] = useState('');
 
 	const filteredTours = useMemo(() => {
 		const lowerSearch = search.trim().toLowerCase();
-		const list = TOURS.filter((tour) => {
+		const list = tours.filter((tour) => {
 			const matchCategory = activeCategory === 'All' || tour.category === activeCategory;
 			const matchSearch =
 				!lowerSearch ||
 				tour.title.toLowerCase().includes(lowerSearch) ||
-				tour.location.toLowerCase().includes(lowerSearch) ||
-				tour.country.toLowerCase().includes(lowerSearch);
+				tour.location.toLowerCase().includes(lowerSearch);
 			return matchCategory && matchSearch;
 		});
-		return sortTours(list, sort);
-	}, [activeCategory, sort, search]);
+		return sortPackages(list, sort);
+	}, [activeCategory, sort, search, tours]);
 
 	return (
 		<Stack className={'tours-page'}>
@@ -70,7 +77,7 @@ const ToursPage: NextPage = () => {
 					>
 						All
 					</button>
-					{TOUR_CATEGORIES.map((category) => (
+					{categories.map((category) => (
 						<button
 							key={category}
 							type="button"
@@ -97,35 +104,15 @@ const ToursPage: NextPage = () => {
 				</div>
 			</Stack>
 
-			<Stack className={'tours-grid container'}>
+			<Stack className={'tours-page-cards tour-packages-section'}>
 				{filteredTours.length === 0 ? (
 					<div className={'tours-empty'}>No tours match your filters yet.</div>
 				) : (
-					filteredTours.map((tour) => (
-						<Link
-							key={tour.id}
-							href={{ pathname: '/tours/detail', query: { id: tour.id } }}
-							className={'tour-grid-card'}
-						>
-							<div className={'tour-grid-image'}>
-								<img src={tour.image} alt={tour.title} />
-								{tour.badge && <span className={'tour-grid-badge'}>{tour.badge}</span>}
-							</div>
-							<div className={'tour-grid-info'}>
-								<span className={'tour-grid-category'}>{tour.category}</span>
-								<h3>{tour.title}</h3>
-								<p>
-									{tour.location}, {tour.country} · {tour.durationDays} days
-								</p>
-								<div className={'tour-grid-bottom'}>
-									<strong>
-										{formatPrice(tour.pricePerPerson)} <span>/ person</span>
-									</strong>
-									<em>★ {tour.rating.toFixed(1)} ({tour.reviews})</em>
-								</div>
-							</div>
-						</Link>
-					))
+					<div className={'tour-grid'}>
+						{filteredTours.map((pkg) => (
+							<PackageCard key={pkg.id} pkg={pkg} />
+						))}
+					</div>
 				)}
 			</Stack>
 		</Stack>

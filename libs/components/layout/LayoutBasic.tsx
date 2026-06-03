@@ -49,6 +49,16 @@ const withLayoutBasic = (Component: any) => {
 					desc = 'Find rental cars for your schedule';
 					bgImage = 'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1600&q=80';
 					break;
+				case '/tours':
+					title = 'Tours';
+					desc = 'Explore curated tour packages';
+					bgImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
+					break;
+				case '/package/detail':
+					title = 'Package details';
+					desc = 'Full itinerary, reviews, and booking';
+					bgImage = 'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
+					break;
 				case '/bookings':
 					title = 'My Bookings';
 					desc = 'Track your tour booking statuses';
@@ -57,7 +67,8 @@ const withLayoutBasic = (Component: any) => {
 				case '/agent':
 					title = 'Agents';
 					desc = 'Meet certified travel experts';
-					bgImage = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80';
+					bgImage =
+						'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
 					break;
 				case '/agent/detail':
 					title = 'Agent Page';

@@ -1,10 +1,9 @@
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/client';
-import { Stack, Typography, Button } from '@mui/material';
-import Link from 'next/link';
-import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
+import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
-import { GET_RENTCARS } from '../../apollo/user/query';
+import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
+import PackageCard from '../../libs/components/packages/PackageCard';
+import { getPackagesByType } from '../../libs/data/packages';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -13,32 +12,20 @@ export const getStaticProps = async ({ locale }: any) => ({
 });
 
 const RentcarPage: NextPage = () => {
-	const { data, error } = useQuery(GET_RENTCARS, {
-		fetchPolicy: 'network-only',
-		variables: {
-			input: { page: 1, limit: 12, sort: 'createdAt', direction: 'DESC' },
-		},
-	});
-	const rentcars = data?.getRentcars?.list ?? [];
+	const cars = getPackagesByType('cars');
 
 	return (
-		<Stack className={'agent-list-page'}>
-			<Stack className={'container'} sx={{ py: 8, gap: 2 }}>
-				<Typography variant="h4">Rentcar</Typography>
-				{error && <Typography color="error">Failed to load rentcars.</Typography>}
-				{!error && rentcars.length === 0 && <Typography>No rentcars found.</Typography>}
-				{rentcars.map((car: any) => (
-					<div key={car._id} style={{ border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' }}>
-						<Typography sx={{ fontWeight: 700 }}>{car.carTitle}</Typography>
-						<Typography variant="body2">{car.carLocation}</Typography>
-						<Typography variant="body2">
-							${car.dailyPrice} / day | {car.seats} seats
-						</Typography>
-					</div>
-				))}
-				<Link href="/" passHref legacyBehavior>
-					<Button variant="contained">Back to home</Button>
-				</Link>
+		<Stack className={'tours-page'}>
+			<Stack className={'container'} sx={{ py: 4 }}>
+				<h2 style={{ margin: 0, fontSize: 28, fontWeight: 800 }}>Popular Cars</h2>
+				<p style={{ marginTop: 8, color: '#6b7280' }}>Compare rental options and book directly from each package page.</p>
+			</Stack>
+			<Stack className={'tours-page-cards tour-packages-section'}>
+				<div className={'tour-grid'}>
+					{cars.map((pkg) => (
+						<PackageCard key={pkg.id} pkg={pkg} />
+					))}
+				</div>
 			</Stack>
 		</Stack>
 	);

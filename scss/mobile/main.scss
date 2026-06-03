@@ -752,7 +752,9 @@
     height: auto;
     display: flex;
     flex-direction: row;
-    background: #181a20;
+    background: $velora-text-main;
+    border-top: 3px solid transparent;
+    border-image: linear-gradient(90deg, $velora-accent 0%, $velora-primary 100%) 1;
     .footer-container {
       padding: 0 10px;
       margin: 0 auto;
@@ -785,8 +787,8 @@
               flex-shrink: 0;
               width: 40px;
               height: 40px;
-              border-radius: 12px;
-              background: linear-gradient(135deg, #ff6b26 0%, #ff9f5a 100%);
+              display: block;
+              object-fit: contain;
             }
             .footer-brand-name {
               color: #ffffff;
@@ -830,6 +832,10 @@
                 font-size: 32px;
                 margin-right: 22px;
                 cursor: pointer;
+                transition: color 0.2s ease;
+                &:hover {
+                  color: $velora-accent;
+                }
               }
             }
           }
@@ -863,6 +869,10 @@
                 font-style: normal;
                 font-weight: 400;
                 cursor: pointer;
+                &:hover {
+                  color: $velora-accent;
+                  text-decoration: underline;
+                }
               }
               a.footer-link {
                 margin-top: 14px;
@@ -871,6 +881,10 @@
                 font-size: 14px;
                 font-weight: 400;
                 text-decoration: none;
+                &:hover {
+                  color: $velora-accent;
+                  text-decoration: underline;
+                }
               }
             }
           }
@@ -902,6 +916,10 @@
             color: #bebdbd;
             font-size: 14px;
             text-decoration: none;
+            &:hover {
+              color: $velora-accent;
+              text-decoration: underline;
+            }
           }
         }
       }
