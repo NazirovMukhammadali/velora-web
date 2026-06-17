@@ -7,6 +7,7 @@ import Footer from '../Footer';
 import { Stack } from '@mui/material';
 import { getJwtToken, updateUserInfo } from '../../auth';
 import Chat from '../Chat';
+import { AGENT_HEADER_BG, AGENT_HEADER_OVERLAY } from '../../data/agentPage';
 import { useTranslation } from 'next-i18next';
 import 'swiper/css';
 import 'swiper/css/pagination';
@@ -67,13 +68,12 @@ const withLayoutBasic = (Component: any) => {
 				case '/agent':
 					title = 'Agents';
 					desc = 'Meet certified travel experts';
-					bgImage =
-						'https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80';
+					bgImage = AGENT_HEADER_BG;
 					break;
 				case '/agent/detail':
 					title = 'Agent Page';
 					desc = 'Travel expert profile';
-					bgImage = 'https://images.unsplash.com/photo-1521737711867-e3b97375f902?auto=format&fit=crop&w=1600&q=80';
+					bgImage = AGENT_HEADER_BG;
 					break;
 				case '/mypage':
 					title = 'my page';
@@ -172,11 +172,19 @@ const withLayoutBasic = (Component: any) => {
 
 						{!hideHeroBanner && (
 							<Stack
-								className={'header-basic'}
+								className={`header-basic${
+									router.pathname === '/agent' || router.pathname === '/agent/detail'
+										? ' header-basic--agents'
+										: ''
+								}`}
 								style={{
 									backgroundImage: `url(${memoizedValues.bgImage})`,
 									backgroundSize: 'cover',
-									boxShadow: 'inset 10px 40px 150px 40px rgb(24 22 36)',
+									backgroundPosition: 'center',
+									boxShadow:
+										router.pathname === '/agent' || router.pathname === '/agent/detail'
+											? AGENT_HEADER_OVERLAY
+											: 'inset 10px 40px 150px 40px rgb(24 22 36)',
 								}}
 							>
 								<Stack className={'container'}>

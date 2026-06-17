@@ -23,6 +23,7 @@ import {
 	filterShowcaseAgents,
 	showcaseAgentToMember,
 } from '../../libs/data/agents';
+import { AGENT_INTRO_BG } from '../../libs/data/agentPage';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -167,7 +168,10 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 		: total > searchFilter.limit;
 
 	return (
-		<Stack className={'agent-list-page'}>
+		<Stack
+			className={'agent-list-page'}
+			sx={{ '--agent-intro-bg': `url(${AGENT_INTRO_BG})` } as React.CSSProperties}
+		>
 			<Stack className={'container'}>
 				<section className={'agent-page-hero'} aria-labelledby="agent-page-title">
 					<div className={'agent-page-hero__inner'}>

@@ -12,14 +12,17 @@
 
 			.video-shell {
 				position: relative;
-				margin: 0 auto;
-				width: 980px;
-				max-width: calc(100% - 32px);
-				border-radius: 24px;
+				left: 50%;
+				right: 50%;
+				margin-left: -50vw;
+				margin-right: -50vw;
+				width: 100vw;
+				max-width: 100vw;
+				height: clamp(520px, 46vw, 720px);
+				border-radius: 0;
 				overflow: hidden;
 				background: #0f1118;
 				box-shadow: 0 18px 44px rgba(17, 19, 27, 0.22);
-				aspect-ratio: 16 / 9;
 
 				&::after {
 					content: '';
@@ -41,6 +44,10 @@
 
 			@media (max-width: 900px) {
 				padding: 4px 0 48px;
+
+				.video-shell {
+					height: 420px;
+				}
 			}
 		}
 

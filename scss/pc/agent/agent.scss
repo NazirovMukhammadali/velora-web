@@ -1,4 +1,12 @@
 #pc-wrap {
+	.header-basic--agents {
+		background-position: center 35%;
+
+		.container strong {
+			letter-spacing: 0.02em;
+		}
+	}
+
 	.agent-demo-note {
 		margin: 0 0 20px;
 		padding: 12px 16px;
@@ -61,8 +69,8 @@
 				position: absolute;
 				inset: 0;
 				background:
-					linear-gradient(115deg, rgba($velora-primary, 0.92) 0%, rgba($velora-primary-dark, 0.78) 42%, rgba($velora-accent, 0.35) 100%),
-					url('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1600&q=80') center / cover no-repeat;
+					linear-gradient(115deg, rgba($velora-primary, 0.9) 0%, rgba($velora-primary-dark, 0.82) 48%, rgba($velora-accent, 0.4) 100%),
+					var(--agent-intro-bg) center / cover no-repeat;
 				opacity: 1;
 			}
 
