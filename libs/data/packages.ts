@@ -1,6 +1,6 @@
 import type { PackageExtra, PackagePlanDay, PackageType, VeloraPackage } from '../types/package';
 
-type PackageSeed = Omit<
+export type PackageSeed = Omit<
 	VeloraPackage,
 	'gallery' | 'about' | 'highlights' | 'included' | 'excluded' | 'plan' | 'locationNote' | 'mapQuery' | 'durationLabel' | 'experienceType' | 'groupSize' | 'languages' | 'extras' | 'timeSlots' | 'youthPrice' | 'childPrice'
 > & {
@@ -29,7 +29,7 @@ const buildPlan = (days: number, location: string): PackagePlanDay[] => {
 	return items;
 };
 
-const enrich = (seed: PackageSeed): VeloraPackage => {
+export const enrich = (seed: PackageSeed): VeloraPackage => {
 	const days = seed.planDays ?? 3;
 	const city = seed.mapCity ?? seed.location.split(',')[0]?.trim() ?? seed.location;
 	const typeCopy =

@@ -1,10 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { NextPage } from 'next';
+import { useQuery } from '@apollo/client';
 import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import PackageCard from '../../libs/components/packages/PackageCard';
 import { getPackagesByType } from '../../libs/data/packages';
+import { mapToursToPackages } from '../../libs/data/packageApi';
+import { GET_TOURS } from '../../apollo/user/query';
 import type { TourCategory } from '../../libs/data/tours';
 
 type SortKey = 'recommended' | 'priceAsc' | 'priceDesc' | 'rating';
@@ -30,7 +33,18 @@ const sortPackages = (list: ReturnType<typeof getPackagesByType>, sort: SortKey)
 };
 
 const ToursPage: NextPage = () => {
-	const tours = getPackagesByType('tours');
+	const { data } = useQuery(GET_TOURS, {
+		fetchPolicy: 'cache-and-network',
+		errorPolicy: 'all',
+		variables: { input: { page: 1, limit: 24, sort: 'createdAt', direction: 'DESC' } },
+	});
+
+	// API-first: show backend tours when available, otherwise fall back to the static catalog.
+	const tours = useMemo(() => {
+		const apiTours = mapToursToPackages(data?.getTours?.list);
+		return apiTours.length > 0 ? apiTours : getPackagesByType('tours');
+	}, [data]);
+
 	const categories = useMemo(() => {
 		const set = new Set<TourCategory>();
 		tours.forEach((t) => {
