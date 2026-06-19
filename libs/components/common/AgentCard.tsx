@@ -65,7 +65,7 @@ const AgentCard = (props: AgentCardProps) => {
 					<IconButton
 						size="small"
 						aria-label="Like expert"
-						onClick={(e) => {
+						onClick={(e: React.MouseEvent) => {
 							e.preventDefault();
 							e.stopPropagation();
 							likeMemberHandler(user, agent?._id);
