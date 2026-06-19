@@ -7,8 +7,8 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import PackageDetailView from '../../libs/components/packages/PackageDetailView';
 import { getPackage } from '../../libs/data/packages';
-import { mapTourToPackage } from '../../libs/data/packageApi';
-import { GET_TOUR_DETAIL } from '../../apollo/user/query';
+import { mapHotelToPackage, mapTourToPackage } from '../../libs/data/packageApi';
+import { GET_HOTEL_DETAIL, GET_TOUR_DETAIL } from '../../apollo/user/query';
 import type { PackageType } from '../../libs/types/package';
 
 export const getStaticProps = async ({ locale }: any) => ({
@@ -28,12 +28,19 @@ const PackageDetailPage: NextPage = () => {
 	const type = isPackageType(typeRaw) ? typeRaw : null;
 	const staticPkg = type ? getPackage(type, id) : undefined;
 
-	// Fall back to the API only for tours that are not part of the static catalog.
+	// Fall back to the API only for items that are not part of the static catalog.
 	const { data: tourData, loading: tourLoading } = useQuery(GET_TOUR_DETAIL, {
 		fetchPolicy: 'cache-and-network',
 		errorPolicy: 'all',
 		variables: { tourId: id },
 		skip: !router.isReady || !id || type !== 'tours' || Boolean(staticPkg),
+	});
+
+	const { data: hotelData, loading: hotelLoading } = useQuery(GET_HOTEL_DETAIL, {
+		fetchPolicy: 'cache-and-network',
+		errorPolicy: 'all',
+		variables: { hotelId: id },
+		skip: !router.isReady || !id || type !== 'hotels' || Boolean(staticPkg),
 	});
 
 	if (!router.isReady) {
@@ -54,10 +61,14 @@ const PackageDetailPage: NextPage = () => {
 	}
 
 	const apiTour = tourData?.getTourDetail;
-	const pkg = staticPkg ?? (apiTour ? mapTourToPackage(apiTour) : undefined);
+	const apiHotel = hotelData?.getHotelDetail;
+	const pkg =
+		staticPkg ??
+		(apiTour ? mapTourToPackage(apiTour) : undefined) ??
+		(apiHotel ? mapHotelToPackage(apiHotel) : undefined);
 
 	if (!pkg) {
-		if (tourLoading) {
+		if (tourLoading || hotelLoading) {
 			return (
 				<Stack className={'pkg-detail-page container'} sx={{ py: 6 }}>
 					<p>Loading…</p>

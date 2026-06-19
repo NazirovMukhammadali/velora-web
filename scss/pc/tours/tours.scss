@@ -47,6 +47,47 @@
 		padding: 0 24px;
 	}
 
+	.catalog-intro {
+		padding: 8px 0 24px;
+
+		.catalog-eyebrow {
+			display: inline-block;
+			font-family: $font;
+			font-size: 12px;
+			font-weight: 700;
+			letter-spacing: 0.16em;
+			text-transform: uppercase;
+			color: $velora-primary;
+			margin-bottom: 10px;
+		}
+
+		.catalog-title {
+			margin: 0;
+			font-family: $font;
+			font-size: 34px;
+			font-weight: 800;
+			line-height: 1.15;
+			color: $velora-text-main;
+		}
+
+		.catalog-sub {
+			margin: 12px 0 0;
+			max-width: 640px;
+			font-family: $font;
+			font-size: 15px;
+			line-height: 1.6;
+			color: #6b7280;
+		}
+	}
+
+	.catalog-count {
+		margin: 0 0 4px;
+		font-family: $font;
+		font-size: 14px;
+		font-weight: 600;
+		color: #5f6575;
+	}
+
 	.tours-toolbar {
 		display: flex;
 		flex-direction: column;

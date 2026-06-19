@@ -56,3 +56,56 @@ export const mapTourToPackage = (tour: BackendTour): VeloraPackage => {
 
 export const mapToursToPackages = (list?: BackendTour[] | null): VeloraPackage[] =>
 	(list ?? []).map(mapTourToPackage);
+
+type BackendHotel = {
+	_id: string;
+	hotelName: string;
+	hotelLocation: string;
+	hotelAddress?: string;
+	hotelPrice: number;
+	hotelStars?: number;
+	hotelImages?: string[];
+	hotelDesc?: string;
+};
+
+const clampStars = (stars?: number): number => {
+	if (!stars || stars < 1) return 4;
+	return Math.min(5, Math.round(stars));
+};
+
+/** Map a backend hotel to the rich VeloraPackage model (reuses enrich for generated fields). */
+export const mapHotelToPackage = (hotel: BackendHotel): VeloraPackage => {
+	const stars = clampStars(hotel.hotelStars);
+	const city = hotel.hotelLocation?.split(',')[0]?.trim() || hotel.hotelLocation || 'Destination';
+	const images = (hotel.hotelImages ?? []).map(resolvePackageImage);
+
+	const seed: PackageSeed = {
+		id: hotel._id,
+		type: 'hotels',
+		title: hotel.hotelName,
+		location: hotel.hotelLocation,
+		subtitle: `${stars}★ Hotel`,
+		priceAmount: hotel.hotelPrice,
+		priceUnit: '/ Night',
+		rating: stars,
+		reviewCount: 0,
+		image: images[0] ?? FALLBACK_IMAGE,
+		category: 'Stay',
+		planDays: 2,
+		mapCity: city,
+	};
+
+	const pkg = enrich(seed);
+
+	return {
+		...pkg,
+		gallery: images.length > 0 ? images : pkg.gallery,
+		about: hotel.hotelDesc?.trim() ? hotel.hotelDesc : pkg.about,
+		locationNote: hotel.hotelAddress?.trim()
+			? `${hotel.hotelName} is located at ${hotel.hotelAddress}. Use the map below for directions and nearby points of interest.`
+			: pkg.locationNote,
+	};
+};
+
+export const mapHotelsToPackages = (list?: BackendHotel[] | null): VeloraPackage[] =>
+	(list ?? []).map(mapHotelToPackage);
