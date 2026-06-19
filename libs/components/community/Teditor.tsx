@@ -15,7 +15,6 @@ import { getJwtToken } from "../../auth";
 import { REACT_APP_API_URL } from "../../config";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { T } from "../../types/common";
 import "@toast-ui/editor/dist/toastui-editor.css";
 import { useMutation } from "@apollo/client";
 import { CREATE_BOARD_ARTICLE } from "../../../apollo/user/mutation";
@@ -91,7 +90,7 @@ const TuiEditor = () => {
 		setArticleCategory(e.target.value);
 	};
 
-	const articleTitleHandler = (e: T) => {
+	const articleTitleHandler = (e: any) => {
 		console.log(e.target.value);
 		memoizedValues.articleTitle = e.target.value;
 	};
