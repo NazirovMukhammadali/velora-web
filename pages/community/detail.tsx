@@ -6,7 +6,7 @@ import withLayoutBasic from "../../libs/components/layout/LayoutBasic";
 import { Button, Stack, Typography, Tab, Tabs, IconButton, Backdrop, Pagination } from "@mui/material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import { useMutation, useQuery, useReactiveVar } from "@apollo/client";
-import Moment from "react-moment";
+import { formatDate } from "../../libs/utils/date";
 import { userVar } from "../../apollo/store";
 import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import ThumbUpAltIcon from "@mui/icons-material/ThumbUpAlt";
@@ -24,7 +24,7 @@ import { BoardArticle } from "../../libs/types/board-article/board-article";
 import { CREATE_COMMENT, LIKE_TARGET_BOARD_ARTICLE, UPDATE_COMMENT } from "../../apollo/user/mutation";
 import { GET_BOARD_ARTICLE, GET_COMMENTS } from "../../apollo/user/query";
 import { Message } from "../../libs/enums/common.enum";
-import { sweetConfirmAlert, sweetMixinErrorAlert, sweetMixinSuccessAlert, sweetTopSmallSuccessAlert, } from "../../libs/sweetAlert";
+import { sweetConfirmAlert, sweetMixinErrorAlert, sweetMixinSuccessAlert } from "../../libs/sweetAlert";
 import { Messages } from "../../libs/config";
 import { CommentUpdate } from "../../libs/types/comment/comment.update";
 
@@ -162,8 +162,6 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 			await likeTargetBoardArticle({ variables: { input: id } });
 
 			await boardArticleRefetch({ input: articleId });
-
-			await sweetTopSmallSuccessAlert("succes", 800);
 		} catch (err: any) {
 			console.log("ERROR, likePropertyHandler:", err.message);
 			sweetMixinErrorAlert(err.message).then();
@@ -346,12 +344,9 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 													{boardArticle?.memberData?.memberNick}
 												</Typography>
 												<Stack className="divider"></Stack>
-												<Moment
-													className={"time-added"}
-													format={"DD.MM.YY HH:mm"}
-												>
-													{boardArticle?.createdAt}
-												</Moment>
+												<span className={"time-added"}>
+													{formatDate(boardArticle?.createdAt, "dd.MM.yy HH:mm")}
+												</span>
 											</Stack>
 										</Stack>
 										<Stack className="info">
@@ -480,12 +475,9 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 																{commentData?.memberData?.memberNick}
 															</Typography>
 															<Typography className="date">
-																<Moment
-																	className={"time-added"}
-																	format={"DD.MM.YY HH:mm"}
-																>
-																	{commentData?.createdAt}
-																</Moment>
+																<span className={"time-added"}>
+																	{formatDate(commentData?.createdAt, "dd.MM.yy HH:mm")}
+																</span>
 															</Typography>
 														</Stack>
 													</Stack>

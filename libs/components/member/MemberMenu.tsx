@@ -79,7 +79,7 @@ const MemberMenu = (props: MemberMenuProps) => {
 							<Button
 								variant="outlined"
 								sx={{ background: "#b9b9b9" }}
-								onClick={() => unsubscribeHandler(member?._id, null, memberId)}
+								onClick={() => unsubscribeHandler(member?._id, getMemberRefetch, memberId)}
 							>
 								Unfollow
 							</Button>
@@ -92,7 +92,7 @@ const MemberMenu = (props: MemberMenuProps) => {
 								background: "#ff5d18",
 								":hover": { background: "#ff5d18" },
 							}}
-							onClick={() => subscribeHandler(member?._id, null, memberId)}
+							onClick={() => subscribeHandler(member?._id, getMemberRefetch, memberId)}
 						>
 							Follow
 						</Button>

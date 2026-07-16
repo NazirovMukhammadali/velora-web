@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { POPULAR_DESTINATIONS } from '../../data/popularDestinations';
+import VeloraImage from '../common/VeloraImage';
 
 const PopularDestinations = () => {
 	return (
@@ -18,7 +19,7 @@ const PopularDestinations = () => {
 				{POPULAR_DESTINATIONS.map((d) => (
 					<Link href={'/tours'} key={d.slug} className={'destination-card'} scroll={true}>
 						<div className={'destination-card-image'}>
-							<img src={d.image} alt={d.name} loading={'lazy'} />
+							<VeloraImage src={d.image} alt={d.name} fill sizes="(max-width: 768px) 100vw, 25vw" />
 							<span className={'destination-badge'}>
 								{d.tourCount.toString().padStart(2, '0')} tours
 							</span>

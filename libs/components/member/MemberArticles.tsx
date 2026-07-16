@@ -13,7 +13,6 @@ import { GET_BOARD_ARTICLES } from "../../../apollo/user/query";
 import { Messages } from "../../config";
 import {
 	sweetMixinErrorAlert,
-	sweetTopSmallSuccessAlert,
 } from "../../sweetAlert";
 
 const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
@@ -35,11 +34,12 @@ const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
 		refetch: boardArticlesRefetch,
 	} = useQuery(GET_BOARD_ARTICLES, {
 		fetchPolicy: "network-only",
+		errorPolicy: "all",
 		variables: { input: searchFilter },
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setMemberBoArticles(data?.getBoardArticles?.list);
-			setTotal(data?.getBoardArticles?.metaCounter[0]?.total || 0);
+			setMemberBoArticles(data?.getBoardArticles?.list ?? []);
+			setTotal(data?.getBoardArticles?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
@@ -63,7 +63,6 @@ const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
 			await likeTargetBoardArticle({ variables: { input: id } });
 
 			await boardArticlesRefetch({ input: searchFilter });
-			await sweetTopSmallSuccessAlert("Success!", 800);
 		} catch (err: any) {
 			console.log("ERROR, likePropertyHandler:", err.message);
 			sweetMixinErrorAlert(err.message).then();

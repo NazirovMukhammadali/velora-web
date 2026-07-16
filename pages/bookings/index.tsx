@@ -5,6 +5,7 @@ import { useQuery } from '@apollo/client';
 import { Stack, Typography } from '@mui/material';
 import Link from 'next/link';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
+import { useRequireAuth } from '../../libs/hooks/useAuth';
 import { GET_MY_TOUR_BOOKINGS } from '../../apollo/user/query';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { formatPackagePrice } from '../../libs/data/packages';
@@ -19,10 +20,12 @@ export const getStaticProps = async ({ locale }: any) => ({
 
 const BookingsPage: NextPage = () => {
 	const router = useRouter();
+	const { isAuthorized } = useRequireAuth();
 	const [localBookings, setLocalBookings] = useState<StoredBooking[]>([]);
 
 	const { data, error } = useQuery(GET_MY_TOUR_BOOKINGS, {
 		fetchPolicy: 'network-only',
+		skip: !isAuthorized,
 		variables: {
 			input: {
 				page: 1,
@@ -34,11 +37,16 @@ const BookingsPage: NextPage = () => {
 	});
 
 	useEffect(() => {
+		if (!isAuthorized) return;
 		setLocalBookings(getLocalBookings());
-	}, [router.query.booked]);
+	}, [router.query.booked, isAuthorized]);
 
 	const apiBookings = data?.getMyTourBookings?.list ?? [];
 	const showSuccess = router.query.booked === '1';
+
+	if (!isAuthorized) {
+		return null;
+	}
 
 	return (
 		<Stack className={'agent-list-page'}>
@@ -79,8 +87,8 @@ const BookingsPage: NextPage = () => {
 
 				{error && (
 					<Typography color="text.secondary">
-						Sign in to sync agent tour bookings from the server. Your Velora package bookings above are
-						stored on this device.
+						Unable to load agent tour bookings from the server right now. Your Velora package bookings
+						above are stored on this device.
 					</Typography>
 				)}
 
@@ -105,7 +113,7 @@ const BookingsPage: NextPage = () => {
 						<Link href="/" style={{ color: '#5b3df5', fontWeight: 600 }}>
 							Browse packages
 						</Link>{' '}
-						and use Book Now on any tour, hotel, or car.
+						and use Book Now on any tour, hotel, car, or flight.
 					</Typography>
 				)}
 			</Stack>

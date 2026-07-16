@@ -13,7 +13,7 @@ import { LIKE_TARGET_MEMBER } from '../../apollo/user/mutation';
 import { GET_AGENTS } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import { Messages } from '../../libs/config';
-import { sweetMixinErrorAlert, sweetTopSmallSuccessAlert } from '../../libs/sweetAlert';
+import { sweetMixinErrorAlert } from '../../libs/sweetAlert';
 import AgentListCard from '../../libs/components/agent/AgentListCard';
 import {
 	AGENT_SPECIALTIES,
@@ -148,7 +148,6 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 			if (!user._id) throw new Error(Messages.error2);
 			await likeTargetMember({ variables: { input: id } });
 			await getAgentsRefetch({ input: searchFilter });
-			await sweetTopSmallSuccessAlert('success', 800);
 		} catch (err: any) {
 			sweetMixinErrorAlert(err.message).then();
 		}
@@ -175,13 +174,13 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 			<Stack className={'container'}>
 				<section className={'agent-page-hero'} aria-labelledby="agent-page-title">
 					<div className={'agent-page-hero__inner'}>
-						<span className={'agent-experts-eyebrow'}>Meet with guide</span>
+						<span className={'agent-experts-eyebrow'}>Certified experts</span>
 						<h1 id="agent-page-title" className={'agent-experts-title'}>
-							Find your perfect travel expert
+							Find your perfect travel guide
 						</h1>
 						<p className={'agent-page-sub'}>
-							Verified locals and certified agents — not tour packages. Compare specialties, ratings, and
-							tour counts, then book directly with the expert you trust.
+							Browse verified agents by destination and specialty. Compare tour counts and ratings, then
+							book packages directly with the expert you trust.
 						</p>
 						<div className={'agent-page-stats'}>
 							<div>
@@ -280,7 +279,6 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 							<AgentListCard
 								key={agent._id}
 								agent={agent}
-								useExternalImage={usingFallback}
 								likeCount={getAgentLikeCount(agent)}
 								liked={
 									usingFallback

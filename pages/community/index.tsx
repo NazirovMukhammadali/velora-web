@@ -17,7 +17,6 @@ import { GET_BOARD_ARTICLES } from "../../apollo/user/query";
 import { Message } from "../../libs/enums/common.enum";
 import {
 	sweetMixinErrorAlert,
-	sweetTopSmallSuccessAlert,
 } from "../../libs/sweetAlert";
 
 export const getStaticProps = async ({ locale }: any) => ({
@@ -46,12 +45,12 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 		refetch: boardArticlesRefetch,
 	} = useQuery(GET_BOARD_ARTICLES, {
 		fetchPolicy: "cache-and-network",
+		errorPolicy: "all",
 		variables: { input: searchCommunity },
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			console.log("data", data);
-			setBoardArticles(data?.getBoardArticles?.list);
-			setTotalCount(data?.getBoardArticles?.metaCounter[0]?.total);
+			setBoardArticles(data?.getBoardArticles?.list ?? []);
+			setTotalCount(data?.getBoardArticles?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
@@ -77,8 +76,6 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 			await likeTargetBoardArticle({ variables: { input: id } });
 
 			await boardArticlesRefetch({ input: searchCommunity });
-
-			await sweetTopSmallSuccessAlert("succes", 800);
 		} catch (err: any) {
 			console.log("ERROR, likePropertyHandler:", err.message);
 			sweetMixinErrorAlert(err.message).then();
@@ -113,11 +110,11 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 		return (
 			<div id="community-list-page">
 				<div className="container">
-					<TabContext value={searchCommunity.search.articleCategory}>
+					<TabContext value={searchCommunity.search.articleCategory ?? 'FREE'}>
 						<Stack className="main-box">
 							<Stack className="left-config">
 								<Stack className={"image-info"}>
-									<img src={"/img/logo/velora-logo.svg"} alt={"Velora"} />
+									<img src={"/img/logo/velora-mark.svg"} alt={"Velora"} />
 									<Stack className={"community-name"}>
 										<Typography className={"name"}>Velora Community</Typography>
 									</Stack>

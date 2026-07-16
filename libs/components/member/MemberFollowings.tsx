@@ -45,12 +45,13 @@ const MemberFollowings = (props: MemberFollowingsProps) => {
 		refetch: getMemberFollowingsRefetch,
 	} = useQuery(GET_MEMBER_FOLLOWINGS, {
 		fetchPolicy: "network-only",
+		errorPolicy: "all",
 		variables: { input: followInquiry },
 		skip: !followInquiry?.search?.followerId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setMemberFollowings(data?.getMemberFollowings?.list);
-			setTotal(data?.getMemberFollowings?.metaCounter[0]?.total);
+			setMemberFollowings(data?.getMemberFollowings?.list ?? []);
+			setTotal(data?.getMemberFollowings?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
@@ -66,7 +67,8 @@ const MemberFollowings = (props: MemberFollowingsProps) => {
 	}, [router]);
 
 	useEffect(() => {
-		getMemberFollowingsRefetch({ input: followInquiry }).then();
+		if (!followInquiry?.search?.followerId) return;
+		getMemberFollowingsRefetch({ input: followInquiry }).catch(() => {});
 	}, [followInquiry]);
 
 	/** HANDLERS **/

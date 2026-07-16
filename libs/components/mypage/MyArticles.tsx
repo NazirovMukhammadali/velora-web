@@ -12,7 +12,6 @@ import { GET_BOARD_ARTICLES } from "../../../apollo/user/query";
 import { Messages } from "../../config";
 import {
 	sweetMixinErrorAlert,
-	sweetTopSmallSuccessAlert,
 } from "../../sweetAlert";
 
 const MyArticles: NextPage = ({ initialInput, ...props }: T) => {
@@ -57,7 +56,6 @@ const MyArticles: NextPage = ({ initialInput, ...props }: T) => {
 			await likeTargetBoardArticle({ variables: { input: id } });
 
 			await boardArticlesRefetch({ input: searchCommunity });
-			await sweetTopSmallSuccessAlert("Success!", 750);
 		} catch (err: any) {
 			console.log("ERROR, likePropertyHandler:", err.message);
 			sweetMixinErrorAlert(err.message).then();

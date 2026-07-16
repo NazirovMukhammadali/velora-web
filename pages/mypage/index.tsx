@@ -3,19 +3,15 @@ import { useRouter } from "next/router";
 import { NextPage } from "next";
 import { Stack, Typography } from "@mui/material";
 import useDeviceDetect from "../../libs/hooks/useDeviceDetect";
+import { useRequireAuth } from "../../libs/hooks/useAuth";
 import withLayoutBasic from "../../libs/components/layout/LayoutBasic";
 import MyProfile from "../../libs/components/mypage/MyProfile";
 import MyArticles from "../../libs/components/mypage/MyArticles";
-import { useMutation, useReactiveVar } from "@apollo/client";
-import { userVar } from "../../apollo/store";
+import { useMutation } from "@apollo/client";
 import MyMenu from "../../libs/components/mypage/MyMenu";
 import WriteArticle from "../../libs/components/mypage/WriteArticle";
 import MemberFollowers from "../../libs/components/member/MemberFollowers";
-import {
-	sweetErrorHandling,
-	sweetMixinErrorAlert,
-	sweetTopSmallSuccessAlert,
-} from "../../libs/sweetAlert";
+import { sweetErrorHandling, sweetMixinErrorAlert } from "../../libs/sweetAlert";
 import MemberFollowings from "../../libs/components/member/MemberFollowings";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
@@ -31,9 +27,14 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
+const safeRefetch = async (refetch: any, query: any) => {
+	if (typeof refetch !== "function") return;
+	await refetch({ input: query });
+};
+
 const MyPage: NextPage = () => {
 	const device = useDeviceDetect();
-	const user = useReactiveVar(userVar);
+	const { user, isAuthorized } = useRequireAuth();
 	const router = useRouter();
 	const category: any = router.query?.category ?? "myProfile";
 
@@ -41,11 +42,6 @@ const MyPage: NextPage = () => {
 	const [subscribe] = useMutation(SUBSCRIBE);
 	const [unsubscribe] = useMutation(UNSUBSCRIBE);
 	const [likeTargetMember] = useMutation(LIKE_TARGET_MEMBER);
-
-	/** LIFECYCLES **/
-	useEffect(() => {
-		if (!user._id) router.push("/").then();
-	}, [user]);
 
 	const legacyCategories = ["addProperty", "myProperties", "myFavorites", "recentlyVisited"];
 	useEffect(() => {
@@ -57,7 +53,6 @@ const MyPage: NextPage = () => {
 	/** HANDLERS **/
 	const subscribeHandler = async (id: string, refetch: any, query: any) => {
 		try {
-			console.log("id:", id);
 			if (!id) throw new Error(Messages.error1);
 			if (!user._id) throw new Error(Messages.error2);
 
@@ -66,8 +61,7 @@ const MyPage: NextPage = () => {
 					input: id,
 				},
 			});
-			await sweetTopSmallSuccessAlert("Subscribed!", 800);
-			await refetch({ input: query });
+			await safeRefetch(refetch, query);
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		}
@@ -78,13 +72,12 @@ const MyPage: NextPage = () => {
 			if (!id) throw new Error(Messages.error1);
 			if (!user._id) throw new Error(Messages.error2);
 
-			await subscribe({
+			await unsubscribe({
 				variables: {
 					input: id,
 				},
 			});
-			await sweetTopSmallSuccessAlert("Unsubscribed!", 800);
-			await refetch({ input: query });
+			await safeRefetch(refetch, query);
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		}
@@ -100,8 +93,7 @@ const MyPage: NextPage = () => {
 					input: id,
 				},
 			});
-			await sweetTopSmallSuccessAlert("Success!", 800);
-			await refetch({ input: query });
+			await safeRefetch(refetch, query);
 		} catch (err: any) {
 			console.log("ERROR, likeMemberHandler:", err.message);
 			sweetMixinErrorAlert(err.message).then();
@@ -117,6 +109,10 @@ const MyPage: NextPage = () => {
 			await sweetErrorHandling(error);
 		}
 	};
+
+	if (!isAuthorized) {
+		return null;
+	}
 
 	if (device === "mobile") {
 		return (

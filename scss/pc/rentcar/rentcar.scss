@@ -1,0 +1,17 @@
+.rentcar-page {
+	.rentcar-price-pills {
+		margin-top: -4px;
+	}
+
+	.tours-toolbar {
+		gap: 14px;
+	}
+}
+
+@media (max-width: 768px) {
+	.rentcar-page {
+		.tours-categories {
+			flex-wrap: wrap;
+		}
+	}
+}

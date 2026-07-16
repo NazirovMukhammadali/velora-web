@@ -1,16 +1,22 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { NextPage } from 'next';
-import { useQuery } from '@apollo/client';
 import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import PackageCard from '../../libs/components/packages/PackageCard';
-import { getPackagesByType } from '../../libs/data/packages';
+import { CatalogGridSkeleton } from '../../libs/components/common/CatalogCardSkeleton';
+import { getPackagesByType, matchesPackageSearch, sortPackages } from '../../libs/data/packages';
 import { mapToursToPackages } from '../../libs/data/packageApi';
 import { GET_TOURS } from '../../apollo/user/query';
+import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
+import type { VeloraPackage } from '../../libs/types/package';
 import type { TourCategory } from '../../libs/data/tours';
 
-type SortKey = 'recommended' | 'priceAsc' | 'priceDesc' | 'rating';
+const TOUR_FILTER_DEFAULTS = {
+	location: '',
+	category: 'All',
+	sort: 'recommended',
+};
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -18,57 +24,31 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
-const sortPackages = (list: ReturnType<typeof getPackagesByType>, sort: SortKey) => {
-	const cloned = [...list];
-	switch (sort) {
-		case 'priceAsc':
-			return cloned.sort((a, b) => a.priceAmount - b.priceAmount);
-		case 'priceDesc':
-			return cloned.sort((a, b) => b.priceAmount - a.priceAmount);
-		case 'rating':
-			return cloned.sort((a, b) => b.rating - a.rating);
-		default:
-			return cloned;
-	}
-};
-
 const ToursPage: NextPage = () => {
-	const { data } = useQuery(GET_TOURS, {
-		fetchPolicy: 'cache-and-network',
-		errorPolicy: 'all',
-		variables: { input: { page: 1, limit: 24, sort: 'createdAt', direction: 'DESC' } },
+	const { filters, setFilter, items, allItems, isInitialLoading } = usePackageCatalog<
+		VeloraPackage,
+		typeof TOUR_FILTER_DEFAULTS
+	>({
+		query: GET_TOURS,
+		selectList: (data) => data?.getTours?.list,
+		mapApi: mapToursToPackages,
+		fallback: () => getPackagesByType('tours'),
+		filterDefaults: TOUR_FILTER_DEFAULTS,
+		catalogOptions: { debounceKeys: ['location'] },
+		filterItem: (tour, f) =>
+			(f.category === 'All' || tour.category === f.category) && matchesPackageSearch(tour, f.location),
+		sortItems: sortPackages,
 	});
-
-	// API-first: show backend tours when available, otherwise fall back to the static catalog.
-	const tours = useMemo(() => {
-		const apiTours = mapToursToPackages(data?.getTours?.list);
-		return apiTours.length > 0 ? apiTours : getPackagesByType('tours');
-	}, [data]);
 
 	const categories = useMemo(() => {
 		const set = new Set<TourCategory>();
-		tours.forEach((t) => {
-			if (t.category) set.add(t.category as TourCategory);
+		allItems.forEach((tour) => {
+			if (tour.category) set.add(tour.category as TourCategory);
 		});
 		return Array.from(set);
-	}, [tours]);
+	}, [allItems]);
 
-	const [activeCategory, setActiveCategory] = useState<TourCategory | 'All'>('All');
-	const [sort, setSort] = useState<SortKey>('recommended');
-	const [search, setSearch] = useState('');
-
-	const filteredTours = useMemo(() => {
-		const lowerSearch = search.trim().toLowerCase();
-		const list = tours.filter((tour) => {
-			const matchCategory = activeCategory === 'All' || tour.category === activeCategory;
-			const matchSearch =
-				!lowerSearch ||
-				tour.title.toLowerCase().includes(lowerSearch) ||
-				tour.location.toLowerCase().includes(lowerSearch);
-			return matchCategory && matchSearch;
-		});
-		return sortPackages(list, sort);
-	}, [activeCategory, sort, search, tours]);
+	const activeCategory = filters.category;
 
 	return (
 		<Stack className={'tours-page'}>
@@ -77,8 +57,8 @@ const ToursPage: NextPage = () => {
 					<input
 						type="text"
 						placeholder="Search by destination or tour"
-						value={search}
-						onChange={(event) => setSearch(event.target.value)}
+						value={filters.location}
+						onChange={(event) => setFilter('location', event.target.value)}
 						className={'tours-search-input'}
 					/>
 				</div>
@@ -87,7 +67,7 @@ const ToursPage: NextPage = () => {
 					<button
 						type="button"
 						className={`category-pill ${activeCategory === 'All' ? 'active' : ''}`}
-						onClick={() => setActiveCategory('All')}
+						onClick={() => setFilter('category', 'All')}
 					>
 						All
 					</button>
@@ -96,7 +76,7 @@ const ToursPage: NextPage = () => {
 							key={category}
 							type="button"
 							className={`category-pill ${activeCategory === category ? 'active' : ''}`}
-							onClick={() => setActiveCategory(category)}
+							onClick={() => setFilter('category', category)}
 						>
 							{category}
 						</button>
@@ -105,11 +85,7 @@ const ToursPage: NextPage = () => {
 
 				<div className={'tours-sort'}>
 					<label htmlFor="tours-sort">Sort by</label>
-					<select
-						id="tours-sort"
-						value={sort}
-						onChange={(event) => setSort(event.target.value as SortKey)}
-					>
+					<select id="tours-sort" value={filters.sort} onChange={(event) => setFilter('sort', event.target.value)}>
 						<option value="recommended">Recommended</option>
 						<option value="priceAsc">Price · Low to High</option>
 						<option value="priceDesc">Price · High to Low</option>
@@ -119,11 +95,13 @@ const ToursPage: NextPage = () => {
 			</Stack>
 
 			<Stack className={'tours-page-cards tour-packages-section'}>
-				{filteredTours.length === 0 ? (
+				{isInitialLoading ? (
+					<CatalogGridSkeleton count={8} />
+				) : items.length === 0 ? (
 					<div className={'tours-empty'}>No tours match your filters yet.</div>
 				) : (
 					<div className={'tour-grid'}>
-						{filteredTours.map((pkg) => (
+						{items.map((pkg) => (
 							<PackageCard key={pkg.id} pkg={pkg} />
 						))}
 					</div>

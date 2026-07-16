@@ -13,13 +13,14 @@ import { userVar } from '../../apollo/store';
 import { CommentInput, CommentsInquiry } from '../../libs/types/comment/comment.input';
 import { Comment } from '../../libs/types/comment/comment';
 import { CommentGroup } from '../../libs/enums/comment.enum';
-import { Messages, REACT_APP_API_URL } from '../../libs/config';
+import { Messages } from '../../libs/config';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { CREATE_COMMENT, CREATE_TOUR_BOOKING } from '../../apollo/user/mutation';
 import { GET_AGENT_TOURS, GET_COMMENTS, GET_MEMBER } from '../../apollo/user/query';
 import { T } from '../../libs/types/common';
 import { Message } from '../../libs/enums/common.enum';
 import { getShowcaseAgentById, showcaseAgentToMember } from '../../libs/data/agents';
+import { resolveMemberImageUrl } from '../../libs/utils/memberImage';
 
 
 export const getStaticProps = async ({ locale }: any) => ({
@@ -182,11 +183,7 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 		return <div>AGENT DETAIL PAGE MOBILE</div>;
 	}
 
-	const agentImage = usingShowcase
-		? agent?.memberImage || '/img/profile/defaultUser.svg'
-		: agent?.memberImage
-			? `${REACT_APP_API_URL}/${agent.memberImage}`
-			: '/img/profile/defaultUser.svg';
+	const agentImage = resolveMemberImageUrl(agent?.memberImage);
 
 	if ((!router.isReady || (memberLoading && !usingShowcase)) && !agent) {
 		return (

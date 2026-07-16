@@ -1,12 +1,13 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useRouter } from 'next/router';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
-import Head from 'next/head';
 import VeloraNavbar from './VeloraNavbar';
 import Footer from '../Footer';
 import { Stack } from '@mui/material';
-import { getJwtToken, updateUserInfo } from '../../auth';
+import useAuth from '../../hooks/useAuth';
 import Chat from '../Chat';
+import ErrorBoundary from '../common/ErrorBoundary';
+import SeoHead from '../common/SeoHead';
+import { getRouteSeo } from '../../config/seo';
 import { AGENT_HEADER_BG, AGENT_HEADER_OVERLAY } from '../../data/agentPage';
 import { useTranslation } from 'next-i18next';
 import 'swiper/css';
@@ -17,12 +18,14 @@ const withLayoutBasic = (Component: any) => {
 	return (props: any) => {
 		const router = useRouter();
 		const { t } = useTranslation('common');
-		const device = useDeviceDetect();
+		useAuth({ syncOnMount: true });
 
 		const authPaths = ['/account/join', '/login', '/register'];
 		const hideHeroBanner = authPaths.includes(router.pathname);
 		const hideNavbar = hideHeroBanner;
 		const hideFooter = hideHeroBanner;
+		const seo = getRouteSeo(router.pathname);
+		const isAgentHeader = router.pathname === '/agent' || router.pathname === '/agent/detail';
 
 		const memoizedValues = useMemo(() => {
 			let title = '',
@@ -122,93 +125,49 @@ const withLayoutBasic = (Component: any) => {
 			return { title, desc, bgImage };
 		}, [router.pathname]);
 
-		/** LIFECYCLES **/
-		useEffect(() => {
-			const jwt = getJwtToken();
-			if (jwt) updateUserInfo(jwt);
-		}, []);
-
-		/** HANDLERS **/
-
-		if (device == 'mobile') {
-			return (
-				<>
-					<Head>
-						<title>Velora</title>
-						<meta name={'title'} content={`Velora`} />
-					</Head>
-					<Stack id="mobile-wrap" className={hideNavbar ? 'mobile-wrap--auth' : undefined}>
-						{!hideNavbar && (
-							<Stack id={'top'}>
-								<VeloraNavbar contrast />
-							</Stack>
-						)}
-
-						<Stack id={'main'}>
-							<Component {...props} />
+		return (
+			<>
+				<SeoHead title={seo.title} description={seo.description} />
+				<Stack id="pc-wrap" className={hideNavbar ? 'pc-wrap--auth' : undefined}>
+					{!hideNavbar && (
+						<Stack id={'top'}>
+							<VeloraNavbar contrast />
 						</Stack>
+					)}
 
-						{!hideFooter && (
-							<Stack id={'footer'}>
-								<Footer />
+					{!hideHeroBanner && memoizedValues.bgImage && (
+						<Stack
+							className={`header-basic${isAgentHeader ? ' header-basic--agents' : ''}`}
+							style={{
+								backgroundImage: `url(${memoizedValues.bgImage})`,
+								backgroundSize: 'cover',
+								backgroundPosition: 'center',
+								boxShadow: isAgentHeader ? AGENT_HEADER_OVERLAY : 'inset 10px 40px 150px 40px rgb(24 22 36)',
+							}}
+						>
+							<Stack className={'container'}>
+								<strong>{t(memoizedValues.title)}</strong>
+								<span>{t(memoizedValues.desc)}</span>
 							</Stack>
-						)}
-					</Stack>
-				</>
-			);
-		} else {
-			return (
-				<>
-					<Head>
-						<title>Velora</title>
-						<meta name={'title'} content={`Velora`} />
-					</Head>
-					<Stack id="pc-wrap" className={hideNavbar ? 'pc-wrap--auth' : undefined}>
-						{!hideNavbar && (
-							<Stack id={'top'}>
-								<VeloraNavbar contrast />
-							</Stack>
-						)}
-
-						{!hideHeroBanner && (
-							<Stack
-								className={`header-basic${
-									router.pathname === '/agent' || router.pathname === '/agent/detail'
-										? ' header-basic--agents'
-										: ''
-								}`}
-								style={{
-									backgroundImage: `url(${memoizedValues.bgImage})`,
-									backgroundSize: 'cover',
-									backgroundPosition: 'center',
-									boxShadow:
-										router.pathname === '/agent' || router.pathname === '/agent/detail'
-											? AGENT_HEADER_OVERLAY
-											: 'inset 10px 40px 150px 40px rgb(24 22 36)',
-								}}
-							>
-								<Stack className={'container'}>
-									<strong>{t(memoizedValues.title)}</strong>
-									<span>{t(memoizedValues.desc)}</span>
-								</Stack>
-							</Stack>
-						)}
-
-						<Stack id={'main'}>
-							<Component {...props} />
 						</Stack>
+					)}
 
-						{!hideNavbar && <Chat />}
-
-						{!hideFooter && (
-							<Stack id={'footer'}>
-								<Footer />
-							</Stack>
-						)}
+					<Stack id={'main'}>
+						<ErrorBoundary>
+							<Component {...props} />
+						</ErrorBoundary>
 					</Stack>
-				</>
-			);
-		}
+
+					{!hideNavbar && <Chat />}
+
+					{!hideFooter && (
+						<Stack id={'footer'}>
+							<Footer />
+						</Stack>
+					)}
+				</Stack>
+			</>
+		);
 	};
 };
 

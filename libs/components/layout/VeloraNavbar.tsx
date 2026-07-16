@@ -2,15 +2,14 @@ import React, { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
-import { useReactiveVar } from '@apollo/client';
 import { styled } from '@mui/material/styles';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { Logout } from '@mui/icons-material';
 import { CaretDown } from 'phosphor-react';
-import { userVar } from '../../../apollo/store';
-import { getJwtToken, logOut, updateUserInfo } from '../../auth';
+import { logOut } from '../../auth';
+import useAuth from '../../hooks/useAuth';
 import { REACT_APP_API_URL } from '../../config';
 
 type VeloraNavbarProps = {
@@ -77,7 +76,7 @@ const LangMenu = styled((props: MenuProps) => (
 }));
 
 const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) => {
-	const user = useReactiveVar(userVar);
+	const { user } = useAuth({ syncOnMount: true });
 	const { t } = useTranslation('common');
 	const router = useRouter();
 	const [lang, setLang] = useState('en');
@@ -95,11 +94,6 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 			setLang('en');
 		}
 	}, [router]);
-
-	useEffect(() => {
-		const jwt = getJwtToken();
-		if (jwt) updateUserInfo(jwt);
-	}, []);
 
 	useEffect(() => {
 		const onScroll = () => setScrolled(window.scrollY > 16);

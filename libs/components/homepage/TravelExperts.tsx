@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import VeloraImage from '../common/VeloraImage';
 
 type TravelExpert = {
 	name: string;
@@ -70,7 +71,7 @@ const TravelExperts = () => {
 				{experts.map((expert) => (
 					<article className={'expert-card'} key={expert.name}>
 						<div className={'expert-avatar'}>
-							<img src={expert.image} alt={expert.name} />
+							<VeloraImage src={expert.image} alt={expert.name} fill sizes="112px" />
 						</div>
 						<h3>{expert.name}</h3>
 						<p>{expert.role}</p>

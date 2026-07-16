@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Checkbox, FormControlLabel, FormGroup, Radio, RadioGroup } from '@mui/material';
 import { logIn, signUp } from '../../auth';
-import { sweetMixinErrorAlert } from '../../sweetAlert';
 
 type VeloraAuthPageProps = {
 	variant: 'login' | 'register';
@@ -12,9 +11,7 @@ type VeloraAuthPageProps = {
 const VeloraAuthPage = ({ variant }: VeloraAuthPageProps) => {
 	const router = useRouter();
 	const [nick, setNick] = useState('');
-	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [confirmPassword, setConfirmPassword] = useState('');
 	const [phone, setPhone] = useState('');
 	const [memberType, setMemberType] = useState<'USER' | 'AGENT'>('USER');
 
@@ -28,21 +25,16 @@ const VeloraAuthPage = ({ variant }: VeloraAuthPageProps) => {
 	}, [nick, password, router]);
 
 	const doSignUp = useCallback(async () => {
-		if (password !== confirmPassword) {
-			await sweetMixinErrorAlert('Passwords do not match');
-			return;
-		}
 		try {
 			await signUp(nick.trim(), password, phone.trim(), memberType);
 			await router.push(`${router.query.referrer ?? '/'}`);
 		} catch {
 			/* alerts handled in auth */
 		}
-	}, [nick, password, confirmPassword, phone, memberType, router]);
+	}, [nick, password, phone, memberType, router]);
 
 	const loginDisabled = nick.trim() === '' || password === '';
-	const registerDisabled =
-		nick.trim() === '' || password === '' || phone.trim() === '' || confirmPassword === '';
+	const registerDisabled = nick.trim() === '' || password === '' || phone.trim() === '';
 
 	if (variant === 'login') {
 		return (
@@ -55,7 +47,7 @@ const VeloraAuthPage = ({ variant }: VeloraAuthPageProps) => {
 						<input
 							type={'text'}
 							className={'velora-auth-input'}
-							placeholder={'E-mail or username'}
+							placeholder={'Username'}
 							autoComplete={'username'}
 							value={nick}
 							onChange={(e) => setNick(e.target.value)}
@@ -109,28 +101,12 @@ const VeloraAuthPage = ({ variant }: VeloraAuthPageProps) => {
 						onChange={(e) => setNick(e.target.value)}
 					/>
 					<input
-						type={'email'}
-						className={'velora-auth-input'}
-						placeholder={'Enter your email'}
-						autoComplete={'email'}
-						value={email}
-						onChange={(e) => setEmail(e.target.value)}
-					/>
-					<input
 						type={'password'}
 						className={'velora-auth-input'}
 						placeholder={'Password'}
 						autoComplete={'new-password'}
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
-					/>
-					<input
-						type={'password'}
-						className={'velora-auth-input'}
-						placeholder={'Confirm password'}
-						autoComplete={'new-password'}
-						value={confirmPassword}
-						onChange={(e) => setConfirmPassword(e.target.value)}
 					/>
 					<input
 						type={'tel'}

@@ -8,11 +8,7 @@ import { useRouter } from "next/router";
 import MemberFollowers from "../../libs/components/member/MemberFollowers";
 import MemberArticles from "../../libs/components/member/MemberArticles";
 import { useMutation, useReactiveVar } from "@apollo/client";
-import {
-	sweetErrorHandling,
-	sweetMixinErrorAlert,
-	sweetTopSmallSuccessAlert,
-} from "../../libs/sweetAlert";
+import { sweetErrorHandling, sweetMixinErrorAlert } from "../../libs/sweetAlert";
 import { userVar } from "../../apollo/store";
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import {
@@ -28,6 +24,11 @@ export const getStaticProps = async ({ locale }: any) => ({
 		...(await serverSideTranslations(locale, ["common"])),
 	},
 });
+
+const safeRefetch = async (refetch: any, query: any) => {
+	if (typeof refetch !== "function") return;
+	await refetch({ input: query });
+};
 
 const MemberPage: NextPage = () => {
 	const device = useDeviceDetect();
@@ -72,7 +73,6 @@ const MemberPage: NextPage = () => {
 	/** HANDLERS **/
 	const subscribeHandler = async (id: string, refetch: any, query: any) => {
 		try {
-			console.log("id:", id);
 			if (!id) throw new Error(Messages.error1);
 			if (!user._id) throw new Error(Messages.error2);
 
@@ -81,8 +81,7 @@ const MemberPage: NextPage = () => {
 					input: id,
 				},
 			});
-			await sweetTopSmallSuccessAlert("Subscribed!", 800);
-			await refetch({ input: query });
+			await safeRefetch(refetch, query);
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		}
@@ -93,13 +92,12 @@ const MemberPage: NextPage = () => {
 			if (!id) throw new Error(Messages.error1);
 			if (!user._id) throw new Error(Messages.error2);
 
-			await subscribe({
+			await unsubscribe({
 				variables: {
 					input: id,
 				},
 			});
-			await sweetTopSmallSuccessAlert("Unsubscribed!", 800);
-			await refetch({ input: query });
+			await safeRefetch(refetch, query);
 		} catch (err: any) {
 			sweetErrorHandling(err).then();
 		}
@@ -115,8 +113,7 @@ const MemberPage: NextPage = () => {
 					input: id,
 				},
 			});
-			await sweetTopSmallSuccessAlert("Success!", 800);
-			await refetch({ input: query });
+			await safeRefetch(refetch, query);
 		} catch (err: any) {
 			console.log("ERROR, likeMemberHandler:", err.message);
 			sweetMixinErrorAlert(err.message).then();

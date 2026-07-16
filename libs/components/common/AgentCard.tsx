@@ -1,7 +1,7 @@
 import React from 'react';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Link from 'next/link';
-import { REACT_APP_API_URL } from '../../config';
+import { resolveMemberImageUrl } from '../../utils/memberImage';
 import IconButton from '@mui/material/IconButton';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
@@ -21,9 +21,7 @@ const AgentCard = (props: AgentCardProps) => {
 	const { agent, likeMemberHandler } = props;
 	const device = useDeviceDetect();
 	const user = useReactiveVar(userVar);
-	const imagePath: string = agent?.memberImage
-		? `${REACT_APP_API_URL}/${agent?.memberImage}`
-		: '/img/profile/defaultUser.svg';
+	const imagePath = resolveMemberImageUrl(agent?.memberImage);
 
 	const detailHref = {
 		pathname: '/agent/detail',

@@ -4,7 +4,7 @@ import TelegramIcon from '@mui/icons-material/Telegram';
 import TwitterIcon from '@mui/icons-material/Twitter';
 import useDeviceDetect from '../hooks/useDeviceDetect';
 import { Stack, Box } from '@mui/material';
-import moment from 'moment';
+import { currentYear } from '../utils/date';
 import Link from 'next/link';
 
 const FooterBrand = () => (
@@ -98,7 +98,7 @@ const Footer = () => {
 					</Stack>
 				</Stack>
 				<Stack className={'second'}>
-					<span>© Velora · {moment().year()} · All rights reserved</span>
+					<span>© Velora · {currentYear()} · All rights reserved</span>
 				</Stack>
 			</Stack>
 		);
@@ -191,7 +191,7 @@ const Footer = () => {
 				</Stack>
 			</Stack>
 			<Stack className={'second'}>
-				<span>© Velora · {moment().year()} · All rights reserved</span>
+				<span>© Velora · {currentYear()} · All rights reserved</span>
 				<span className={'footer-legal'}>
 					<Link href={'/about'} className={linkClass}>
 						Privacy

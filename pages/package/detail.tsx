@@ -6,9 +6,11 @@ import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import PackageDetailView from '../../libs/components/packages/PackageDetailView';
-import { getPackage } from '../../libs/data/packages';
-import { mapHotelToPackage, mapTourToPackage } from '../../libs/data/packageApi';
-import { GET_HOTEL_DETAIL, GET_TOUR_DETAIL } from '../../apollo/user/query';
+import { PackageDetailSkeleton } from '../../libs/components/common/PackageDetailSkeleton';
+import SeoHead from '../../libs/components/common/SeoHead';
+import { getPackage, formatPackagePrice } from '../../libs/data/packages';
+import { mapHotelToPackage, mapRentcarToPackage, mapTourToPackage } from '../../libs/data/packageApi';
+import { GET_HOTEL_DETAIL, GET_RENTCAR_DETAIL, GET_TOUR_DETAIL } from '../../apollo/user/query';
 import type { PackageType } from '../../libs/types/package';
 
 export const getStaticProps = async ({ locale }: any) => ({
@@ -43,10 +45,17 @@ const PackageDetailPage: NextPage = () => {
 		skip: !router.isReady || !id || type !== 'hotels' || Boolean(staticPkg),
 	});
 
+	const { data: rentcarData, loading: rentcarLoading } = useQuery(GET_RENTCAR_DETAIL, {
+		fetchPolicy: 'cache-and-network',
+		errorPolicy: 'all',
+		variables: { rentcarId: id },
+		skip: !router.isReady || !id || type !== 'cars' || Boolean(staticPkg),
+	});
+
 	if (!router.isReady) {
 		return (
-			<Stack className={'pkg-detail-page container'} sx={{ py: 6 }}>
-				<p>Loading…</p>
+			<Stack className={'pkg-detail-wrap'}>
+				<PackageDetailSkeleton />
 			</Stack>
 		);
 	}
@@ -62,16 +71,18 @@ const PackageDetailPage: NextPage = () => {
 
 	const apiTour = tourData?.getTourDetail;
 	const apiHotel = hotelData?.getHotelDetail;
+	const apiRentcar = rentcarData?.getRentcarDetail;
 	const pkg =
 		staticPkg ??
 		(apiTour ? mapTourToPackage(apiTour) : undefined) ??
-		(apiHotel ? mapHotelToPackage(apiHotel) : undefined);
+		(apiHotel ? mapHotelToPackage(apiHotel) : undefined) ??
+		(apiRentcar ? mapRentcarToPackage(apiRentcar) : undefined);
 
 	if (!pkg) {
-		if (tourLoading || hotelLoading) {
+		if (tourLoading || hotelLoading || rentcarLoading) {
 			return (
-				<Stack className={'pkg-detail-page container'} sx={{ py: 6 }}>
-					<p>Loading…</p>
+				<Stack className={'pkg-detail-wrap'}>
+					<PackageDetailSkeleton />
 				</Stack>
 			);
 		}
@@ -84,9 +95,15 @@ const PackageDetailPage: NextPage = () => {
 	}
 
 	return (
-		<Stack className={'pkg-detail-wrap'}>
-			<PackageDetailView pkg={pkg} />
-		</Stack>
+		<>
+			<SeoHead
+				title={pkg.title}
+				description={`Book ${pkg.title} in ${pkg.location}. From ${formatPackagePrice(pkg.priceAmount)} ${pkg.priceUnit}. View gallery, reviews, and reserve on Velora.`}
+			/>
+			<Stack className={'pkg-detail-wrap'}>
+				<PackageDetailView pkg={pkg} />
+			</Stack>
+		</>
 	);
 };
 

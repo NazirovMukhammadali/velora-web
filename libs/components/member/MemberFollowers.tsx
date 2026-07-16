@@ -45,12 +45,13 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 		refetch: getMemberFollowersRefetch,
 	} = useQuery(GET_MEMBER_FOLLOWERS, {
 		fetchPolicy: "network-only",
+		errorPolicy: "all",
 		variables: { input: followInquiry },
 		skip: !followInquiry?.search?.followingId,
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			setMemberFollowers(data?.getMemberFollowers?.list);
-			setTotal(data?.getMemberFollowers?.metaCounter[0]?.total);
+			setMemberFollowers(data?.getMemberFollowers?.list ?? []);
+			setTotal(data?.getMemberFollowers?.metaCounter?.[0]?.total ?? 0);
 		},
 	});
 
@@ -69,7 +70,8 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 	}, [router]);
 
 	useEffect(() => {
-		getMemberFollowersRefetch({ input: followInquiry }).then();
+		if (!followInquiry?.search?.followingId) return;
+		getMemberFollowersRefetch({ input: followInquiry }).catch(() => {});
 	}, [followInquiry]);
 
 	/** HANDLERS **/
@@ -153,11 +155,13 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 											/>
 										) : (
 											<FavoriteBorderIcon
-												onClick={likeMemberHandler(
-													follower?.followerData?._id,
-													getMemberFollowersRefetch,
-													followInquiry
-												)}
+												onClick={() =>
+													likeMemberHandler(
+														follower?.followerData?._id,
+														getMemberFollowersRefetch,
+														followInquiry
+													)
+												}
 											/>
 										)}
 										<span>({follower?.followerData?.memberLikes})</span>
@@ -196,7 +200,7 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 												onClick={() =>
 													subscribeHandler(
 														follower?.followerData?._id,
-														null,
+														getMemberFollowersRefetch,
 														followInquiry
 													)
 												}

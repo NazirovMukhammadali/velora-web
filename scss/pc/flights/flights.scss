@@ -1,0 +1,476 @@
+/* Shared catalog header used by /tours, /hotels, /flights, /rentcar */
+.catalog-intro {
+	padding: 8px 0 24px;
+
+	.catalog-eyebrow {
+		display: inline-block;
+		font-family: $font;
+		font-size: 12px;
+		font-weight: 700;
+		letter-spacing: 0.16em;
+		text-transform: uppercase;
+		color: $velora-primary;
+		margin-bottom: 10px;
+	}
+
+	.catalog-title {
+		margin: 0;
+		font-family: $font;
+		font-size: 34px;
+		font-weight: 800;
+		line-height: 1.15;
+		color: $velora-text-main;
+	}
+
+	.catalog-sub {
+		margin: 12px 0 0;
+		max-width: 640px;
+		font-family: $font;
+		font-size: 15px;
+		line-height: 1.6;
+		color: #6b7280;
+	}
+}
+
+.catalog-count {
+	margin: 0 0 4px;
+	font-family: $font;
+	font-size: 14px;
+	font-weight: 600;
+	color: #5f6575;
+}
+
+.flights-page {
+	width: 100%;
+	padding: 36px 0 80px;
+	background: #f6f7fb;
+
+	.container {
+		width: 100%;
+		max-width: 1100px;
+		margin: 0 auto;
+		padding: 0 24px;
+	}
+
+	.flights-toolbar {
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 18px;
+		margin-bottom: 24px;
+		padding: 20px 24px;
+		background: #ffffff;
+		border-radius: 16px;
+		box-shadow: 0 6px 18px rgba(24, 26, 32, 0.06);
+
+		.flights-search {
+			display: flex;
+			align-items: flex-end;
+			gap: 12px;
+			flex: 1 1 auto;
+
+			.flights-field {
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+				flex: 1 1 0;
+				min-width: 140px;
+
+				span {
+					font-family: $font;
+					font-size: 12px;
+					font-weight: 700;
+					letter-spacing: 0.04em;
+					text-transform: uppercase;
+					color: #5f6575;
+				}
+
+				input {
+					height: 44px;
+					padding: 0 14px;
+					border-radius: 10px;
+					border: 1px solid #d6dcea;
+					background: #f7f8fb;
+					font-family: $font;
+					font-size: 14px;
+					color: $velora-text-main;
+					outline: none;
+					transition: 0.18s ease;
+
+					&:focus {
+						border-color: $velora-primary;
+						background: #ffffff;
+					}
+				}
+			}
+
+			.flights-swap {
+				padding-bottom: 12px;
+				font-size: 18px;
+				color: $velora-primary;
+			}
+		}
+
+		.flights-sort {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+
+			label {
+				font-family: $font;
+				font-size: 13px;
+				font-weight: 600;
+				color: #5f6575;
+			}
+
+			select {
+				height: 44px;
+				padding: 0 32px 0 12px;
+				border-radius: 10px;
+				border: 1px solid #d6dcea;
+				background: #ffffff;
+				color: $velora-text-main;
+				font-family: $font;
+				font-size: 13px;
+				font-weight: 600;
+				cursor: pointer;
+				outline: none;
+				appearance: none;
+				background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6' fill='none'><path d='M1 1l4 4 4-4' stroke='%23424857' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+				background-repeat: no-repeat;
+				background-position: right 12px center;
+			}
+		}
+	}
+
+	.flights-list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+
+		.tours-empty {
+			padding: 60px 24px;
+			border-radius: 16px;
+			background: #ffffff;
+			text-align: center;
+			color: #6b7280;
+			font-family: $font;
+			font-size: 15px;
+			box-shadow: 0 6px 18px rgba(24, 26, 32, 0.04);
+		}
+	}
+}
+
+.flight-card {
+	display: grid;
+	grid-template-columns: 1.1fr 1.6fr 1fr;
+	align-items: center;
+	gap: 20px;
+	padding: 18px 22px;
+	background: #ffffff;
+	border-radius: 16px;
+	box-shadow: 0 8px 22px rgba(24, 26, 32, 0.06);
+	transition: transform 0.18s ease, box-shadow 0.18s ease;
+
+	&:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 14px 30px rgba(24, 26, 32, 0.12);
+	}
+
+	&__airline {
+		display: flex;
+		align-items: center;
+		gap: 12px;
+
+		.flight-card__logo {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 44px;
+			height: 44px;
+			border-radius: 12px;
+			background: linear-gradient(135deg, $velora-primary, #7d63f7);
+			color: #ffffff;
+			font-family: $font;
+			font-size: 14px;
+			font-weight: 800;
+			letter-spacing: 0.02em;
+		}
+
+		strong {
+			display: block;
+			font-family: $font;
+			font-size: 15px;
+			font-weight: 700;
+			color: $velora-text-main;
+		}
+
+		em {
+			font-family: $font;
+			font-style: normal;
+			font-size: 12px;
+			color: #6b7280;
+		}
+	}
+
+	&__route {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 12px;
+	}
+
+	&__point {
+		text-align: left;
+
+		strong {
+			display: block;
+			font-family: $font;
+			font-size: 20px;
+			font-weight: 800;
+			color: $velora-text-main;
+		}
+
+		span {
+			font-family: $font;
+			font-size: 13px;
+			font-weight: 600;
+			color: #6b7280;
+		}
+
+		&--end {
+			text-align: right;
+		}
+	}
+
+	&__path {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 4px;
+		flex: 1 1 auto;
+
+		.flight-card__duration {
+			font-family: $font;
+			font-size: 12px;
+			font-weight: 600;
+			color: #6b7280;
+		}
+
+		.flight-card__line {
+			position: relative;
+			width: 100%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: $velora-primary;
+
+			i {
+				position: absolute;
+				left: 0;
+				right: 0;
+				height: 2px;
+				background: linear-gradient(90deg, #d6dcea, $velora-primary, #d6dcea);
+			}
+
+			svg {
+				position: relative;
+				background: #ffffff;
+				padding: 0 6px;
+			}
+		}
+
+		.flight-card__stops {
+			font-family: $font;
+			font-size: 11px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.04em;
+			color: #9aa1ad;
+
+			&.is-direct {
+				color: #16a34a;
+			}
+		}
+	}
+
+	&__fare {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 8px;
+
+		.flight-card__price {
+			text-align: right;
+
+			del {
+				display: block;
+				font-family: $font;
+				font-size: 12px;
+				color: #9aa1ad;
+			}
+
+			strong {
+				font-family: $font;
+				font-size: 22px;
+				font-weight: 800;
+				color: $velora-text-main;
+			}
+
+			span {
+				display: block;
+				font-family: $font;
+				font-size: 11px;
+				color: #6b7280;
+			}
+		}
+
+		.flight-card__cta {
+			padding: 9px 18px;
+			border-radius: 10px;
+			background: $velora-primary;
+			color: #ffffff;
+			font-family: $font;
+			font-size: 13px;
+			font-weight: 700;
+			text-decoration: none;
+			transition: 0.18s ease;
+
+			&:hover {
+				background: $velora-primary-dark;
+			}
+		}
+	}
+}
+
+/* Flight detail route strip + booking summary */
+.flight-detail-route {
+	display: grid;
+	grid-template-columns: 1fr 1.4fr 1fr;
+	align-items: center;
+	gap: 20px;
+	margin: 18px 0 8px;
+	padding: 24px;
+	background: #ffffff;
+	border-radius: 16px;
+	box-shadow: 0 8px 22px rgba(24, 26, 32, 0.06);
+
+	.flight-detail-point {
+		strong {
+			display: block;
+			font-family: $font;
+			font-size: 28px;
+			font-weight: 800;
+			color: $velora-text-main;
+		}
+
+		span {
+			font-family: $font;
+			font-size: 15px;
+			font-weight: 700;
+			color: $velora-primary;
+		}
+
+		em {
+			display: block;
+			font-family: $font;
+			font-style: normal;
+			font-size: 13px;
+			color: #6b7280;
+		}
+
+		&--end {
+			text-align: right;
+		}
+	}
+
+	.flight-detail-path {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 6px;
+
+		span {
+			font-family: $font;
+			font-size: 13px;
+			font-weight: 600;
+			color: #6b7280;
+
+			&.is-direct {
+				color: #16a34a;
+				font-weight: 700;
+			}
+		}
+
+		.flight-detail-line {
+			width: 100%;
+			height: 2px;
+			background: linear-gradient(90deg, #d6dcea, $velora-primary, #d6dcea);
+			border-radius: 2px;
+		}
+	}
+}
+
+.flight-book-summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	margin-bottom: 14px;
+	padding: 12px 14px;
+	border-radius: 12px;
+	background: rgba(91, 61, 245, 0.06);
+
+	div {
+		strong {
+			display: block;
+			font-family: $font;
+			font-size: 16px;
+			font-weight: 800;
+			color: $velora-text-main;
+		}
+
+		span {
+			font-family: $font;
+			font-size: 12px;
+			font-weight: 600;
+			color: #6b7280;
+		}
+
+		&:last-child {
+			text-align: right;
+		}
+	}
+
+	em {
+		font-family: $font;
+		font-style: normal;
+		font-size: 12px;
+		color: $velora-primary;
+		font-weight: 600;
+	}
+}
+
+@media (max-width: 768px) {
+	.flight-card {
+		grid-template-columns: 1fr;
+		gap: 14px;
+
+		&__fare {
+			align-items: stretch;
+			flex-direction: row;
+			justify-content: space-between;
+		}
+	}
+
+	.flight-detail-route {
+		grid-template-columns: 1fr;
+		text-align: center;
+
+		.flight-detail-point--end {
+			text-align: center;
+		}
+	}
+}

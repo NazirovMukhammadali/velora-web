@@ -1,0 +1,120 @@
+/* Phase 2 — skeletons, inline errors, error boundary */
+.velora-error-fallback {
+	max-width: 520px;
+	margin: 48px auto;
+	padding: 32px 28px;
+	text-align: center;
+	background: #ffffff;
+	border-radius: 16px;
+	box-shadow: 0 10px 30px rgba(24, 26, 32, 0.08);
+
+	h2 {
+		margin: 0 0 10px;
+		font-family: $font;
+		font-size: 22px;
+		font-weight: 800;
+		color: $velora-text-main;
+	}
+
+	p {
+		margin: 0;
+		font-family: $font;
+		font-size: 15px;
+		line-height: 1.6;
+		color: #6b7280;
+	}
+
+	&__actions {
+		display: flex;
+		justify-content: center;
+		gap: 12px;
+		margin-top: 22px;
+
+		button {
+			padding: 10px 18px;
+			border: none;
+			border-radius: 10px;
+			background: $velora-primary;
+			color: #ffffff;
+			font-family: $font;
+			font-size: 14px;
+			font-weight: 700;
+			cursor: pointer;
+		}
+
+		a {
+			display: inline-flex;
+			align-items: center;
+			padding: 10px 18px;
+			border-radius: 10px;
+			border: 1px solid #d6dcea;
+			color: $velora-text-main;
+			font-family: $font;
+			font-size: 14px;
+			font-weight: 600;
+			text-decoration: none;
+		}
+	}
+}
+
+.pkg-booking-field-error {
+	display: block;
+	margin-top: 6px;
+	font-family: $font;
+	font-size: 12px;
+	font-weight: 600;
+	color: #dc2626;
+}
+
+.tour-card--skeleton {
+	pointer-events: none;
+	box-shadow: 0 6px 18px rgba(24, 26, 32, 0.04);
+
+	.tour-card--skeleton-body {
+		padding: 16px 18px 20px;
+	}
+}
+
+.flight-card--skeleton {
+	pointer-events: none;
+	opacity: 0.95;
+}
+
+.flights-list-skeleton {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+}
+
+.pkg-detail-page--skeleton {
+	.pkg-gallery--skeleton {
+		display: grid;
+		grid-template-columns: 1.4fr 1fr;
+		gap: 12px;
+		margin-bottom: 8px;
+
+		.pkg-gallery-side {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+
+		.pkg-gallery-row {
+			display: flex;
+			gap: 12px;
+		}
+	}
+
+	.pkg-booking--skeleton {
+		padding: 20px;
+		border-radius: 16px;
+		background: #ffffff;
+		box-shadow: 0 8px 22px rgba(24, 26, 32, 0.06);
+	}
+}
+
+@media (max-width: 768px) {
+	.pkg-detail-page--skeleton .pkg-gallery--skeleton {
+		grid-template-columns: 1fr;
+	}
+}

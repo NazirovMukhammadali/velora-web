@@ -1,79 +1,42 @@
-import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
-import Head from 'next/head';
+import React from 'react';
 import VeloraNavbar from './VeloraNavbar';
 import Footer from '../Footer';
 import { Stack } from '@mui/material';
-import { getJwtToken, updateUserInfo } from '../../auth';
+import useAuth from '../../hooks/useAuth';
 import Chat from '../Chat';
-import { useReactiveVar } from '@apollo/client';
-import { userVar } from '../../../apollo/store';
+import ErrorBoundary from '../common/ErrorBoundary';
+import SeoHead from '../common/SeoHead';
+import { DEFAULT_SEO } from '../../config/seo';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 
 const withLayoutFull = (Component: any) => {
 	return (props: any) => {
-		const router = useRouter();
-		const device = useDeviceDetect();
-		const user = useReactiveVar(userVar);
+		useAuth({ syncOnMount: true });
 
-		/** LIFECYCLES **/
-		useEffect(() => {
-			const jwt = getJwtToken();
-			if (jwt) updateUserInfo(jwt);
-		}, []);
-
-		/** HANDLERS **/
-
-		if (device == 'mobile') {
-			return (
-				<>
-					<Head>
-						<title>Velora</title>
-						<meta name={'title'} content={`Velora`} />
-					</Head>
-					<Stack id="mobile-wrap">
-						<Stack id={'top'}>
-							<VeloraNavbar contrast />
-						</Stack>
-
-						<Stack id={'main'}>
-							<Component {...props} />
-						</Stack>
-
-						<Stack id={'footer'}>
-							<Footer />
-						</Stack>
+		return (
+			<>
+				<SeoHead title={DEFAULT_SEO.title} description={DEFAULT_SEO.description} rawTitle />
+				<Stack id="pc-wrap">
+					<Stack id={'top'}>
+						<VeloraNavbar contrast />
 					</Stack>
-				</>
-			);
-		} else {
-			return (
-				<>
-					<Head>
-						<title>Velora</title>
-						<meta name={'title'} content={`Velora`} />
-					</Head>
-					<Stack id="pc-wrap">
-						<Stack id={'top'}>
-							<VeloraNavbar contrast />
-						</Stack>
 
-						<Stack id={'main'}>
+					<Stack id={'main'}>
+						<ErrorBoundary>
 							<Component {...props} />
-						</Stack>
-
-						<Chat />
-
-						<Stack id={'footer'}>
-							<Footer />
-						</Stack>
+						</ErrorBoundary>
 					</Stack>
-				</>
-			);
-		}
+
+					<Chat />
+
+					<Stack id={'footer'}>
+						<Footer />
+					</Stack>
+				</Stack>
+			</>
+		);
 	};
 };
 

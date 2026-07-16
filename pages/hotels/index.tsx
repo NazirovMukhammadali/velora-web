@@ -1,17 +1,23 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React from 'react';
 import { NextPage } from 'next';
-import { useRouter } from 'next/router';
-import { useQuery } from '@apollo/client';
 import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import PackageCard from '../../libs/components/packages/PackageCard';
-import { getPackagesByType } from '../../libs/data/packages';
+import { CatalogGridSkeleton } from '../../libs/components/common/CatalogCardSkeleton';
+import { getPackagesByType, matchesPackageSearch, sortPackages } from '../../libs/data/packages';
 import { mapHotelsToPackages } from '../../libs/data/packageApi';
 import { GET_HOTELS } from '../../apollo/user/query';
+import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
+import type { VeloraPackage } from '../../libs/types/package';
 
-type SortKey = 'recommended' | 'priceAsc' | 'priceDesc' | 'rating';
 type PriceKey = 'any' | 'under100' | '100to200' | 'over200';
+
+const HOTEL_FILTER_DEFAULTS = {
+	location: '',
+	price: 'any',
+	sort: 'recommended',
+};
 
 const PRICE_RANGES: { key: PriceKey; label: string }[] = [
 	{ key: 'any', label: 'Any price' },
@@ -26,7 +32,7 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
-const inPriceRange = (price: number, range: PriceKey): boolean => {
+const inPriceRange = (price: number, range: string): boolean => {
 	switch (range) {
 		case 'under100':
 			return price < 100;
@@ -39,56 +45,20 @@ const inPriceRange = (price: number, range: PriceKey): boolean => {
 	}
 };
 
-const sortHotels = (list: ReturnType<typeof getPackagesByType>, sort: SortKey) => {
-	const cloned = [...list];
-	switch (sort) {
-		case 'priceAsc':
-			return cloned.sort((a, b) => a.priceAmount - b.priceAmount);
-		case 'priceDesc':
-			return cloned.sort((a, b) => b.priceAmount - a.priceAmount);
-		case 'rating':
-			return cloned.sort((a, b) => b.rating - a.rating);
-		default:
-			return cloned;
-	}
-};
-
 const HotelsPage: NextPage = () => {
-	const router = useRouter();
-	const { data } = useQuery(GET_HOTELS, {
-		fetchPolicy: 'cache-and-network',
-		errorPolicy: 'all',
-		variables: { input: { page: 1, limit: 24, sort: 'createdAt', direction: 'DESC' } },
+	const { filters, setFilter, items, total, isInitialLoading } = usePackageCatalog<
+		VeloraPackage,
+		typeof HOTEL_FILTER_DEFAULTS
+	>({
+		query: GET_HOTELS,
+		selectList: (data) => data?.getHotels?.list,
+		mapApi: mapHotelsToPackages,
+		fallback: () => getPackagesByType('hotels'),
+		filterDefaults: HOTEL_FILTER_DEFAULTS,
+		catalogOptions: { debounceKeys: ['location'] },
+		filterItem: (hotel, f) => matchesPackageSearch(hotel, f.location) && inPriceRange(hotel.priceAmount, f.price),
+		sortItems: sortPackages,
 	});
-
-	// API-first: show backend hotels when available, otherwise fall back to the static catalog.
-	const hotels = useMemo(() => {
-		const apiHotels = mapHotelsToPackages(data?.getHotels?.list);
-		return apiHotels.length > 0 ? apiHotels : getPackagesByType('hotels');
-	}, [data]);
-
-	const [search, setSearch] = useState('');
-	const [price, setPrice] = useState<PriceKey>('any');
-	const [sort, setSort] = useState<SortKey>('recommended');
-
-	// Prefill search from the home-page hero ("Hotel" tab pushes ?location=...).
-	useEffect(() => {
-		if (!router.isReady) return;
-		const loc = typeof router.query.location === 'string' ? router.query.location : '';
-		if (loc) setSearch(loc);
-	}, [router.isReady, router.query.location]);
-
-	const filteredHotels = useMemo(() => {
-		const lowerSearch = search.trim().toLowerCase();
-		const list = hotels.filter((hotel) => {
-			const matchSearch =
-				!lowerSearch ||
-				hotel.title.toLowerCase().includes(lowerSearch) ||
-				hotel.location.toLowerCase().includes(lowerSearch);
-			return matchSearch && inPriceRange(hotel.priceAmount, price);
-		});
-		return sortHotels(list, sort);
-	}, [hotels, search, price, sort]);
 
 	return (
 		<Stack className={'tours-page'}>
@@ -108,8 +78,8 @@ const HotelsPage: NextPage = () => {
 					<input
 						type="text"
 						placeholder="Search by city or hotel name"
-						value={search}
-						onChange={(event) => setSearch(event.target.value)}
+						value={filters.location}
+						onChange={(event) => setFilter('location', event.target.value)}
 						className={'tours-search-input'}
 					/>
 				</div>
@@ -119,8 +89,8 @@ const HotelsPage: NextPage = () => {
 						<button
 							key={range.key}
 							type="button"
-							className={`category-pill ${price === range.key ? 'active' : ''}`}
-							onClick={() => setPrice(range.key)}
+							className={`category-pill ${filters.price === range.key ? 'active' : ''}`}
+							onClick={() => setFilter('price', range.key)}
 						>
 							{range.label}
 						</button>
@@ -129,7 +99,7 @@ const HotelsPage: NextPage = () => {
 
 				<div className={'tours-sort'}>
 					<label htmlFor="hotels-sort">Sort by</label>
-					<select id="hotels-sort" value={sort} onChange={(event) => setSort(event.target.value as SortKey)}>
+					<select id="hotels-sort" value={filters.sort} onChange={(event) => setFilter('sort', event.target.value)}>
 						<option value="recommended">Recommended</option>
 						<option value="priceAsc">Price · Low to High</option>
 						<option value="priceDesc">Price · High to Low</option>
@@ -140,16 +110,18 @@ const HotelsPage: NextPage = () => {
 
 			<Stack className={'container'}>
 				<p className={'catalog-count'}>
-					{filteredHotels.length} {filteredHotels.length === 1 ? 'hotel' : 'hotels'} available
+					{total} {total === 1 ? 'hotel' : 'hotels'} available
 				</p>
 			</Stack>
 
 			<Stack className={'tours-page-cards tour-packages-section'}>
-				{filteredHotels.length === 0 ? (
+				{isInitialLoading ? (
+					<CatalogGridSkeleton count={8} />
+				) : items.length === 0 ? (
 					<div className={'tours-empty'}>No hotels match your filters yet.</div>
 				) : (
 					<div className={'tour-grid'}>
-						{filteredHotels.map((pkg) => (
+						{items.map((pkg) => (
 							<PackageCard key={pkg.id} pkg={pkg} />
 						))}
 					</div>

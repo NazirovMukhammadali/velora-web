@@ -13,17 +13,17 @@ import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import Tooltip from '@mui/material/Tooltip';
-import { getJwtToken, logOut, updateUserInfo } from '../../auth';
-import { useReactiveVar } from '@apollo/client';
-import { userVar } from '../../../apollo/store';
+import { logOut } from '../../auth';
+import useAuth from '../../hooks/useAuth';
 import { REACT_APP_API_URL } from '../../config';
 import { MemberType } from '../../enums/member.enum';
+import ErrorBoundary from '../common/ErrorBoundary';
 const drawerWidth = 280;
 
 const withAdminLayout = (Component: ComponentType) => {
 	return (props: object) => {
 		const router = useRouter();
-		const user = useReactiveVar(userVar);
+		const { user } = useAuth({ syncOnMount: true });
 		const [settingsState, setSettingsStateState] = useState(false);
 		const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 		const [openMenu, setOpenMenu] = useState(false);
@@ -33,8 +33,6 @@ const withAdminLayout = (Component: ComponentType) => {
 
 		/** LIFECYCLES **/
 		useEffect(() => {
-			const jwt = getJwtToken();
-			if (jwt) updateUserInfo(jwt);
 			setLoading(false);
 		}, []);
 
@@ -172,8 +170,10 @@ const withAdminLayout = (Component: ComponentType) => {
 					</Drawer>
 
 					<Box component={'div'} id="bunker" sx={{ flexGrow: 1 }}>
-						{/*@ts-ignore*/}
-						<Component {...props} setSnackbar={setSnackbar} setTitle={setTitle} />
+						<ErrorBoundary>
+							{/* @ts-expect-error admin pages receive injected layout props */}
+							<Component {...props} setSnackbar={setSnackbar} setTitle={setTitle} />
+						</ErrorBoundary>
 					</Box>
 				</Box>
 			</main>

@@ -1,10 +1,10 @@
 import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import type { VeloraPackage } from '../../types/package';
 import { formatPackagePrice } from '../../data/packages';
-import { getJwtToken } from '../../auth';
 import { createBookingId, saveLocalBooking } from '../../utils/bookingsStorage';
+import useAuth from '../../hooks/useAuth';
 
 type PackageBookingPanelProps = {
 	pkg: VeloraPackage;
@@ -12,7 +12,7 @@ type PackageBookingPanelProps = {
 
 const PackageBookingPanel = ({ pkg }: PackageBookingPanelProps) => {
 	const router = useRouter();
-	const [isLoggedIn, setIsLoggedIn] = useState(false);
+	const { isLoggedIn } = useAuth();
 	const [date, setDate] = useState('');
 	const [time, setTime] = useState(pkg.timeSlots[0] ?? '12:00');
 	const [adults, setAdults] = useState(1);
@@ -20,12 +20,9 @@ const PackageBookingPanel = ({ pkg }: PackageBookingPanelProps) => {
 	const [children, setChildren] = useState(0);
 	const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
 	const [submitting, setSubmitting] = useState(false);
+	const [dateError, setDateError] = useState('');
 
 	const loginHref = `/login?referrer=${encodeURIComponent(router.asPath)}`;
-
-	useEffect(() => {
-		setIsLoggedIn(!!getJwtToken());
-	}, []);
 
 	const youthPrice = pkg.youthPrice ?? Math.round(pkg.priceAmount * 0.85);
 	const childPrice = pkg.childPrice ?? Math.round(pkg.priceAmount * 0.65);
@@ -48,14 +45,15 @@ const PackageBookingPanel = ({ pkg }: PackageBookingPanelProps) => {
 	};
 
 	const onBook = () => {
-		if (!getJwtToken()) {
+		if (!isLoggedIn) {
 			void router.push(loginHref);
 			return;
 		}
 		if (!date) {
-			window.alert('Please select a date.');
+			setDateError('Please select a date.');
 			return;
 		}
+		setDateError('');
 		setSubmitting(true);
 		saveLocalBooking({
 			id: createBookingId(),
@@ -98,8 +96,18 @@ const PackageBookingPanel = ({ pkg }: PackageBookingPanelProps) => {
 					type="date"
 					value={date}
 					disabled={!isLoggedIn}
-					onChange={(e) => setDate(e.target.value)}
+					onChange={(e) => {
+						setDate(e.target.value);
+						if (e.target.value) setDateError('');
+					}}
+					aria-invalid={Boolean(dateError)}
+					aria-describedby={dateError ? 'pkg-date-error' : undefined}
 				/>
+				{dateError && (
+					<span id="pkg-date-error" className="pkg-booking-field-error" role="alert">
+						{dateError}
+					</span>
+				)}
 			</label>
 
 			<div className={'pkg-booking-times'}>

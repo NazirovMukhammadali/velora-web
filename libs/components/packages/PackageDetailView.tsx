@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { VeloraPackage } from '../../types/package';
 import { formatPackagePrice, getPackageReviewsLabel } from '../../data/packages';
 import PackageBookingPanel from './PackageBookingPanel';
+import VeloraImage from '../common/VeloraImage';
 
 type PackageGalleryImageProps = {
 	src: string;
@@ -10,19 +11,9 @@ type PackageGalleryImageProps = {
 	fallback: string;
 };
 
-const PackageGalleryImage = ({ src, alt, fallback }: PackageGalleryImageProps) => {
-	const [currentSrc, setCurrentSrc] = useState(src);
-
-	return (
-		<img
-			src={currentSrc}
-			alt={alt}
-			onError={() => {
-				if (currentSrc !== fallback) setCurrentSrc(fallback);
-			}}
-		/>
-	);
-};
+const PackageGalleryImage = ({ src, alt, fallback }: PackageGalleryImageProps) => (
+	<VeloraImage src={src} alt={alt} fallback={fallback} fill sizes="(max-width: 768px) 100vw, 50vw" />
+);
 
 type PackageDetailViewProps = {
 	pkg: VeloraPackage;
@@ -31,8 +22,14 @@ type PackageDetailViewProps = {
 const PackageDetailView = ({ pkg }: PackageDetailViewProps) => {
 	const [openDay, setOpenDay] = useState(0);
 	const reviewsLabel = getPackageReviewsLabel(pkg.reviewCount);
-	const listLabel = pkg.type === 'tours' ? 'Tours' : pkg.type === 'hotels' ? 'Hotels' : 'Cars';
+	const listLabel = pkg.type === 'tours' ? 'Tours' : pkg.type === 'hotels' ? 'Hotels' : 'Rentals';
 	const listHref = pkg.type === 'tours' ? '/tours' : pkg.type === 'hotels' ? '/hotels' : '/rentcar';
+	const reviewLabels =
+		pkg.type === 'cars'
+			? ['Pickup', 'Cleanliness', 'Condition', 'Price', 'Support']
+			: pkg.type === 'hotels'
+				? ['Location', 'Amenities', 'Services', 'Price', 'Rooms']
+				: ['Guide', 'Itinerary', 'Value', 'Organization', 'Experience'];
 
 	return (
 		<div className={'pkg-detail-page'}>
@@ -85,19 +82,19 @@ const PackageDetailView = ({ pkg }: PackageDetailViewProps) => {
 
 			<div className={'pkg-meta-bar'}>
 				<div>
-					<span>Duration</span>
+					<span>{pkg.type === 'cars' ? 'Rate' : 'Duration'}</span>
 					<strong>{pkg.durationLabel}</strong>
 				</div>
 				<div>
-					<span>Type</span>
+					<span>{pkg.type === 'cars' ? 'Category' : 'Type'}</span>
 					<strong>{pkg.experienceType}</strong>
 				</div>
 				<div>
-					<span>Group Size</span>
+					<span>{pkg.type === 'cars' ? 'Seats' : 'Group Size'}</span>
 					<strong>{pkg.groupSize}</strong>
 				</div>
 				<div>
-					<span>Languages</span>
+					<span>{pkg.type === 'cars' ? 'Transmission' : 'Languages'}</span>
 					<strong>{pkg.languages}</strong>
 				</div>
 			</div>
@@ -177,7 +174,7 @@ const PackageDetailView = ({ pkg }: PackageDetailViewProps) => {
 								<em>Based on {pkg.reviewCount} reviews</em>
 							</div>
 							<div className={'pkg-review-bars'}>
-								{['Location', 'Amenities', 'Services', 'Price', 'Rooms'].map((label, i) => (
+								{reviewLabels.map((label, i) => (
 									<div key={label}>
 										<span>{label}</span>
 										<div>

@@ -78,7 +78,7 @@ export const enrich = (seed: PackageSeed): VeloraPackage => {
 		experienceType:
 			seed.type === 'hotels' ? 'Boutique Stay' : seed.type === 'cars' ? 'Car Rental' : seed.category ?? 'Adventure',
 		groupSize: typeCopy.group,
-		languages: 'English',
+		languages: seed.type === 'cars' ? 'Automatic' : 'English',
 		extras: DEFAULT_EXTRAS,
 		timeSlots: ['09:00', '12:00', '15:00', '19:00'],
 		youthPrice: Math.round(seed.priceAmount * 0.85),
@@ -498,4 +498,26 @@ export const getPackage = (type: PackageType, id: string) =>
 export const getPackageReviewsLabel = (count: number) => {
 	if (count >= 100) return `${Math.round(count / 10)} Reviews`;
 	return `${Math.max(4, Math.round(count / 15))} Reviews`;
+};
+
+/** Shared free-text match across a package title and location (case-insensitive). */
+export const matchesPackageSearch = (pkg: VeloraPackage, query: string): boolean => {
+	const term = query.trim().toLowerCase();
+	if (!term) return true;
+	return pkg.title.toLowerCase().includes(term) || pkg.location.toLowerCase().includes(term);
+};
+
+/** Shared sort used by every package catalog (tours / hotels / cars). */
+export const sortPackages = (list: VeloraPackage[], sort: string): VeloraPackage[] => {
+	const cloned = [...list];
+	switch (sort) {
+		case 'priceAsc':
+			return cloned.sort((a, b) => a.priceAmount - b.priceAmount);
+		case 'priceDesc':
+			return cloned.sort((a, b) => b.priceAmount - a.priceAmount);
+		case 'rating':
+			return cloned.sort((a, b) => b.rating - a.rating);
+		default:
+			return cloned;
+	}
 };

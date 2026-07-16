@@ -3,6 +3,7 @@ import Link from 'next/link';
 import type { VeloraPackage } from '../../types/package';
 import { formatPackagePrice, getPackageReviewsLabel, packageDetailHref } from '../../data/packages';
 import { isPackageFavorite, togglePackageFavorite } from '../../utils/favoritesStorage';
+import VeloraImage from '../common/VeloraImage';
 
 const PinIcon = () => (
 	<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -54,7 +55,7 @@ const PackageCard = ({ pkg }: PackageCardProps) => {
 		<article className={'tour-card'}>
 			<div className={'tour-image'}>
 				<Link href={href} className={'tour-image-link'} tabIndex={-1} aria-hidden>
-					<img src={pkg.image} alt={pkg.title} />
+					<VeloraImage src={pkg.image} alt={pkg.title} fill sizes="(max-width: 768px) 100vw, 25vw" />
 				</Link>
 				{pkg.badge && (
 					<span className={`tour-badge tour-badge--${pkg.badge.toLowerCase()}`}>

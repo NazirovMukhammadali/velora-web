@@ -103,6 +103,7 @@
 
 		.pkg-gallery-main,
 		.pkg-gallery-thumb {
+			position: relative;
 			overflow: hidden;
 			border-radius: 14px;
 			min-height: 0;
@@ -110,6 +111,10 @@
 
 		.pkg-gallery-main {
 			height: 100%;
+		}
+
+		.velora-img {
+			object-fit: cover;
 		}
 
 		.pkg-gallery-side {

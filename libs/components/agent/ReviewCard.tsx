@@ -2,7 +2,7 @@ import React from 'react';
 import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { Stack, Box, Typography } from '@mui/material';
 import { Comment } from '../../types/comment/comment';
-import Moment from 'react-moment';
+import { formatDate } from '../../utils/date';
 import { REACT_APP_API_URL } from '../../config';
 
 interface ReviewCardProps {
@@ -26,9 +26,7 @@ const ReviewCard = (props: ReviewCardProps) => {
 						<img src={imagePath} alt="" />
 						<div>
 							<strong>{comment.memberData?.memberNick}</strong>
-							<span>
-								<Moment format={'DD MMMM'}>{comment.createdAt}</Moment>
-							</span>
+							<span>{formatDate(comment.createdAt, 'dd MMMM')}</span>
 						</div>
 					</div>
 				</div>

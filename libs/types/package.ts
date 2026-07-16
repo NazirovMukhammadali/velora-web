@@ -50,7 +50,7 @@ export type VeloraPackage = {
 export type StoredBooking = {
 	id: string;
 	packageId: string;
-	packageType: PackageType;
+	packageType: PackageType | 'flights';
 	title: string;
 	location: string;
 	image: string;

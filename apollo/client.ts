@@ -102,7 +102,13 @@ function createIsomorphicLink() {
 					console.log(
 						`[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
 					);
-					if (!message.includes("input")) sweetErrorAlert(message);
+					const operationName = Array.isArray(path) ? String(path[0] ?? "") : "";
+					const authHandled =
+						operationName === "signup" ||
+						operationName === "login" ||
+						operationName === "changePassword";
+					// Auth mutations surface errors in libs/auth; skip duplicate toasts there.
+					if (!authHandled) sweetErrorAlert(message);
 				});
 			}
 			if (networkError) console.log(`[Network error]: ${networkError}`);
