@@ -9,11 +9,15 @@ import { getPackagesByType, matchesPackageSearch, sortPackages } from '../../lib
 import { mapToursToPackages } from '../../libs/data/packageApi';
 import { GET_TOURS } from '../../apollo/user/query';
 import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
+import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
 import type { VeloraPackage } from '../../libs/types/package';
 import type { TourCategory } from '../../libs/data/tours';
 
 const TOUR_FILTER_DEFAULTS = {
 	location: '',
+	startDate: '',
+	endDate: '',
+	party: '',
 	category: 'All',
 	sort: 'recommended',
 };
@@ -34,7 +38,10 @@ const ToursPage: NextPage = () => {
 		mapApi: mapToursToPackages,
 		fallback: () => getPackagesByType('tours'),
 		filterDefaults: TOUR_FILTER_DEFAULTS,
-		catalogOptions: { debounceKeys: ['location'] },
+		catalogOptions: {
+			debounceKeys: ['location'],
+			stripQueryKeys: stripKeysForCatalog('/tours'),
+		},
 		filterItem: (tour, f) =>
 			(f.category === 'All' || tour.category === f.category) && matchesPackageSearch(tour, f.location),
 		sortItems: sortPackages,
@@ -61,6 +68,37 @@ const ToursPage: NextPage = () => {
 						onChange={(event) => setFilter('location', event.target.value)}
 						className={'tours-search-input'}
 					/>
+				</div>
+
+				<div className={'catalog-hero-filters'}>
+					<label>
+						<span>Start</span>
+						<input
+							type="date"
+							value={filters.startDate}
+							onChange={(event) => setFilter('startDate', event.target.value)}
+						/>
+					</label>
+					<label>
+						<span>End</span>
+						<input
+							type="date"
+							value={filters.endDate}
+							min={filters.startDate || undefined}
+							onChange={(event) => setFilter('endDate', event.target.value)}
+						/>
+					</label>
+					<label>
+						<span>Travelers</span>
+						<input
+							type="number"
+							min={HERO_PARTY_MIN}
+							max={HERO_PARTY_MAX}
+							value={filters.party}
+							placeholder="2"
+							onChange={(event) => setFilter('party', event.target.value)}
+						/>
+					</label>
 				</div>
 
 				<div className={'tours-categories'}>

@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import type { Flight } from '../../data/flights';
 import { formatPackagePrice } from '../../data/packages';
 import { createBookingId, saveLocalBooking } from '../../utils/bookingsStorage';
+import { flightBookingTotal } from '../../utils/bookingPanel';
 import useAuth from '../../hooks/useAuth';
 
 const FLIGHT_IMAGE = 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80';
@@ -22,7 +23,7 @@ const FlightBookingPanel = ({ flight }: FlightBookingPanelProps) => {
 
 	const loginHref = `/login?referrer=${encodeURIComponent(router.asPath)}`;
 
-	const total = useMemo(() => flight.basePrice * passengers, [flight.basePrice, passengers]);
+	const total = useMemo(() => flightBookingTotal(flight.basePrice, passengers), [flight.basePrice, passengers]);
 
 	const onBook = () => {
 		if (!isLoggedIn) {

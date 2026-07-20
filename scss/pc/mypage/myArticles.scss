@@ -57,4 +57,35 @@
 			}
 		}
 	}
+
+	@media (max-width: 768px) {
+		#my-articles-page {
+			.main-title-box .right-box {
+				width: 100%;
+
+				.main-title {
+					font-size: 24px;
+				}
+			}
+
+			.article-list-box {
+				margin-top: 28px;
+				margin-bottom: 40px;
+				gap: 16px;
+				justify-content: center;
+
+				.community-general-card-config {
+					max-width: 100%;
+				}
+			}
+		}
+	}
+
+	@media (max-width: 375px) {
+		#my-articles-page {
+			.main-title-box .right-box .main-title {
+				font-size: 20px;
+			}
+		}
+	}
 }

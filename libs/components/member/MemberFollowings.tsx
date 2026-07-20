@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
 import { Box, Button, Pagination, Stack, Typography } from "@mui/material";
-import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { useRouter } from "next/router";
 import { FollowInquiry } from "../../types/follow/follow.input";
 import { useQuery, useReactiveVar } from "@apollo/client";
@@ -28,7 +27,6 @@ const MemberFollowings = (props: MemberFollowingsProps) => {
 		redirectToMemberPageHandler,
 		likeMemberHandler,
 	} = props;
-	const device = useDeviceDetect();
 	const router = useRouter();
 	const [total, setTotal] = useState<number>(0);
 	const category: any = router.query?.category ?? "properties";
@@ -80,14 +78,7 @@ const MemberFollowings = (props: MemberFollowingsProps) => {
 		setFollowInquiry({ ...followInquiry });
 	};
 
-	if (device === "mobile") {
-		return (
-			<Stack sx={{ p: 3 }} alignItems={'center'}>
-				<Typography>Velora — following (mobile layout coming soon)</Typography>
-			</Stack>
-		);
-	} else {
-		return (
+	return (
 			<div id="member-follows-page">
 				<Stack className="main-title-box">
 					<Stack className="right-box">
@@ -229,7 +220,6 @@ const MemberFollowings = (props: MemberFollowingsProps) => {
 				)}
 			</div>
 		);
-	}
 };
 
 MemberFollowings.defaultProps = {

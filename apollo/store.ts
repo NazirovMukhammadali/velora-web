@@ -23,5 +23,5 @@ export const userVar = makeVar<CustomJwtPayload>({
 	memberBlocks: 0,
 });
 
-// @ts-ignore
-export const socketVar = makeVar<WebSocket>();
+// Real socket assigned when Apollo client opens the GraphQL WS connection.
+export const socketVar = makeVar<WebSocket | null>(null);

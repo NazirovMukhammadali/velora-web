@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { NextPage } from 'next';
-import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { Stack, Pagination } from '@mui/material';
 import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
@@ -42,7 +41,6 @@ const SORT_OPTIONS: { key: AgentSortKey; label: string }[] = [
 ];
 
 const AgentList: NextPage = ({ initialInput, ...props }: any) => {
-	const device = useDeviceDetect();
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
 	const [searchFilter, setSearchFilter] = useState<any>(
@@ -152,10 +150,6 @@ const AgentList: NextPage = ({ initialInput, ...props }: any) => {
 			sweetMixinErrorAlert(err.message).then();
 		}
 	};
-
-	if (device === 'mobile') {
-		return <h1>AGENTS PAGE MOBILE</h1>;
-	}
 
 	const count = usingFallback ? displayAgents.length : total || displayAgents.length;
 	const activePage = usingFallback ? fallbackPage : currentPage;

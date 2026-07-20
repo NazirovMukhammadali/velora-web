@@ -513,6 +513,65 @@ export const GET_RENTCAR_DETAIL = gql`
 `;
 
 /**************************
+ *      NOTICE / CS       *
+ *************************/
+
+export const GET_NOTICES = gql`
+	query GetNotices($input: NoticesInquiry!) {
+		getNotices(input: $input) {
+			list {
+				_id
+				noticeCategory
+				noticeStatus
+				noticeTitle
+				noticeContent
+				memberId
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_NOTICE = gql`
+	query GetNotice($noticeId: String!) {
+		getNotice(noticeId: $noticeId) {
+			_id
+			noticeCategory
+			noticeStatus
+			noticeTitle
+			noticeContent
+			memberId
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const GET_MY_INQUIRIES = gql`
+	query GetMyInquiries($input: NoticesInquiry!) {
+		getMyInquiries(input: $input) {
+			list {
+				_id
+				noticeCategory
+				noticeStatus
+				noticeTitle
+				noticeContent
+				memberId
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+/**************************
  *        BOOKING         *
  *************************/
 
@@ -526,6 +585,31 @@ export const GET_MY_TOUR_BOOKINGS = gql`
 				bookingRefId
 				bookingTitle
 				bookingPrice
+				agentId
+				memberId
+				createdAt
+				updatedAt
+			}
+			metaCounter {
+				total
+			}
+		}
+	}
+`;
+
+export const GET_MY_HOTEL_BOOKINGS = gql`
+	query GetMyHotelBookings($input: BookingInquiry!) {
+		getMyHotelBookings(input: $input) {
+			list {
+				_id
+				bookingType
+				bookingStatus
+				bookingRefId
+				bookingTitle
+				bookingPrice
+				checkInDate
+				checkOutDate
+				quantity
 				agentId
 				memberId
 				createdAt

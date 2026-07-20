@@ -9,6 +9,7 @@ import { getPackagesByType, matchesPackageSearch, sortPackages } from '../../lib
 import { mapRentcarsToPackages } from '../../libs/data/packageApi';
 import { GET_RENTCARS } from '../../apollo/user/query';
 import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
+import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
 import type { VeloraPackage } from '../../libs/types/package';
 
 type PriceKey = 'any' | 'under75' | '75to150' | 'over150';
@@ -16,6 +17,9 @@ type CategoryKey = 'all' | 'compact' | 'suv' | 'sedan' | 'luxury' | 'electric';
 
 const RENTCAR_FILTER_DEFAULTS = {
 	location: '',
+	startDate: '',
+	endDate: '',
+	party: '',
 	price: 'any',
 	category: 'all',
 	sort: 'recommended',
@@ -90,7 +94,10 @@ const RentcarPage: NextPage = () => {
 		mapApi: mapRentcarsToPackages,
 		fallback: () => getPackagesByType('cars'),
 		filterDefaults: RENTCAR_FILTER_DEFAULTS,
-		catalogOptions: { debounceKeys: ['location'] },
+		catalogOptions: {
+			debounceKeys: ['location'],
+			stripQueryKeys: stripKeysForCatalog('/rentcar'),
+		},
 		filterItem: (car, f) =>
 			matchesPackageSearch(car, f.location) && inPriceRange(car.priceAmount, f.price) && matchesCategory(car, f.category),
 		sortItems: sortPackages,
@@ -120,20 +127,51 @@ const RentcarPage: NextPage = () => {
 					/>
 				</div>
 
+				<div className={'catalog-hero-filters'}>
+					<label>
+						<span>Pick-up</span>
+						<input
+							type="date"
+							value={filters.startDate}
+							onChange={(event) => setFilter('startDate', event.target.value)}
+						/>
+					</label>
+					<label>
+						<span>Drop-off</span>
+						<input
+							type="date"
+							value={filters.endDate}
+							min={filters.startDate || undefined}
+							onChange={(event) => setFilter('endDate', event.target.value)}
+						/>
+					</label>
+					<label>
+						<span>Drivers</span>
+						<input
+							type="number"
+							min={HERO_PARTY_MIN}
+							max={HERO_PARTY_MAX}
+							value={filters.party}
+							placeholder="1"
+							onChange={(event) => setFilter('party', event.target.value)}
+						/>
+					</label>
+				</div>
+
 				<div className={'tours-categories'}>
-					{CATEGORIES.map((item) => (
+					{CATEGORIES.map((category) => (
 						<button
-							key={item.key}
+							key={category.key}
 							type="button"
-							className={`category-pill ${filters.category === item.key ? 'active' : ''}`}
-							onClick={() => setFilter('category', item.key)}
+							className={`category-pill ${filters.category === category.key ? 'active' : ''}`}
+							onClick={() => setFilter('category', category.key)}
 						>
-							{item.label}
+							{category.label}
 						</button>
 					))}
 				</div>
 
-				<div className={'tours-categories rentcar-price-pills'}>
+				<div className={'tours-categories'}>
 					{PRICE_RANGES.map((range) => (
 						<button
 							key={range.key}

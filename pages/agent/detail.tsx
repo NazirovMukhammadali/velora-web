@@ -1,6 +1,5 @@
 import React, { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { NextPage } from 'next';
-import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import ReviewCard from '../../libs/components/agent/ReviewCard';
 import { Box, Button, Pagination, Stack, Typography } from '@mui/material';
@@ -30,7 +29,6 @@ export const getStaticProps = async ({ locale }: any) => ({
 });
 
 const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) => {
-	const device = useDeviceDetect();
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
 	const agentId = typeof router.query.agentId === 'string' ? router.query.agentId : null;
@@ -174,14 +172,9 @@ const AgentDetail: NextPage = ({ initialInput, initialComment, ...props }: any) 
 			await sweetTopSmallSuccessAlert("success", 800);
 			await router.push('/bookings');
 		} catch (err: any) {
-			console.log("ERROR, createBookingHandler:", err.message);
-			sweetMixinErrorAlert(err.message).then();
+						sweetMixinErrorAlert(err.message).then();
 		}
 	};
-
-	if (device === 'mobile') {
-		return <div>AGENT DETAIL PAGE MOBILE</div>;
-	}
 
 	const agentImage = resolveMemberImageUrl(agent?.memberImage);
 

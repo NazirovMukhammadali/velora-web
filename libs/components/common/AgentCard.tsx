@@ -1,5 +1,4 @@
 import React from 'react';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Link from 'next/link';
 import { resolveMemberImageUrl } from '../../utils/memberImage';
 import IconButton from '@mui/material/IconButton';
@@ -19,7 +18,6 @@ interface AgentCardProps {
 
 const AgentCard = (props: AgentCardProps) => {
 	const { agent, likeMemberHandler } = props;
-	const device = useDeviceDetect();
 	const user = useReactiveVar(userVar);
 	const imagePath = resolveMemberImageUrl(agent?.memberImage);
 
@@ -29,10 +27,6 @@ const AgentCard = (props: AgentCardProps) => {
 	} as const;
 
 	const displayName = agent?.memberFullName ?? agent?.memberNick ?? 'Travel expert';
-
-	if (device === 'mobile') {
-		return <div>AGENT CARD</div>;
-	}
 
 	return (
 		<article className="agent-guide-card">

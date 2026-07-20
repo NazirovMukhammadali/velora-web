@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import { NextPage } from "next";
-import useDeviceDetect from "../../libs/hooks/useDeviceDetect";
 import withLayoutBasic from "../../libs/components/layout/LayoutBasic";
-import { Stack, Typography } from "@mui/material";
+import { Stack } from "@mui/material";
 import MemberMenu from "../../libs/components/member/MemberMenu";
 import { useRouter } from "next/router";
 import MemberFollowers from "../../libs/components/member/MemberFollowers";
@@ -31,7 +30,6 @@ const safeRefetch = async (refetch: any, query: any) => {
 };
 
 const MemberPage: NextPage = () => {
-	const device = useDeviceDetect();
 	const router = useRouter();
 	const category: any = router.query?.category;
 	const user = useReactiveVar(userVar);
@@ -115,8 +113,7 @@ const MemberPage: NextPage = () => {
 			});
 			await safeRefetch(refetch, query);
 		} catch (err: any) {
-			console.log("ERROR, likeMemberHandler:", err.message);
-			sweetMixinErrorAlert(err.message).then();
+						sweetMixinErrorAlert(err.message).then();
 		}
 	};
 
@@ -130,14 +127,7 @@ const MemberPage: NextPage = () => {
 		}
 	};
 
-	if (device === "mobile") {
-		return (
-			<Stack sx={{ p: 3 }} alignItems="center">
-				<Typography>Velora — member profile (mobile view coming soon)</Typography>
-			</Stack>
-		);
-	} else {
-		return (
+	return (
 			<div id="member-page" style={{ position: "relative" }}>
 				<div className="container">
 					<Stack className={"member-page"}>
@@ -174,7 +164,6 @@ const MemberPage: NextPage = () => {
 				</div>
 			</div>
 		);
-	}
 };
 
 export default withLayoutBasic(MemberPage);

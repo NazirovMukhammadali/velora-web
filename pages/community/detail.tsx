@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import useDeviceDetect from "../../libs/hooks/useDeviceDetect";
 import withLayoutBasic from "../../libs/components/layout/LayoutBasic";
 import { Button, Stack, Typography, Tab, Tabs, IconButton, Backdrop, Pagination } from "@mui/material";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
@@ -40,7 +39,6 @@ export const getStaticProps = async ({ locale }: any) => ({
 });
 
 const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
-	const device = useDeviceDetect();
 	const router = useRouter();
 	const { query } = router;
 
@@ -84,8 +82,7 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 		variables: { input: articleId },
 		notifyOnNetworkStatusChange: true,
 		onCompleted: (data: T) => {
-			console.log("data", data);
-			setBoardArticle(data?.getBoardArticle);
+						setBoardArticle(data?.getBoardArticle);
 			if (data?.getBoardArticle?.memberData?.memberImage) {
 				setMemberImage(
 					`${process.env.REACT_APP_API_URL}/${data?.getBoardArticle?.memberData?.memberImage}`
@@ -163,8 +160,7 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 
 			await boardArticleRefetch({ input: articleId });
 		} catch (err: any) {
-			console.log("ERROR, likePropertyHandler:", err.message);
-			sweetMixinErrorAlert(err.message).then();
+						sweetMixinErrorAlert(err.message).then();
 		}
 	};
 
@@ -243,10 +239,7 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 		}
 	};
 
-	if (device === "mobile") {
-		return <div>COMMUNITY DETAIL PAGE MOBILE</div>;
-	} else {
-		return (
+	return (
 			<div id="community-detail-page">
 				<div className="container">
 					<Stack className="main-box">
@@ -626,7 +619,6 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 				</div>
 			</div>
 		);
-	}
 };
 CommunityDetail.defaultProps = {
 	initialInput: {

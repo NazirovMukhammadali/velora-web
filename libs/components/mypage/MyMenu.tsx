@@ -1,7 +1,6 @@
 import React from 'react';
 import { useRouter } from 'next/router';
 import { Stack, Typography, Box, List, ListItem } from '@mui/material';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
 import Link from 'next/link';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../../apollo/store';
@@ -10,7 +9,6 @@ import { logOut } from '../../auth';
 import { sweetConfirmAlert, sweetMixinErrorAlert } from '../../sweetAlert';
 
 const MyMenu = () => {
-	const device = useDeviceDetect();
 	const router = useRouter();
 	const pathname = router.query.category ?? 'myProfile';
 	const category: any = router.query?.category ?? 'myProfile';
@@ -20,19 +18,12 @@ const MyMenu = () => {
 	const logoutHandler = async () => {
 		try {
 			if (await sweetConfirmAlert('Do you want to logout?')) logOut();
-		} catch (err: any) {
-			console.log('ERROR, logoutHandler:', err.message);
+		} catch {
+			/* user dismissed confirm */
 		}
 	};
 
-	if (device === 'mobile') {
-		return (
-			<Stack sx={{ p: 2 }} alignItems="center">
-				<Typography variant="body2">Velora — account menu (mobile)</Typography>
-			</Stack>
-		);
-	} else {
-		return (
+	return (
 			<Stack width={'100%'} padding={'30px 24px'}>
 				<Stack className={'profile'}>
 					<Box component={'div'} className={'profile-img'}>
@@ -247,7 +238,6 @@ const MyMenu = () => {
 				</Stack>
 			</Stack>
 		);
-	}
 };
 
 export default MyMenu;

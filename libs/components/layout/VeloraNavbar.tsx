@@ -133,7 +133,7 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 	const flagFile = LANG_FLAGS[lang] ?? 'langen';
 	const flagSrc = `/img/flag/${flagFile}.png`;
 
-	const labelFor = (key: NavItem['labelKey']) => (key === 'Tours' ? 'Tours' : t(key));
+	const labelFor = (key: NavItem['labelKey']) => t(key);
 
 	return (
 		<>
@@ -144,12 +144,12 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 			/>
 			<aside className={`velora-nav-drawer ${menuOpen ? 'open' : ''}`} aria-hidden={!menuOpen}>
 				<div className="velora-nav-drawer-head">
-					<span>Menu</span>
+					<span>{t('Menu')}</span>
 					<button
 						type="button"
 						className="velora-nav-drawer-close"
 						onClick={() => setMenuOpen(false)}
-						aria-label="Close menu"
+						aria-label={t('Close menu')}
 					>
 						×
 					</button>
@@ -175,7 +175,7 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 							type="button"
 							className="velora-navbar-menu-btn"
 							onClick={() => setMenuOpen(true)}
-							aria-label="Open menu"
+							aria-label={t('Open menu')}
 							aria-expanded={menuOpen}
 						>
 							<span />
@@ -207,7 +207,7 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 									type="button"
 									className="velora-navbar-avatar"
 									onClick={(e) => setUserAnchor(e.currentTarget)}
-									aria-label="Account menu"
+									aria-label={t('Account menu')}
 								>
 									<img
 										src={
@@ -234,7 +234,7 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 										}}
 									>
 										<Logout fontSize="small" sx={{ mr: 1, color: 'primary.main' }} />
-										Logout
+										{t('Logout')}
 									</MenuItem>
 								</Menu>
 							</>
@@ -253,7 +253,7 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 							type="button"
 							className="velora-navbar-lang"
 							onClick={(e) => setLangAnchor(e.currentTarget)}
-							aria-label="Change language"
+							aria-label={t('Change language')}
 						>
 							<img src={flagSrc} alt="" width={24} height={17} />
 							<CaretDown size={14} weight="fill" aria-hidden />

@@ -837,4 +837,53 @@
 			width: 100%;
 		}
 	}
+
+	@media (max-width: 768px) {
+		.agent-list-page {
+			padding: 24px 0 56px;
+
+			.agent-page-hero__inner {
+				padding: 24px 20px 20px;
+			}
+
+			.agent-featured {
+				grid-template-columns: 1fr;
+				gap: 20px;
+				padding: 16px;
+			}
+
+			.agent-toolbar {
+				flex-direction: column;
+				align-items: stretch;
+				gap: 12px;
+			}
+
+			.agent-toolbar-filters {
+				width: 100%;
+			}
+
+			.agent-toolbar-search {
+				width: 100%;
+			}
+
+			.card-wrap.agent-experts-grid {
+				grid-template-columns: 1fr;
+				gap: 16px;
+			}
+		}
+	}
+
+	@media (max-width: 375px) {
+		.agent-list-page {
+			padding: 16px 0 48px;
+
+			.agent-page-hero__inner {
+				padding: 20px 16px 16px;
+			}
+
+			.agent-experts-title {
+				font-size: 24px;
+			}
+		}
+	}
 }

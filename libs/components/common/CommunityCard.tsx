@@ -1,6 +1,5 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
 import { Stack, Typography } from '@mui/material';
 import { BoardArticle } from '../../types/board-article/board-article';
 import { formatDate } from '../../utils/date';
@@ -20,7 +19,6 @@ interface CommunityCardProps {
 
 const CommunityCard = (props: CommunityCardProps) => {
 	const { boardArticle, size = 'normal', likeArticleHandler: likeBoardArticleHandler, } = props;
-	const device = useDeviceDetect();
 	const router = useRouter();
 	const user = useReactiveVar(userVar);
 	const imagePath: string = boardArticle?.articleImage
@@ -44,12 +42,9 @@ const CommunityCard = (props: CommunityCardProps) => {
 		else router.push(`/member?memberId=${id}`);
 	};
 
-	if (device === "mobile") {
-		return <div>COMMUNITY CARD MOBILE</div>;
-	} else {
-		return (
+	return (
 			<Stack
-				sx={{ width: size === "small" ? "285px" : "317px" }}
+				sx={{ width: '100%', maxWidth: size === "small" ? 285 : 317 }}
 				className="community-general-card-config"
 				onClick={(e: any) => chooseArticleHandler(e, boardArticle)}
 			>
@@ -99,7 +94,6 @@ const CommunityCard = (props: CommunityCardProps) => {
 				</Stack>
 			</Stack>
 		);
-	}
 };
 
 export default CommunityCard;

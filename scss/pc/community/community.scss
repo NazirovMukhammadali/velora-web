@@ -215,4 +215,93 @@
 			}
 		}
 	}
+
+	@media (max-width: 768px) {
+		#community-list-page {
+			.container {
+				padding-top: 72px;
+				gap: 32px;
+			}
+
+			.main-box {
+				flex-direction: column;
+				gap: 20px;
+
+				.left-config {
+					width: 100%;
+					margin-top: 24px;
+					margin-bottom: 0;
+					padding: 20px 16px;
+
+					.tab-button,
+					.tab-button.active {
+						width: 100%;
+					}
+				}
+
+				.right-config {
+					.panel-config {
+						.title-box {
+							flex-direction: column;
+							align-items: flex-start;
+							gap: 12px;
+							margin-bottom: 24px;
+
+							.left {
+								width: 100%;
+							}
+						}
+
+						.list-box {
+							gap: 20px;
+							justify-content: center;
+
+							.community-general-card-config {
+								max-width: 100%;
+							}
+						}
+					}
+				}
+			}
+
+			.similar-articles-config {
+				gap: 24px;
+				padding: 20px 12px;
+
+				.similar-articles-title {
+					padding-left: 0;
+					font-size: 22px;
+				}
+
+				.articles-box-row {
+					flex-direction: column;
+					gap: 16px;
+				}
+			}
+
+			.pagination-config {
+				padding-left: 0;
+				margin-bottom: 32px;
+			}
+		}
+	}
+
+	@media (max-width: 375px) {
+		#community-list-page {
+			.container {
+				padding-top: 64px;
+				gap: 24px;
+			}
+
+			.main-box {
+				.left-config {
+					padding: 16px 12px;
+				}
+
+				.right-config .panel-config .title-box .left .title {
+					font-size: 20px;
+				}
+			}
+		}
+	}
 }

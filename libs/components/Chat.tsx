@@ -69,9 +69,10 @@ const Chat = () => {
 
 	/** LIFECYCLES **/
 	useEffect(() => {
+		if (!socket) return;
+
 		socket.onmessage = (msg) => {
 			const data = JSON.parse(msg.data);
-			console.log("WebSocket message:", data);
 
 			switch (data.event) {
 				case "info":
@@ -108,26 +109,26 @@ const Chat = () => {
 	};
 
 	const getInputMessageHandler = useCallback(
-		(e: any) => {
+		(e: React.ChangeEvent<HTMLInputElement>) => {
 			const text = e.target.value;
 			setMessageInput(text);
 		},
 		[messageInput]
 	);
 
-	const getKeyHandler = (e: any) => {
+	const getKeyHandler = (e: React.KeyboardEvent) => {
 		try {
 			if (e.key == "Enter") {
 				onClickHandler();
 			}
-		} catch (err: any) {
-			console.log(err);
+		} catch {
+			/* ignore key handler errors */
 		}
 	};
 
 	const onClickHandler = () => {
 		if (!messageInput) sweetErrorAlert(Messages.error4);
-		else {
+		else if (socket) {
 			socket.send(JSON.stringify({ event: "message", data: messageInput }));
 			setMessageInput("");
 		}

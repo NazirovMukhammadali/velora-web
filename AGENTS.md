@@ -6,7 +6,7 @@ Bu fayl keyingi agentlar uchun **dizayn g‘oyasi**, **qilingan ishlar** va **qo
 
 - **Nom:** velora-web (travel booking frontend)
 - **Stack:** Next.js 14, React 18, MUI, Apollo GraphQL, SCSS
-- **Backend:** Nestar GraphQL — odatda `http://127.0.0.1:3007/graphql` (`.env.example`)
+- **Backend:** Nestar GraphQL — odatda `http://127.0.0.1:3003/graphql` (`.env.example`)
 - **Ishga tushirish:** `yarn dev` (development). `yarn start` production build uchun.
 
 ---

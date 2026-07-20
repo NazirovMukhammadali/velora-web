@@ -78,4 +78,34 @@
 			padding: 4px;
 		}
 	}
+
+	@media (max-width: 768px) {
+		#write-article-page {
+			.main-title-box .right-box {
+				width: 100%;
+
+				.main-title {
+					font-size: 24px;
+				}
+			}
+
+			.right-wrap {
+				.select {
+					width: 100%;
+				}
+
+				.cont_bd {
+					padding: 20px 0;
+				}
+			}
+		}
+	}
+
+	@media (max-width: 375px) {
+		#write-article-page {
+			.main-title-box .right-box .main-title {
+				font-size: 20px;
+			}
+		}
+	}
 }

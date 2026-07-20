@@ -55,7 +55,24 @@ hr {
 	.container {
 		position: relative;
 		width: 1300px;
+		max-width: 100%;
 		margin: 0 auto;
 		display: flex;
+		box-sizing: border-box;
+	}
+
+	@media (max-width: 1300px) {
+		.container {
+			width: 100%;
+			padding-left: 16px;
+			padding-right: 16px;
+		}
+	}
+
+	@media (max-width: 375px) {
+		.container {
+			padding-left: 12px;
+			padding-right: 12px;
+		}
 	}
 }

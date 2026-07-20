@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { NextPage } from "next";
-import useDeviceDetect from "../../hooks/useDeviceDetect";
 import { Button, Stack, Typography } from "@mui/material";
 import axios from "axios";
 import { Messages, REACT_APP_API_URL } from "../../config";
@@ -12,7 +11,6 @@ import { UPDATE_MEMBER } from "../../../apollo/user/mutation";
 import { sweetErrorHandling, sweetMixinSuccessAlert } from "../../sweetAlert";
 
 const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
-	const device = useDeviceDetect();
 	const token = getJwtToken();
 	const user = useReactiveVar(userVar);
 	const [updateData, setUpdateData] = useState<MemberUpdate>(initialValues);
@@ -35,7 +33,6 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 	const uploadImage = async (e: any) => {
 		try {
 			const image = e.target.files[0];
-			console.log("+image:", image);
 
 			const formData = new FormData();
 			formData.append(
@@ -71,13 +68,11 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 			);
 
 			const responseImage = response.data.data.imageUploader;
-			console.log("+responseImage: ", responseImage);
 			updateData.memberImage = responseImage;
 			setUpdateData({ ...updateData });
 
 			return `${REACT_APP_API_URL}/${responseImage}`;
 		} catch (err) {
-			console.log("Error, uploadImage:", err);
 		}
 	};
 
@@ -90,13 +85,13 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 					input: updateData,
 				},
 			});
-			//@ts-ignore
-			const jwtToken = result.data.updateMember?.accessToken;
+			const jwtToken = result.data?.updateMember?.accessToken as string | undefined;
+			if (!jwtToken) throw new Error(Messages.error1);
 			await updateStorage({ jwtToken });
-			updateUserInfo(result.data.updateMember?.accessToken);
+			updateUserInfo(jwtToken);
 			await sweetMixinSuccessAlert("Information updated successfuly");
-		} catch (err: any) {
-			sweetErrorHandling(err).then();
+		} catch (err: unknown) {
+			await sweetErrorHandling(err);
 		}
 	}, [updateData]);
 
@@ -111,12 +106,8 @@ const MyProfile: NextPage = ({ initialValues, ...props }: any) => {
 		}
 	};
 
-	console.log("+updateData", updateData);
 
-	if (device === "mobile") {
-		return <>MY PROFILE PAGE MOBILE</>;
-	} else
-		return (
+	return (
 			<div id="my-profile-page">
 				<Stack className="main-title-box">
 					<Stack className="right-box">

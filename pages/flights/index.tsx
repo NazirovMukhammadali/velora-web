@@ -1,6 +1,5 @@
 import React from 'react';
 import { NextPage } from 'next';
-import type { ParsedUrlQuery } from 'querystring';
 import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
@@ -9,19 +8,15 @@ import { FlightListSkeleton } from '../../libs/components/common/FlightCardSkele
 import { getFlights, mapBackendFlights, type Flight } from '../../libs/data/flights';
 import { GET_FLIGHTS } from '../../apollo/user/query';
 import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
+import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
 
 const FLIGHT_FILTER_DEFAULTS = {
 	from: '',
 	to: '',
+	startDate: '',
+	endDate: '',
+	party: '',
 	sort: 'recommended',
-};
-
-const mapHeroLocationToTo = (query: ParsedUrlQuery) => {
-	const patch: Partial<typeof FLIGHT_FILTER_DEFAULTS> = {};
-	if (typeof query.location === 'string' && query.location && !query.to) {
-		patch.to = query.location;
-	}
-	return patch;
 };
 
 export const getStaticProps = async ({ locale }: any) => ({
@@ -72,8 +67,7 @@ const FlightsPage: NextPage = () => {
 		filterDefaults: FLIGHT_FILTER_DEFAULTS,
 		catalogOptions: {
 			debounceKeys: ['from', 'to'],
-			mapQuery: mapHeroLocationToTo,
-			stripQueryKeys: ['location'],
+			stripQueryKeys: stripKeysForCatalog('/flights'),
 		},
 		filterItem: (flight, f) => matchesRoute(flight, f.from, f.to),
 		sortItems: sortFlights,
@@ -113,6 +107,37 @@ const FlightsPage: NextPage = () => {
 							placeholder="City or airport"
 							value={filters.to}
 							onChange={(event) => setFilter('to', event.target.value)}
+						/>
+					</label>
+				</div>
+
+				<div className={'catalog-hero-filters'}>
+					<label>
+						<span>Departure</span>
+						<input
+							type="date"
+							value={filters.startDate}
+							onChange={(event) => setFilter('startDate', event.target.value)}
+						/>
+					</label>
+					<label>
+						<span>Return</span>
+						<input
+							type="date"
+							value={filters.endDate}
+							min={filters.startDate || undefined}
+							onChange={(event) => setFilter('endDate', event.target.value)}
+						/>
+					</label>
+					<label>
+						<span>Passengers</span>
+						<input
+							type="number"
+							min={HERO_PARTY_MIN}
+							max={HERO_PARTY_MAX}
+							value={filters.party}
+							placeholder="1"
+							onChange={(event) => setFilter('party', event.target.value)}
 						/>
 					</label>
 				</div>

@@ -324,4 +324,61 @@
 			}
 		}
 	}
+
+	@media (max-width: 768px) {
+		#my-page {
+			#my-profile-page {
+				.main-title-box .right-box {
+					width: 100%;
+
+					.main-title {
+						font-size: 24px;
+					}
+				}
+
+				.top-box {
+					padding: 20px 16px;
+					margin-top: 20px;
+
+					.photo-box .image-big-box {
+						flex-direction: column;
+						gap: 16px;
+					}
+
+					.small-input-box {
+						flex-direction: column;
+						gap: 16px;
+
+						.input-box {
+							width: 100%;
+						}
+					}
+				}
+
+				.bottom-box {
+					padding: 20px 16px;
+				}
+
+				.change-password {
+					align-self: stretch;
+					width: 100%;
+				}
+			}
+		}
+	}
+
+	@media (max-width: 375px) {
+		#my-page {
+			#my-profile-page {
+				.main-title-box .right-box .main-title {
+					font-size: 20px;
+				}
+
+				.top-box,
+				.bottom-box {
+					padding: 16px 12px;
+				}
+			}
+		}
+	}
 }

@@ -1,34 +1,81 @@
-import React from 'react';
-import { Stack, Box } from '@mui/material';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
+import React, { useState } from 'react';
+import { Stack, Box, CircularProgress, Pagination } from '@mui/material';
+import { useQuery } from '@apollo/client';
+import { GET_NOTICES, GET_NOTICE } from '../../../apollo/user/query';
+import { Notice as NoticeType } from '../../types/notice/notice';
+import { NoticeCategory } from '../../enums/notice.enum';
+import { formatDate } from '../../utils/date';
+import { T } from '../../types/common';
 
 const Notice = () => {
-	const device = useDeviceDetect();
+	const [page, setPage] = useState(1);
+	const [selectedId, setSelectedId] = useState<string | null>(null);
+	const limit = 10;
 
-	/** APOLLO REQUESTS **/
-	/** LIFECYCLES **/
-	/** HANDLERS **/
-
-	const data = [
-		{
-			no: 1,
-			event: true,
-			title: 'Register to use and get discounts',
-			date: '01.03.2024',
+	const {
+		data: listData,
+		loading: listLoading,
+		error: listError,
+		refetch,
+	} = useQuery(GET_NOTICES, {
+		fetchPolicy: 'network-only',
+		variables: {
+			input: {
+				page,
+				limit,
+				sort: 'createdAt',
+				direction: 'DESC',
+				search: {},
+			},
 		},
-		{
-			no: 2,
-			title: "It's absolutely free to discover and book your perfect holiday deals",
-			date: '31.03.2024',
-		},
-	];
+		notifyOnNetworkStatusChange: true,
+	});
 
-	if (device === 'mobile') {
-		return <div>NOTICE MOBILE</div>;
-	} else {
-		return (
-			<Stack className={'notice-content'}>
-				<span className={'title'}>Notice</span>
+	const {
+		data: detailData,
+		loading: detailLoading,
+		error: detailError,
+	} = useQuery(GET_NOTICE, {
+		skip: !selectedId,
+		fetchPolicy: 'cache-and-network',
+		variables: { noticeId: selectedId },
+	});
+
+	const notices: NoticeType[] = listData?.getNotices?.list ?? [];
+	const total = listData?.getNotices?.metaCounter?.[0]?.total ?? 0;
+	const selected: NoticeType | null = detailData?.getNotice ?? null;
+
+	const openNotice = (id: string) => {
+		setSelectedId((prev) => (prev === id ? null : id));
+	};
+
+	return (
+		<Stack className={'notice-content'}>
+			<span className={'title'}>Notice</span>
+
+			{listLoading && !listData ? (
+				<Stack className={'cs-state'} alignItems="center" py={6}>
+					<CircularProgress size={28} />
+					<p>Loading notices…</p>
+				</Stack>
+			) : null}
+
+			{listError ? (
+				<Stack className={'cs-state cs-state--error'} alignItems="center" py={6} gap={1}>
+					<p>Could not load notices.</p>
+					<button type="button" className="cs-retry" onClick={() => refetch()}>
+						Try again
+					</button>
+				</Stack>
+			) : null}
+
+			{!listLoading && !listError && notices.length === 0 ? (
+				<Stack className={'cs-state'} alignItems="center" py={6}>
+					<p>No notices yet. Check back soon for travel updates.</p>
+				</Stack>
+			) : null}
+
+			{!listError && notices.length > 0 ? (
 				<Stack className={'main'}>
 					<Box component={'div'} className={'top'}>
 						<span>number</span>
@@ -36,18 +83,64 @@ const Notice = () => {
 						<span>date</span>
 					</Box>
 					<Stack className={'bottom'}>
-						{data.map((ele: any) => (
-							<div className={`notice-card ${ele?.event && 'event'}`} key={ele.title}>
-								{ele?.event ? <div>event</div> : <span className={'notice-number'}>{ele.no}</span>}
-								<span className={'notice-title'}>{ele.title}</span>
-								<span className={'notice-date'}>{ele.date}</span>
-							</div>
-						))}
+						{notices.map((ele: NoticeType, index: number) => {
+							const isEvent = ele.noticeCategory === NoticeCategory.EVENT;
+							const rowNumber = (page - 1) * limit + index + 1;
+							const isOpen = selectedId === ele._id;
+
+							return (
+								<React.Fragment key={ele._id}>
+									<div
+										className={`notice-card ${isEvent ? 'event' : ''} ${isOpen ? 'is-open' : ''}`}
+										onClick={() => openNotice(ele._id)}
+										role="button"
+										tabIndex={0}
+										onKeyDown={(e: React.KeyboardEvent) => {
+											if (e.key === 'Enter' || e.key === ' ') openNotice(ele._id);
+										}}
+									>
+										{isEvent ? (
+											<div>event</div>
+										) : (
+											<span className={'notice-number'}>{rowNumber}</span>
+										)}
+										<span className={'notice-title'}>{ele.noticeTitle}</span>
+										<span className={'notice-date'}>{formatDate(ele.createdAt, 'dd.MM.yyyy')}</span>
+									</div>
+									{isOpen ? (
+										<Box component="div" className="notice-detail">
+											{detailLoading && !selected ? (
+												<Stack alignItems="center" py={2}>
+													<CircularProgress size={22} />
+												</Stack>
+											) : null}
+											{detailError ? <p className="notice-detail__error">Could not load notice details.</p> : null}
+											{selected && selected._id === ele._id ? (
+												<p className="notice-detail__body">{selected.noticeContent}</p>
+											) : null}
+										</Box>
+									) : null}
+								</React.Fragment>
+							);
+						})}
 					</Stack>
+					{total > limit ? (
+						<Stack className="pagination" mt={3}>
+							<Pagination
+								page={page}
+								count={Math.ceil(total / limit)}
+								onChange={(_e: T, value: number) => {
+									setPage(value);
+									setSelectedId(null);
+								}}
+								color="secondary"
+							/>
+						</Stack>
+					) : null}
 				</Stack>
-			</Stack>
-		);
-	}
+			) : null}
+		</Stack>
+	);
 };
 
 export default Notice;

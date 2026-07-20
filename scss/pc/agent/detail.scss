@@ -385,4 +385,66 @@
 			}
 		}
 	}
+
+	@media (max-width: 768px) {
+		.agent-detail-page {
+			padding: 88px 0 56px;
+
+			.container {
+				.agent-info {
+					margin-left: 0;
+					flex-direction: column;
+					align-items: flex-start;
+					gap: 16px;
+
+					img {
+						margin-right: 0;
+						width: 96px;
+						height: 96px;
+					}
+
+					.info {
+						strong {
+							font-size: 20px;
+						}
+
+						div span {
+							font-size: 16px;
+						}
+					}
+				}
+
+				.agent-home-list {
+					.card-wrap {
+						.wrap-main {
+							width: 100%;
+							justify-content: center;
+						}
+
+						.agent-card {
+							margin-right: 0;
+							width: 100%;
+
+							.agent-img {
+								width: 100%;
+								height: auto;
+								aspect-ratio: 233 / 273;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	@media (max-width: 375px) {
+		.agent-detail-page {
+			padding: 80px 0 48px;
+
+			.container .agent-info img {
+				width: 80px;
+				height: 80px;
+			}
+		}
+	}
 }

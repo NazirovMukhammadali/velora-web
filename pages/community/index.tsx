@@ -4,7 +4,6 @@ import { useRouter } from 'next/router';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Stack, Tab, Typography, Button, Pagination } from '@mui/material';
 import CommunityCard from '../../libs/components/common/CommunityCard';
-import useDeviceDetect from '../../libs/hooks/useDeviceDetect';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import { BoardArticle } from '../../libs/types/board-article/board-article';
 import { T } from '../../libs/types/common';
@@ -26,7 +25,6 @@ export const getStaticProps = async ({ locale }: any) => ({
 });
 
 const Community: NextPage = ({ initialInput, ...props }: T) => {
-	const device = useDeviceDetect();
 	const router = useRouter();
 	const { query } = router;
 	const articleCategory = query?.articleCategory as string;
@@ -77,14 +75,12 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 
 			await boardArticlesRefetch({ input: searchCommunity });
 		} catch (err: any) {
-			console.log("ERROR, likePropertyHandler:", err.message);
-			sweetMixinErrorAlert(err.message).then();
+						sweetMixinErrorAlert(err.message).then();
 		}
 	};
 
 	const tabChangeHandler = async (e: T, value: string) => {
-		console.log(value);
-
+		
 		setSearchCommunity({
 			...searchCommunity,
 			page: 1,
@@ -104,10 +100,7 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 		setSearchCommunity({ ...searchCommunity, page: value });
 	};
 
-	if (device === "mobile") {
-		return <h1>COMMUNITY PAGE MOBILE</h1>;
-	} else {
-		return (
+	return (
 			<div id="community-list-page">
 				<div className="container">
 					<TabContext value={searchCommunity.search.articleCategory ?? 'FREE'}>
@@ -296,7 +289,6 @@ const Community: NextPage = ({ initialInput, ...props }: T) => {
 				</div>
 			</div>
 		);
-	}
 };
 
 Community.defaultProps = {

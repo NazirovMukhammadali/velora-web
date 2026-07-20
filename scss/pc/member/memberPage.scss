@@ -198,4 +198,56 @@
 			}
 		}
 	}
+
+	@media (max-width: 768px) {
+		#member-page {
+			.member-page {
+				padding-top: 72px;
+				flex-direction: column;
+
+				.back-frame {
+					width: 100%;
+					flex-direction: column;
+					margin: 24px 0 80px;
+
+					.left-config {
+						width: calc(100% - 32px);
+						height: auto;
+						margin: 16px;
+
+						.sections .section .sub-section {
+							width: 100%;
+						}
+					}
+
+					.main-config {
+						width: 100%;
+						margin-top: 8px;
+						gap: 32px;
+						padding: 0 16px 24px;
+						box-sizing: border-box;
+					}
+				}
+			}
+		}
+	}
+
+	@media (max-width: 375px) {
+		#member-page {
+			.member-page {
+				padding-top: 64px;
+
+				.back-frame {
+					.left-config {
+						width: calc(100% - 24px);
+						margin: 12px;
+					}
+
+					.main-config {
+						padding: 0 12px 16px;
+					}
+				}
+			}
+		}
+	}
 }

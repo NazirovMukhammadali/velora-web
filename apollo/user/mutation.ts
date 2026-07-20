@@ -239,6 +239,25 @@ export const UNSUBSCRIBE = gql`
 `;
 
 /**************************
+ *      NOTICE / CS       *
+ *************************/
+
+export const CREATE_INQUIRY = gql`
+	mutation CreateInquiry($input: InquiryInput!) {
+		createInquiry(input: $input) {
+			_id
+			noticeCategory
+			noticeStatus
+			noticeTitle
+			noticeContent
+			memberId
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+/**************************
  *        BOOKING         *
  *************************/
 
@@ -251,6 +270,26 @@ export const CREATE_TOUR_BOOKING = gql`
 			bookingRefId
 			bookingTitle
 			bookingPrice
+			agentId
+			memberId
+			createdAt
+			updatedAt
+		}
+	}
+`;
+
+export const CREATE_HOTEL_BOOKING = gql`
+	mutation CreateHotelBooking($input: CreateHotelBookingInput!) {
+		createHotelBooking(input: $input) {
+			_id
+			bookingType
+			bookingStatus
+			bookingRefId
+			bookingTitle
+			bookingPrice
+			checkInDate
+			checkOutDate
+			quantity
 			agentId
 			memberId
 			createdAt

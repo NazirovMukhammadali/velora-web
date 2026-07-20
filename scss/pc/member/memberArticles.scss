@@ -54,4 +54,38 @@
 			}
 		}
 	}
+
+	@media (max-width: 768px) {
+		#member-articles-page {
+			.main-title-box {
+				align-self: stretch;
+
+				.right-box {
+					width: 100%;
+
+					.main-title {
+						font-size: 24px;
+					}
+				}
+			}
+
+			.articles-list-box {
+				margin-top: 28px;
+				gap: 16px;
+				justify-content: center;
+
+				.community-general-card-config {
+					max-width: 100%;
+				}
+			}
+		}
+	}
+
+	@media (max-width: 375px) {
+		#member-articles-page {
+			.main-title-box .right-box .main-title {
+				font-size: 20px;
+			}
+		}
+	}
 }

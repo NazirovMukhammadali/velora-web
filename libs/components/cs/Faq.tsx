@@ -3,7 +3,6 @@ import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import { AccordionDetails, Box, Stack, Typography } from '@mui/material';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
-import useDeviceDetect from '../../hooks/useDeviceDetect';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 
 type FaqCategory = 'booking' | 'payment' | 'staysTours' | 'flights' | 'cancellations' | 'other';
@@ -242,7 +241,6 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 }));
 
 const Faq = () => {
-	const device = useDeviceDetect();
 	const [category, setCategory] = useState<FaqCategory>('booking');
 	const [expanded, setExpanded] = useState<string | false>(FAQ_DATA.booking[0]?.id ?? false);
 
@@ -255,10 +253,6 @@ const Faq = () => {
 	const handleChange = (panel: string) => (_event: SyntheticEvent, isExpanded: boolean) => {
 		setExpanded(isExpanded ? panel : false);
 	};
-
-	if (device === 'mobile') {
-		return <div>FAQ MOBILE</div>;
-	}
 
 	return (
 		<Stack className={'faq-content'}>

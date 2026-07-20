@@ -1,4 +1,6 @@
 export enum NoticeCategory {
+	NOTICE = 'NOTICE',
+	EVENT = 'EVENT',
 	FAQ = 'FAQ',
 	TERMS = 'TERMS',
 	INQUIRY = 'INQUIRY',

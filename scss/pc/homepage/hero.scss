@@ -122,9 +122,13 @@
 
 .velora-hero-search-form {
 	display: grid;
-	grid-template-columns: 1.4fr 1fr 1fr 1fr auto;
+	grid-template-columns: 1.4fr 1fr 1fr 0.8fr auto;
 	gap: 14px;
-	align-items: end;
+	align-items: flex-end;
+
+	&:has(#hero-from) {
+		grid-template-columns: 1fr 1fr 0.9fr 0.9fr 0.7fr auto;
+	}
 
 	.field-group {
 		display: flex;
@@ -175,6 +179,14 @@
 	}
 }
 
+.velora-hero-search-error {
+	margin: 12px 0 0;
+	font-family: $font;
+	font-size: 13px;
+	font-weight: 600;
+	color: #c62828;
+}
+
 #pc-wrap .main-after-hero,
 #mobile-wrap .main-after-hero {
 	position: relative;
@@ -199,6 +211,10 @@
 
 	.velora-hero-search-form {
 		grid-template-columns: 1fr 1fr;
+
+		&:has(#hero-from) {
+			grid-template-columns: 1fr 1fr;
+		}
 	}
 
 	.velora-hero-search-submit {

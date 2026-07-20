@@ -34,7 +34,7 @@
 | Framework | [Next.js 14](https://nextjs.org/) (Pages Router) |
 | UI | React 18, [MUI](https://mui.com/) 5, SCSS |
 | Data | [Apollo Client](https://www.apollographql.com/docs/react/) GraphQL |
-| Backend | Nestar GraphQL API (NestJS) — typically `http://127.0.0.1:3007/graphql` |
+| Backend | Nestar GraphQL API (NestJS) — typically `http://127.0.0.1:3003/graphql` |
 | i18n | `next-i18next` |
 | Images | `next/image` with `remotePatterns` (Unsplash + API host) |
 | Notifications | `notistack` |
@@ -60,7 +60,7 @@ This makes demos, portfolio reviews, and local UI work reliable without requirin
 
 - Node.js 18+
 - [Yarn](https://yarnpkg.com/) 1.x
-- (Optional) Nestar backend on port `3007` for live GraphQL data
+- (Optional) Nestar backend on port `3003` for live GraphQL data
 
 ### Install & run
 
@@ -79,9 +79,9 @@ Open **http://localhost:3000**
 Copy `.env.example` to `.env` and adjust if your API runs elsewhere:
 
 ```env
-NEXT_PUBLIC_API_URL=http://127.0.0.1:3007
-NEXT_PUBLIC_API_GRAPHQL_URL=http://127.0.0.1:3007/graphql
-NEXT_PUBLIC_API_WS_URL=ws://127.0.0.1:3007/graphql
+NEXT_PUBLIC_API_URL=http://127.0.0.1:3003
+NEXT_PUBLIC_API_GRAPHQL_URL=http://127.0.0.1:3003/graphql
+NEXT_PUBLIC_API_WS_URL=ws://127.0.0.1:3003/graphql
 ```
 
 Legacy `REACT_APP_*` names are also supported for backward compatibility.

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import type { ParsedUrlQuery } from 'querystring';
+import { mapHeroQueryToFilters } from '../utils/heroSearch';
 
 export type UseCatalogQueryOptions<T extends Record<string, string>> = {
 	/** Keys that debounce URL updates (e.g. text search). */
@@ -10,6 +11,15 @@ export type UseCatalogQueryOptions<T extends Record<string, string>> = {
 	mapQuery?: (query: ParsedUrlQuery) => Partial<T>;
 	/** Query keys to remove when syncing filters (e.g. hero ?location= on flights). */
 	stripQueryKeys?: string[];
+	/** Apply shared hero param normalization (dates/party/from-to aliases). Default true. */
+	applyHeroMapping?: boolean;
+};
+
+const queryValue = (query: ParsedUrlQuery, key: string): string => {
+	const value = query[key];
+	if (typeof value === 'string') return value;
+	if (Array.isArray(value) && typeof value[0] === 'string') return value[0];
+	return '';
 };
 
 const buildUrlQuery = <T extends Record<string, string>>(
@@ -37,9 +47,16 @@ const buildUrlQuery = <T extends Record<string, string>>(
 	return query;
 };
 
+const trackedKeys = <T extends Record<string, string>>(defaults: T, stripQueryKeys: string[]): string[] =>
+	Array.from(new Set([...Object.keys(defaults), ...stripQueryKeys])).sort();
+
+const serializeTrackedQuery = (query: ParsedUrlQuery, keys: string[]): string =>
+	keys.map((key) => `${key}=${queryValue(query, key)}`).join('&');
+
 /**
  * Sync catalog filter state with URL query params (?location=...&sort=...).
  * Omits default values from the URL so share links stay clean.
+ * Skips router.replace when the tracked query is unchanged (avoids loops).
  */
 export const useCatalogQuery = <T extends Record<string, string>>(
 	defaultFilters: T,
@@ -47,10 +64,13 @@ export const useCatalogQuery = <T extends Record<string, string>>(
 ) => {
 	const router = useRouter();
 	const defaultsRef = useRef(defaultFilters);
+	defaultsRef.current = defaultFilters;
 	const mapQueryRef = useRef(options.mapQuery);
 	mapQueryRef.current = options.mapQuery;
 	const stripQueryKeysRef = useRef(options.stripQueryKeys ?? []);
 	stripQueryKeysRef.current = options.stripQueryKeys ?? [];
+	const applyHeroMappingRef = useRef(options.applyHeroMapping !== false);
+	applyHeroMappingRef.current = options.applyHeroMapping !== false;
 	const debounceKeysRef = useRef(options.debounceKeys);
 	debounceKeysRef.current = options.debounceKeys;
 	const debounceMsRef = useRef(options.debounceMs ?? 400);
@@ -58,11 +78,21 @@ export const useCatalogQuery = <T extends Record<string, string>>(
 	const [filters, setFilters] = useState<T>(defaultFilters);
 	const [ready, setReady] = useState(false);
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+	const hydratingRef = useRef(false);
 
 	const syncUrl = useCallback(
 		(next: T) => {
-			if (!router.isReady) return;
-			const query = buildUrlQuery(router.query, next, defaultsRef.current, stripQueryKeysRef.current);
+			if (!router.isReady || hydratingRef.current) return;
+
+			const defaults = defaultsRef.current;
+			const stripKeys = stripQueryKeysRef.current;
+			const query = buildUrlQuery(router.query, next, defaults, stripKeys);
+			const keys = trackedKeys(defaults, stripKeys);
+			const nextSerialized = serializeTrackedQuery(query, keys);
+			const currentSerialized = serializeTrackedQuery(router.query, keys);
+
+			if (nextSerialized === currentSerialized) return;
+
 			void router.replace({ pathname: router.pathname, query }, undefined, { shallow: true });
 		},
 		[router],
@@ -71,19 +101,32 @@ export const useCatalogQuery = <T extends Record<string, string>>(
 	useEffect(() => {
 		if (!router.isReady || ready) return;
 
+		hydratingRef.current = true;
 		const next = { ...defaultFilters };
+
 		for (const key of Object.keys(defaultFilters) as (keyof T)[]) {
-			const value = router.query[key as string];
-			if (typeof value === 'string' && value !== '') {
+			const value = queryValue(router.query, key as string);
+			if (value) {
 				next[key] = value as T[keyof T];
 			}
+		}
+
+		if (applyHeroMappingRef.current) {
+			Object.assign(next, mapHeroQueryToFilters(router.query, defaultFilters));
 		}
 		if (mapQueryRef.current) {
 			Object.assign(next, mapQueryRef.current(router.query));
 		}
+
 		setFilters(next);
 		setReady(true);
-	}, [router.isReady, router.query, defaultFilters, ready]);
+
+		// Clean invalid/stripped params from the address bar once after hydrate.
+		queueMicrotask(() => {
+			hydratingRef.current = false;
+			syncUrl(next);
+		});
+	}, [router.isReady, router.query, defaultFilters, ready, syncUrl]);
 
 	useEffect(
 		() => () => {

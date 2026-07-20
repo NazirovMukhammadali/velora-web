@@ -1,67 +1,82 @@
 import React, { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useTranslation } from 'next-i18next';
 import { HERO_BACKGROUNDS, HERO_SLIDE_INTERVAL_MS } from '../../data/heroBackgrounds';
 import type { SearchTabKey } from '../../types/hero';
+import {
+	HERO_PARTY_MAX,
+	HERO_PARTY_MIN,
+	buildHeroSearchQuery,
+	routeForSearchTab,
+	validateHeroSearch,
+	type HeroSearchForm,
+} from '../../utils/heroSearch';
 
 type SearchTabConfig = {
 	key: SearchTabKey;
-	label: string;
-	locationLabel: string;
-	locationPlaceholder: string;
-	startLabel: string;
-	endLabel: string;
-	passengerLabel: string;
+	labelKey: string;
+	locationLabelKey: string;
+	locationPlaceholderKey: string;
+	startLabelKey: string;
+	endLabelKey: string;
+	passengerLabelKey: string;
 	passengerPlaceholder: string;
-	targetRoute: string;
+	targetRoute: '/hotels' | '/flights' | '/rentcar';
 };
 
 const TAB_CONFIG: SearchTabConfig[] = [
 	{
 		key: 'hotel',
-		label: 'Hotel',
-		locationLabel: 'Location',
-		locationPlaceholder: 'City, region, or hotel name',
-		startLabel: 'Check-in',
-		endLabel: 'Check-out',
-		passengerLabel: 'Guests',
-		passengerPlaceholder: '2 Guests',
+		labelKey: 'Hotel',
+		locationLabelKey: 'Location',
+		locationPlaceholderKey: 'City hotel placeholder',
+		startLabelKey: 'Check-in',
+		endLabelKey: 'Check-out',
+		passengerLabelKey: 'Guests',
+		passengerPlaceholder: '2',
 		targetRoute: '/hotels',
 	},
 	{
 		key: 'flights',
-		label: 'Flights',
-		locationLabel: 'Destination',
-		locationPlaceholder: 'Where do you want to fly?',
-		startLabel: 'Departure',
-		endLabel: 'Return',
-		passengerLabel: 'Passengers',
-		passengerPlaceholder: '1 Passenger',
+		labelKey: 'Flights',
+		locationLabelKey: 'Location',
+		locationPlaceholderKey: 'Flight destination placeholder',
+		startLabelKey: 'Departure',
+		endLabelKey: 'Return',
+		passengerLabelKey: 'Passengers',
+		passengerPlaceholder: '1',
 		targetRoute: '/flights',
 	},
 	{
 		key: 'rentcar',
-		label: 'RentCar',
-		locationLabel: 'Pick-up location',
-		locationPlaceholder: 'City or airport',
-		startLabel: 'Pick-up date',
-		endLabel: 'Drop-off date',
-		passengerLabel: 'Drivers',
-		passengerPlaceholder: '1 Driver',
+		labelKey: 'Rentcar',
+		locationLabelKey: 'Pick-up location',
+		locationPlaceholderKey: 'City or airport',
+		startLabelKey: 'Pick-up date',
+		endLabelKey: 'Drop-off date',
+		passengerLabelKey: 'Drivers',
+		passengerPlaceholder: '1',
 		targetRoute: '/rentcar',
 	},
 ];
 
+const EMPTY_FORM: HeroSearchForm = {
+	location: '',
+	from: '',
+	to: '',
+	startDate: '',
+	endDate: '',
+	party: '',
+};
+
 const HeaderFilter = () => {
 	const router = useRouter();
+	const { t } = useTranslation('common');
 	const [activeTab, setActiveTab] = useState<SearchTabKey>('hotel');
 	const [slideIndex, setSlideIndex] = useState(0);
 	const [reducedMotion, setReducedMotion] = useState(false);
-	const [form, setForm] = useState({
-		location: '',
-		startDate: '',
-		endDate: '',
-		travelers: '',
-	});
+	const [form, setForm] = useState<HeroSearchForm>(EMPTY_FORM);
+	const [error, setError] = useState('');
 
 	const slides = HERO_BACKGROUNDS[activeTab];
 
@@ -80,6 +95,7 @@ const HeaderFilter = () => {
 
 	useEffect(() => {
 		setSlideIndex(0);
+		setError('');
 	}, [activeTab]);
 
 	useEffect(() => {
@@ -92,20 +108,28 @@ const HeaderFilter = () => {
 
 	const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
+		const validation = validateHeroSearch(form, activeTab);
+		if (!validation.ok) {
+			setError(validation.message ?? 'Please check your search details.');
+			return;
+		}
+
+		setError('');
+		const route = routeForSearchTab(activeTab);
+		const query = buildHeroSearchQuery(form, route, validation.party ?? '');
+
 		await router.push({
-			pathname: activeConfig.targetRoute,
-			query: {
-				location: form.location,
-				startDate: form.startDate,
-				endDate: form.endDate,
-				party: form.travelers,
-			},
+			pathname: route,
+			query,
 		});
 	};
 
-	const handleField = (name: 'location' | 'startDate' | 'endDate' | 'travelers', value: string) => {
+	const handleField = (name: keyof HeroSearchForm, value: string) => {
 		setForm((prev) => ({ ...prev, [name]: value }));
+		if (error) setError('');
 	};
+
+	const isFlights = activeTab === 'flights';
 
 	return (
 		<section className="velora-hero" aria-label="Travel search">
@@ -132,25 +156,53 @@ const HeaderFilter = () => {
 								className={`velora-hero-search-tab ${activeTab === tab.key ? 'is-active' : ''}`}
 								onClick={() => setActiveTab(tab.key)}
 							>
-								{tab.label}
+								{t(tab.labelKey)}
 							</button>
 						))}
 					</div>
 
-					<form className="velora-hero-search-form" onSubmit={onSubmit}>
-						<div className="field-group location">
-							<label htmlFor="hero-location">{activeConfig.locationLabel}</label>
-							<input
-								id="hero-location"
-								type="text"
-								value={form.location}
-								placeholder={activeConfig.locationPlaceholder}
-								onChange={(event) => handleField('location', event.target.value)}
-							/>
-						</div>
+					<form className="velora-hero-search-form" onSubmit={onSubmit} noValidate>
+						{isFlights ? (
+							<>
+								<div className="field-group location">
+									<label htmlFor="hero-from">{t('From')}</label>
+									<input
+										id="hero-from"
+										type="text"
+										value={form.from}
+										placeholder={t('City or airport')}
+										onChange={(event) => handleField('from', event.target.value)}
+										autoComplete="off"
+									/>
+								</div>
+								<div className="field-group location">
+									<label htmlFor="hero-to">{t('To')}</label>
+									<input
+										id="hero-to"
+										type="text"
+										value={form.to}
+										placeholder={t('City or airport')}
+										onChange={(event) => handleField('to', event.target.value)}
+										autoComplete="off"
+									/>
+								</div>
+							</>
+						) : (
+							<div className="field-group location">
+								<label htmlFor="hero-location">{t(activeConfig.locationLabelKey)}</label>
+								<input
+									id="hero-location"
+									type="text"
+									value={form.location}
+									placeholder={t(activeConfig.locationPlaceholderKey)}
+									onChange={(event) => handleField('location', event.target.value)}
+									autoComplete="off"
+								/>
+							</div>
+						)}
 
 						<div className="field-group date">
-							<label htmlFor="hero-start-date">{activeConfig.startLabel}</label>
+							<label htmlFor="hero-start-date">{t(activeConfig.startLabelKey)}</label>
 							<input
 								id="hero-start-date"
 								type="date"
@@ -160,30 +212,40 @@ const HeaderFilter = () => {
 						</div>
 
 						<div className="field-group date">
-							<label htmlFor="hero-end-date">{activeConfig.endLabel}</label>
+							<label htmlFor="hero-end-date">{t(activeConfig.endLabelKey)}</label>
 							<input
 								id="hero-end-date"
 								type="date"
 								value={form.endDate}
+								min={form.startDate || undefined}
 								onChange={(event) => handleField('endDate', event.target.value)}
 							/>
 						</div>
 
 						<div className="field-group party">
-							<label htmlFor="hero-party">{activeConfig.passengerLabel}</label>
+							<label htmlFor="hero-party">{t(activeConfig.passengerLabelKey)}</label>
 							<input
 								id="hero-party"
-								type="text"
-								value={form.travelers}
+								type="number"
+								inputMode="numeric"
+								min={HERO_PARTY_MIN}
+								max={HERO_PARTY_MAX}
+								value={form.party}
 								placeholder={activeConfig.passengerPlaceholder}
-								onChange={(event) => handleField('travelers', event.target.value)}
+								onChange={(event) => handleField('party', event.target.value)}
 							/>
 						</div>
 
 						<button className="velora-hero-search-submit" type="submit">
-							Search
+							{t('Search')}
 						</button>
 					</form>
+
+					{error ? (
+						<p className="velora-hero-search-error" role="alert">
+							{error}
+						</p>
+					) : null}
 				</div>
 			</div>
 		</section>

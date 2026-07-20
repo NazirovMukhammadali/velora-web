@@ -9,12 +9,17 @@ import { getPackagesByType, matchesPackageSearch, sortPackages } from '../../lib
 import { mapHotelsToPackages } from '../../libs/data/packageApi';
 import { GET_HOTELS } from '../../apollo/user/query';
 import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
+import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
 import type { VeloraPackage } from '../../libs/types/package';
 
 type PriceKey = 'any' | 'under100' | '100to200' | 'over200';
 
 const HOTEL_FILTER_DEFAULTS = {
 	location: '',
+	startDate: '',
+	endDate: '',
+	party: '',
+	guests: '',
 	price: 'any',
 	sort: 'recommended',
 };
@@ -46,7 +51,7 @@ const inPriceRange = (price: number, range: string): boolean => {
 };
 
 const HotelsPage: NextPage = () => {
-	const { filters, setFilter, items, total, isInitialLoading } = usePackageCatalog<
+	const { filters, setFilter, setFilters, items, total, isInitialLoading } = usePackageCatalog<
 		VeloraPackage,
 		typeof HOTEL_FILTER_DEFAULTS
 	>({
@@ -55,10 +60,15 @@ const HotelsPage: NextPage = () => {
 		mapApi: mapHotelsToPackages,
 		fallback: () => getPackagesByType('hotels'),
 		filterDefaults: HOTEL_FILTER_DEFAULTS,
-		catalogOptions: { debounceKeys: ['location'] },
+		catalogOptions: {
+			debounceKeys: ['location'],
+			stripQueryKeys: stripKeysForCatalog('/hotels'),
+		},
 		filterItem: (hotel, f) => matchesPackageSearch(hotel, f.location) && inPriceRange(hotel.priceAmount, f.price),
 		sortItems: sortPackages,
 	});
+
+	const partyValue = filters.party || filters.guests;
 
 	return (
 		<Stack className={'tours-page'}>
@@ -82,6 +92,40 @@ const HotelsPage: NextPage = () => {
 						onChange={(event) => setFilter('location', event.target.value)}
 						className={'tours-search-input'}
 					/>
+				</div>
+
+				<div className={'catalog-hero-filters'}>
+					<label>
+						<span>Check-in</span>
+						<input
+							type="date"
+							value={filters.startDate}
+							onChange={(event) => setFilter('startDate', event.target.value)}
+						/>
+					</label>
+					<label>
+						<span>Check-out</span>
+						<input
+							type="date"
+							value={filters.endDate}
+							min={filters.startDate || undefined}
+							onChange={(event) => setFilter('endDate', event.target.value)}
+						/>
+					</label>
+					<label>
+						<span>Guests</span>
+						<input
+							type="number"
+							min={HERO_PARTY_MIN}
+							max={HERO_PARTY_MAX}
+							value={partyValue}
+							placeholder="2"
+							onChange={(event) => {
+								const value = event.target.value;
+								setFilters({ party: value, guests: value });
+							}}
+						/>
+					</label>
 				</div>
 
 				<div className={'tours-categories'}>

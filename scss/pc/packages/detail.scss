@@ -198,7 +198,7 @@
 		display: grid;
 		grid-template-columns: 1fr 360px;
 		gap: 28px;
-		align-items: start;
+		align-items: flex-start;
 	}
 
 	.pkg-detail-main {

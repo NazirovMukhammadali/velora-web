@@ -4,26 +4,24 @@ import { userVar } from "../../apollo/store";
 import { CustomJwtPayload } from "../types/customJwtPayload";
 import { sweetMixinErrorAlert } from "../sweetAlert";
 import { LOGIN, SIGN_UP } from "../../apollo/user/mutation";
+import { clearJwtToken, setJwtToken } from "./token";
 
 export type PublicSignupMemberType = "USER" | "AGENT";
 
-export function getJwtToken(): any {
-	if (typeof window !== "undefined") {
-		return localStorage.getItem("accessToken") ?? "";
-	}
-}
+export { getJwtToken, setJwtToken } from "./token";
 
-export function setJwtToken(token: string) {
-	localStorage.setItem("accessToken", token);
-}
 
 /**
  * Surface readable auth / signup validation failures to the user.
  * Prefer GraphQL messages from the API so validation rules stay clear.
  */
-const reportAuthError = async (err: any): Promise<void> => {
-	const graphQLMessages: string[] = (err?.graphQLErrors ?? [])
-		.map((item: { message?: string }) => item?.message)
+const reportAuthError = async (err: unknown): Promise<void> => {
+	const graphQLErrors =
+		err && typeof err === "object" && "graphQLErrors" in err
+			? ((err as { graphQLErrors?: Array<{ message?: string }> }).graphQLErrors ?? [])
+			: [];
+	const graphQLMessages: string[] = graphQLErrors
+		.map((item) => item?.message)
 		.filter((message: string | undefined): message is string => Boolean(message));
 
 	if (graphQLMessages.length > 0) {
@@ -42,7 +40,7 @@ const reportAuthError = async (err: any): Promise<void> => {
 		return;
 	}
 
-	if (err?.networkError) {
+	if (err && typeof err === "object" && "networkError" in err && (err as { networkError?: unknown }).networkError) {
 		await sweetMixinErrorAlert(
 			"Cannot reach the server. Please make sure the backend is running."
 		);
@@ -80,7 +78,7 @@ const requestJwtToken = async ({
 		const { accessToken } = result?.data?.login;
 
 		return { jwtToken: accessToken };
-	} catch (err: any) {
+	} catch (err: unknown) {
 		await reportAuthError(err);
 		throw new Error("token error");
 	}
@@ -140,18 +138,18 @@ const requestSignUpJwtToken = async ({
 		const { accessToken } = result?.data?.signup;
 
 		return { jwtToken: accessToken };
-	} catch (err: any) {
+	} catch (err: unknown) {
 		await reportAuthError(err);
 		throw new Error("token error");
 	}
 };
 
-export const updateStorage = ({ jwtToken }: { jwtToken: any }) => {
+export const updateStorage = ({ jwtToken }: { jwtToken: string }) => {
 	setJwtToken(jwtToken);
 	window.localStorage.setItem("login", Date.now().toString());
 };
 
-export const updateUserInfo = (jwtToken: any) => {
+export const updateUserInfo = (jwtToken: string) => {
 	if (!jwtToken) return false;
 
 	const claims = decodeJWT<CustomJwtPayload>(jwtToken);
@@ -187,7 +185,7 @@ export const logOut = () => {
 };
 
 const deleteStorage = () => {
-	localStorage.removeItem("accessToken");
+	clearJwtToken();
 	window.localStorage.setItem("logout", Date.now().toString());
 };
 
