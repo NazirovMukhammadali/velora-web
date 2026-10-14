@@ -6,18 +6,20 @@ Bu fayl keyingi agentlar uchun **dizayn g‘oyasi**, **qilingan ishlar** va **qo
 
 - **Nom:** velora-web (travel booking frontend)
 - **Stack:** Next.js 14, React 18, MUI, Apollo GraphQL, SCSS
-- **Backend:** Nestar GraphQL — odatda `http://127.0.0.1:3003/graphql` (`.env.example`)
+- **Backend:** Velora GraphQL API (`velora-api`, NestJS) — odatda `http://127.0.0.1:3003/graphql` (`.env.example`)
 - **Ishga tushirish:** `yarn dev` (development). `yarn start` production build uchun.
 
 ---
 
-## Dizayn manbalari (aralash, bittasini to‘liq ko‘chirmang)
+## Dizayn tamoyillari
 
-| Manba | Nimalarni olish | Nimalarni olmaslik |
-|--------|-----------------|-------------------|
-| [nestar.uz](http://nestar.uz/) | Navbar tuzilishi: logo chap, linklar markazda, Login/Register + til o‘ngda; sticky navbar | Property hero (3 ta uy rasmi), property qidiruv maydonlari |
-| Kayak | Rang palitrasi, travel his, accent Search tugmasi | “Ask AI” chatbot UI |
-| Tourex (namuna) | To‘liq fon hero, pastda oq qidiruv kartasi (overlap), tablar | 6 ta tab (Restaurant, Activity…); markazda katta CTA “Take a tour” |
+To‘liq spetsifikatsiya: [docs/DESIGN.md](./docs/DESIGN.md).
+
+| Qism | Qoida | Qilinmasin |
+|------|-------|------------|
+| Navigatsiya | Logo chapda, linklar markazda, Login/Register + til o‘ngda; sticky navbar | Katalog qidiruv maydonlarini navbarga qo‘yish |
+| Rang va qidiruv | Velora palitrasi; Search tugmasi `$velora-accent` | Palitradan tashqari rang qo‘shish |
+| Bosh sahifa hero | To‘liq fon slider, pastda oq qidiruv kartasi (overlap), Hotel · Flights · RentCar tablari | Ortiqcha tablar; markazda katta CTA tugma |
 
 ### Velora ranglari (`scss/variables.scss`)
 
@@ -32,7 +34,7 @@ Bu fayl keyingi agentlar uchun **dizayn g‘oyasi**, **qilingan ishlar** va **qo
 **Komponent:** `libs/components/layout/VeloraNavbar.tsx`  
 **Stillar:** `scss/pc/layout/navbar.scss`
 
-### Tuzilish (Nestar)
+### Tuzilish
 
 - Chap: dumaloq logo mark + **VELORA**
 - Markaz: **Home** `/` · **Tours** `/tours` · **Agents** `/agent` · **Community** `/community?articleCategory=FREE` · **CS** `/cs`
@@ -107,7 +109,7 @@ Workspace qoidasi (`travel-booking-workflow`):
 
 Quyidagilarni **tartib bilan**, yuqoridagi qoidalarga rioya qilib bajaring:
 
-1. **Chatbot Assistant UI** — Kayak “Ask AI” emas; dizayn foydalanuvchi yuborgan rasmga qarab (`libs/components/Chat.tsx` almashtirish yoki yangi widget)
+1. ~~**Chatbot Assistant UI**~~ — bajarildi: Gemini AI assistant widget (`libs/components/Chat.tsx`, `libs/components/assistant/`)
 2. **Tours API** — `/tours` hozir statik `libs/data/tours.ts`; `getTours` GraphQL ga ulash
 3. **Flights / Hotels / RentCar** sahifalari — chiroyli katalog + `HeaderFilter` query parametrlarini uzatish
 4. **README / i18n** — `Tours` va boshqa matnlar `common.json` ga

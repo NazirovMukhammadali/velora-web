@@ -1,7 +1,7 @@
 import type { ChangeEvent } from 'react';
 
 /**
- * Loose alias kept for backward compatibility with legacy Nestar components.
+ * Loose alias kept for backward compatibility with older components.
  *
  * @deprecated Prefer an explicit type for new code — e.g. the form-event aliases
  * (`InputChangeEvent`, `SelectChangeEvent`) or the GraphQL envelope helpers
@@ -12,7 +12,7 @@ export type T = any;
 /** DOM change-event aliases for typed form handlers (replaces `e: any`). */
 export type InputChangeEvent = ChangeEvent<HTMLInputElement>;
 export type SelectChangeEvent = ChangeEvent<HTMLSelectElement>;
-/** Pagination counter returned by Nestar list queries. */
+/** Pagination counter returned by Velora API list queries. */
 export interface MetaCounter {
 	total: number;
 }

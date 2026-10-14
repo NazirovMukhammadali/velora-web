@@ -1,89 +1,128 @@
 # Velora Web
 
-**Velora** is a modern travel booking frontend — search and compare **flights**, **hotels**, **rental cars**, and **tour packages**, connect with **travel agents**, and explore a **travel community**. Built as a portfolio-grade Next.js application with a Nestar GraphQL backend and a resilient static demo fallback when the API is offline.
+**Velora** is a full-stack travel booking platform. Travellers search and compare **flights**, **hotels**, **rental cars**, and **tour packages**, follow verified **travel agents**, share stories in the **community**, and plan trips with a built-in **Gemini-powered AI assistant**.
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black)
-![React](https://img.shields.io/badge/React-18-61dafb)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178c6)
-![GraphQL](https://img.shields.io/badge/GraphQL-Apollo-e535ab)
+This repository is the web client (`velora-web`). It talks to the **Velora GraphQL API** (`velora-api`, NestJS) and stays fully browsable thanks to a curated static fallback when the API is unavailable.
+
+![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![GraphQL](https://img.shields.io/badge/GraphQL-Apollo%20Client-E10098?logo=graphql&logoColor=white)
+![MUI](https://img.shields.io/badge/MUI-5-007FFF?logo=mui&logoColor=white)
+![Gemini](https://img.shields.io/badge/AI-Google%20Gemini-8E75B2?logo=googlegemini&logoColor=white)
 
 ---
 
-## Features
+## Highlights
 
-| Area | Highlights |
-|------|------------|
-| **Home** | Immersive hero with tabbed search (Hotel · Flights · RentCar), rotating backgrounds, overlapping search card |
-| **Catalogs** | `/tours`, `/hotels`, `/rentcar`, `/flights` — filters, sort, URL-shareable query params |
-| **Details** | Rich package & flight detail pages with gallery, reviews, and booking panels |
-| **Booking** | Guest flow with date validation, auth-aware panels, local booking persistence |
-| **Agents** | Agent directory and profile pages with reviews |
-| **Community** | Articles, comments, and member profiles |
-| **Auth** | JWT login/register, `useAuth()` hook, protected my-page & admin routes |
-| **UX** | Error boundaries, skeleton loaders, SweetAlert2 dialogs, Velora AI travel assistant widget |
-| **i18n** | English, Korean, Russian via `next-i18next` |
-| **SEO** | Per-route `<title>` and meta descriptions; dynamic detail metadata |
-| **Mobile** | Responsive CSS — hero banners and layouts adapt without user-agent splitting |
+| Area | What it does |
+|------|--------------|
+| **Home** | Immersive hero with tabbed search (Hotel · Flights · Rent a Car), rotating backgrounds and an overlapping search card |
+| **Catalogs** | `/tours`, `/hotels`, `/rentcar`, `/flights` with filters, sorting, URL-shareable queries, type-ahead suggestions and scroll-stable pagination |
+| **Details & booking** | Galleries, reviews and booking panels with date validation and auth-aware flows |
+| **AI assistant** | Floating robot widget that answers with live listings as cards (image, price, link), follow-up suggestion chips and an AI / FAQ indicator |
+| **Agents** | Directory and profiles of verified travel experts |
+| **Community** | Articles, comments, likes and Instagram-style follow / followers |
+| **Auth** | JWT login and registration, safe redirects, session expiry handling, protected My Page and admin routes |
+| **Admin** | Dashboard plus management of catalogs, bookings, members, articles and notices |
+| **i18n** | English, Korean and Russian |
+| **Responsive** | Media-query driven layouts from 360px phones to wide desktops |
 
 ---
 
 ## Tech stack
 
-| Layer | Choice |
-|-------|--------|
-| Framework | [Next.js 14](https://nextjs.org/) (Pages Router) |
-| UI | React 18, [MUI](https://mui.com/) 5, SCSS |
-| Data | [Apollo Client](https://www.apollographql.com/docs/react/) GraphQL |
-| Backend | Nestar GraphQL API (NestJS) — typically `http://127.0.0.1:3003/graphql` |
-| i18n | `next-i18next` |
-| Images | `next/image` with `remotePatterns` (Unsplash + API host) |
-| Notifications | `sweetalert2` |
+### Frontend — `velora-web`
+
+| Concern | Technology |
+|---------|------------|
+| Framework | Next.js 14 (Pages Router) |
+| Core library | React 18 |
+| Language | TypeScript |
+| State & API | Apollo Client (GraphQL), Apollo reactive variables |
+| UI & styling | Material UI (MUI 5), SCSS (Sass), custom Velora design system, Phosphor Icons |
+| AI assistant | Gemini AI assistant widget (floating hero UI) |
+| Internationalization | next-i18next (English, Korean, Russian) |
+| Feedback & dialogs | SweetAlert2 |
+| Testing | Jest |
+
+### Backend — `velora-api`
+
+| Concern | Technology |
+|---------|------------|
+| Framework | NestJS (Node.js) |
+| API architecture | GraphQL (code-first) and REST health check |
+| Database & ODM | MongoDB, Mongoose |
+| AI engine | Google Gemini 3.5 Flash-Lite (`@google/genai`) with parallel tool calls |
+| Security & rate limiting | JWT authentication, `@nestjs/throttler` (global and AI assistant limits) |
+| Testing | Jest (unit tests and in-memory MongoDB integration tests) |
+
+### DevOps & tooling
+
+| Concern | Technology |
+|---------|------------|
+| Package management | Yarn (`yarn.lock`) for the web client, npm (`package-lock.json`) for the API |
+| Code quality | ESLint, Prettier; Husky + lint-staged pre-commit checks (API) |
+| CI | GitHub Actions on the API (lint, build, unit and integration tests) |
+| Operations | `/health` endpoint (API and MongoDB status), persistent uploads volume (`UPLOADS_DIR` → `/uploads`) |
 
 ---
 
-## Static / demo fallback strategy
+## Architecture
 
-Velora is designed to **look complete even without a running backend**:
+```text
+┌────────────────────────┐   GraphQL (Apollo)    ┌──────────────────────────┐
+│  velora-web (Next.js)  │ ────────────────────▶ │  velora-api (NestJS)     │
+│  pages · components    │                       │  GraphQL + REST /health  │
+│  Apollo cache · i18n   │ ◀──────────────────── │  JWT · throttling        │
+└───────────┬────────────┘                       └─────┬──────────────┬─────┘
+            │ static fallback                          │              │
+            ▼                                          ▼              ▼
+   curated demo catalogs                           MongoDB      Google Gemini
+   (libs/data)                                                  (AI assistant)
+```
 
-1. **Catalog pages** (`/tours`, `/hotels`, `/rentcar`, `/flights`) call GraphQL with `errorPolicy: 'all'`.
-2. If the API returns data → results are mapped via `libs/data/packageApi.ts` and `libs/data/flights.ts`.
-3. If the API is empty or unreachable → the UI falls back to curated static datasets in `libs/data/packages.ts` and `libs/data/flights.ts`.
-4. **Detail pages** check the static catalog first by ID; only then query the API for items not in the demo set.
+### Resilient catalog data
 
-This makes demos, portfolio reviews, and local UI work reliable without requiring a live Nestar instance.
+The catalog pages stay complete even without a running API:
+
+1. `/tours`, `/hotels`, `/rentcar` and `/flights` query GraphQL with `errorPolicy: 'all'`.
+2. When the API returns data, results are mapped by `libs/data/packageApi.ts` and `libs/data/flights.ts`.
+3. When the API is empty or unreachable, the UI falls back to curated datasets in `libs/data/packages.ts` and `libs/data/flights.ts`.
+4. Detail pages resolve demo IDs from the static catalog first and query the API for everything else.
+
+Demos, reviews and local UI work therefore run without requiring an active backend service.
 
 ---
 
-## Local setup
+## Getting started
 
 ### Prerequisites
 
-- Node.js 18+
+- Node.js 18.17+ (20 LTS recommended)
 - [Yarn](https://yarnpkg.com/) 1.x
-- (Optional) Nestar backend on port `3003` for live GraphQL data
+- Optional: the Velora API backend on port `3003` for live data, accounts and the AI assistant
 
-### Install & run
+### Install and run
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/NazirovMukhammadali/velora-web.git
 cd velora-web
 yarn install
 cp .env.example .env
 yarn dev
 ```
 
-Open **http://localhost:3000**
+Open **http://localhost:3000**.
 
 ### Environment variables
-
-Copy `.env.example` to `.env` and adjust if your API runs elsewhere:
 
 ```env
 NEXT_PUBLIC_API_URL=http://127.0.0.1:3003
 NEXT_PUBLIC_API_GRAPHQL_URL=http://127.0.0.1:3003/graphql
 ```
 
-Legacy `REACT_APP_*` names are also supported for backward compatibility.
+Legacy `REACT_APP_*` names are still read for backward compatibility.
 
 ### Scripts
 
@@ -91,48 +130,44 @@ Legacy `REACT_APP_*` names are also supported for backward compatibility.
 |---------|-------------|
 | `yarn dev` | Development server with hot reload |
 | `yarn build` | Production build |
-| `yarn start:prod` | Serve production build on port 3000 |
-| `yarn lint` | ESLint (optional; skipped during build) |
+| `yarn start:prod` | Serve the production build on port 3000 |
+| `yarn lint` | ESLint |
+| `yarn typecheck` | TypeScript type check |
+| `yarn test` | Jest unit tests |
 
 ---
 
 ## Project structure
 
-```
-pages/                  # Next.js routes
+```text
+pages/                  Next.js routes (catalogs, details, community, admin, auth)
 libs/
-  components/           # UI (layout, homepage, packages, flights, …)
-  hooks/                # useAuth, useCatalogQuery, usePagedItems, …
-  data/                 # Static catalogs + API mappers
-  config/               # SEO and app config
-apollo/                 # GraphQL client, queries, store
-scss/pc/                # Primary styles (+ responsive @media)
-scss/mobile/            # Mobile footer overrides
-public/                 # Static assets, locales, video
+  components/           UI: layout, homepage, catalogs, assistant, admin, community
+  hooks/                useAuth, useCatalogQuery, usePackageCatalog, usePagedItems, …
+  data/                 Static catalogs and API mappers
+  utils/                Search, suggestions, referrer, assistant helpers
+  config/               SEO and app configuration
+apollo/                 Apollo client, queries, mutations, reactive store
+scss/                   Design tokens (variables.scss) and page styles with responsive @media
+public/                 Static assets and locales
+__tests__/              Jest unit tests
 ```
 
-Key entry points:
-
-| Concern | Path |
-|---------|------|
-| Home layout & hero | `libs/components/layout/LayoutHome.tsx`, `HeaderFilter.tsx` |
-| Inner pages layout | `libs/components/layout/LayoutBasic.tsx` |
-| Navbar | `libs/components/layout/VeloraNavbar.tsx` |
-| SEO | `libs/config/seo.ts`, `libs/components/common/SeoHead.tsx` |
-| Auth hook | `libs/hooks/useAuth.ts` |
-| URL filters | `libs/hooks/useCatalogQuery.ts` |
+| Concern | Entry point |
+|---------|-------------|
+| Home layout and hero | `libs/components/layout/LayoutHome.tsx`, `libs/components/homepage/HeaderFilter.tsx` |
+| Inner page layout | `libs/components/layout/LayoutBasic.tsx` |
+| Navigation | `libs/components/layout/VeloraNavbar.tsx` |
+| AI assistant | `libs/components/Chat.tsx`, `libs/components/assistant/` |
+| Catalog data pipeline | `libs/hooks/usePackageCatalog.ts`, `libs/hooks/useCatalogQuery.ts` |
+| Design tokens | `scss/variables.scss` |
 
 ---
 
-## Design & contributor notes
+## Documentation
 
-- **[AGENTS.md](./AGENTS.md)** — agent workflow, design rules, file map
-- **[docs/DESIGN.md](./docs/DESIGN.md)** — UI spec (Nestar navbar + Kayak palette + Tourex hero)
+- **[docs/DESIGN.md](./docs/DESIGN.md)** — UI design system, color palette, and component architecture
+- **[AGENTS.md](./AGENTS.md)** — contributor workflow, design rules and file map
+- **[CHANGELOG.md](./CHANGELOG.md)** — version history
 
-Velora brand colors live in `scss/variables.scss` (`$velora-primary`, `$velora-accent`).
-
----
-
-## License
-
-See [LICENSE](./LICENSE) · Version history in [CHANGELOG.md](./CHANGELOG.md).
+Brand colors: `$velora-primary` `#5b3df5` and `$velora-accent` `#ff6b2c` (`scss/variables.scss`).
