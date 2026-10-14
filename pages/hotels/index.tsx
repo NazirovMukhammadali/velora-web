@@ -4,6 +4,7 @@ import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import PackageCard from '../../libs/components/packages/PackageCard';
+import CatalogPagination from '../../libs/components/common/CatalogPagination';
 import { CatalogGridSkeleton } from '../../libs/components/common/CatalogCardSkeleton';
 import { getPackagesByType, matchesPackageSearch, sortPackages } from '../../libs/data/packages';
 import { mapHotelsToPackages } from '../../libs/data/packageApi';
@@ -12,6 +13,10 @@ import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
 import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
 import type { VeloraPackage } from '../../libs/types/package';
 import useTodayIso from '../../libs/hooks/useTodayIso';
+import usePagedItems from '../../libs/hooks/usePagedItems';
+
+/** Two rows of the 4-column desktop grid. */
+const HOTELS_PER_PAGE = 8;
 
 type PriceKey = 'any' | 'under100' | '100to200' | 'over200';
 
@@ -71,6 +76,7 @@ const HotelsPage: NextPage = () => {
 	});
 
 	const partyValue = filters.party || filters.guests;
+	const { page, setPage, pageItems } = usePagedItems(items, HOTELS_PER_PAGE);
 
 	return (
 		<Stack className={'tours-page'}>
@@ -167,11 +173,20 @@ const HotelsPage: NextPage = () => {
 				) : items.length === 0 ? (
 					<div className={'tours-empty'}>No hotels match your filters yet.</div>
 				) : (
-					<div className={'tour-grid'}>
-						{items.map((pkg) => (
-							<PackageCard key={pkg.id} pkg={pkg} />
-						))}
-					</div>
+					<>
+						<div className={'tour-grid'}>
+							{pageItems.map((pkg) => (
+								<PackageCard key={pkg.id} pkg={pkg} />
+							))}
+						</div>
+						<CatalogPagination
+							page={page}
+							pageSize={HOTELS_PER_PAGE}
+							total={items.length}
+							label="hotels"
+							onChange={setPage}
+						/>
+					</>
 				)}
 			</Stack>
 		</Stack>

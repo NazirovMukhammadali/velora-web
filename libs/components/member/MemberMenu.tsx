@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/router';
+import { userVar } from '../../../apollo/store';
 import { Stack, Typography, Box, List, ListItem, Button } from '@mui/material';
 import Link from 'next/link';
 import { Member } from '../../types/member/member';
 import { REACT_APP_API_URL } from '../../config';
-import { useQuery } from '@apollo/client';
+import { useQuery, useReactiveVar } from '@apollo/client';
 import { GET_MEMBER } from '../../../apollo/user/query';
 import { T } from '../../types/common';
 
@@ -19,6 +20,7 @@ const MemberMenu = (props: MemberMenuProps) => {
 	const category: any = router.query?.category;
 	const [member, setMember] = useState<Member | null>(null);
 	const { memberId } = router.query;
+	const user = useReactiveVar(userVar);
 
 	/** APOLLO REQUESTS **/
 	const { refetch: getMemberRefetch } = useQuery(GET_MEMBER, {
@@ -50,7 +52,7 @@ const MemberMenu = (props: MemberMenuProps) => {
 				</Stack>
 			</Stack>
 			<Stack className="follow-button-box">
-				{!member?._id ? null : member?.meFollowed && member?.meFollowed[0]?.myFollowing ? (
+				{!member?._id || member._id === user?._id ? null : member?.meFollowed && member?.meFollowed[0]?.myFollowing ? (
 					<>
 						<Button
 							variant="outlined"

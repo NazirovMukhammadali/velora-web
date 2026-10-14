@@ -39,12 +39,7 @@
 
 		.agent-experts-eyebrow {
 			display: block;
-			font-family: $font;
-			font-size: 12px;
-			font-weight: 700;
-			letter-spacing: 0.2em;
-			text-transform: uppercase;
-			color: $velora-accent;
+			@include velora-script-eyebrow;
 		}
 
 		.agent-experts-title {

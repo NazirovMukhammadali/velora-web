@@ -275,8 +275,18 @@
 	}
 
 	@media (max-width: 768px) {
+		padding-bottom: 24px;
+
 		.tours-toolbar {
 			padding: 18px;
+		}
+
+		.catalog-count {
+			margin-top: 16px;
+		}
+
+		.tours-page-cards {
+			padding: 20px 0 40px;
 		}
 
 		.tour-grid-card {

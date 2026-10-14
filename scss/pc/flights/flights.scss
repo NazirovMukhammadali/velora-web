@@ -4,13 +4,8 @@
 
 	.catalog-eyebrow {
 		display: inline-block;
-		font-family: $font;
-		font-size: 12px;
-		font-weight: 700;
-		letter-spacing: 0.16em;
-		text-transform: uppercase;
-		color: $velora-primary;
-		margin-bottom: 10px;
+		@include velora-script-eyebrow;
+		margin-bottom: 6px;
 	}
 
 	.catalog-title {
@@ -471,6 +466,41 @@
 
 		.flight-detail-point--end {
 			text-align: center;
+		}
+	}
+}
+
+/* Phones: the From ⇄ To pair must shrink to the screen; the rest of the toolbar goes full width. */
+@media (max-width: 560px) {
+	.flights-page {
+		.container {
+			padding: 0 16px;
+		}
+
+		.flights-toolbar {
+			padding: 16px;
+			gap: 14px;
+
+			.flights-search {
+				width: 100%;
+				gap: 8px;
+
+				.flights-field {
+					min-width: 0;
+				}
+			}
+
+			.flights-sort {
+				width: 100%;
+
+				select {
+					flex: 1;
+				}
+			}
+		}
+
+		.catalog-count {
+			margin-top: 16px;
 		}
 	}
 }
