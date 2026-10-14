@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import { useReactiveVar } from '@apollo/client';
 import { userVar } from '../../apollo/store';
 import { getJwtToken, updateUserInfo } from '../auth';
+import { clearJwtToken } from '../auth/token';
 import type { CustomJwtPayload } from '../types/customJwtPayload';
 
 type UseAuthOptions = {
@@ -20,7 +21,13 @@ export const useAuth = (options: UseAuthOptions = {}) => {
 
 	const syncUser = useCallback(() => {
 		const jwt = getJwtToken();
-		if (jwt) updateUserInfo(jwt);
+		if (!jwt) return;
+		try {
+			updateUserInfo(jwt);
+		} catch {
+			// Malformed token in storage — drop it so the user can sign in again.
+			clearJwtToken();
+		}
 	}, []);
 
 	useEffect(() => {
@@ -50,11 +57,13 @@ export const useRequireAuth = () => {
 		if (!auth.authReady || !router.isReady) return;
 
 		const jwt = getJwtToken();
-		if (!jwt) {
+		// A token without a member id can never authorize; treat it like no token at all.
+		if (jwt && !auth.user._id) clearJwtToken();
+		if (!jwt || !auth.user._id) {
 			const referrer = encodeURIComponent(router.asPath || '/');
 			void router.replace(`/login?referrer=${referrer}`);
 		}
-	}, [auth.authReady, router]);
+	}, [auth.authReady, auth.user._id, router]);
 
 	const isAuthorized = auth.authReady && Boolean(getJwtToken()) && Boolean(auth.user._id);
 

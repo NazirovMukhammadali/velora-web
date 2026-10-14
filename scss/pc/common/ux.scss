@@ -157,3 +157,45 @@
 		}
 	}
 }
+
+/* Shared catalog pager (tours, agents) */
+.catalog-pagination {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+	margin: 40px auto 0;
+
+	.MuiPaginationItem-root {
+		font-family: $font;
+		font-weight: 600;
+		color: $velora-text-main;
+		border: 1px solid #e3e6f0;
+		background: #ffffff;
+
+		&:hover {
+			border-color: $velora-primary;
+			color: $velora-primary;
+			background: #ffffff;
+		}
+
+		&.Mui-selected,
+		&.Mui-selected:hover {
+			border-color: $velora-primary;
+			background: $velora-primary;
+			color: #ffffff;
+		}
+	}
+
+	.MuiPaginationItem-ellipsis {
+		border: none;
+		background: transparent;
+	}
+
+	> span {
+		color: #6b7280;
+		font-family: $font;
+		font-size: 14px;
+		font-weight: 500;
+	}
+}

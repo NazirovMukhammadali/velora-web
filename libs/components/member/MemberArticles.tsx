@@ -1,41 +1,35 @@
-import React, { useEffect, useState } from "react";
-import { NextPage } from "next";
-import { Pagination, Stack, Typography } from "@mui/material";
-import { useRouter } from "next/router";
-import CommunityCard from "../common/CommunityCard";
-import { T } from "../../types/common";
-import { BoardArticle } from "../../types/board-article/board-article";
-import { BoardArticlesInquiry } from "../../types/board-article/board-article.input";
-import { useMutation, useQuery } from "@apollo/client";
-import { LIKE_TARGET_BOARD_ARTICLE } from "../../../apollo/user/mutation";
-import { GET_BOARD_ARTICLES } from "../../../apollo/user/query";
-import { Messages } from "../../config";
-import {
-	sweetMixinErrorAlert,
-} from "../../sweetAlert";
+import React, { ChangeEvent, useEffect, useState } from 'react';
+import { NextPage } from 'next';
+import Image from 'next/image';
+import { Pagination, Stack, Typography } from '@mui/material';
+import { useRouter } from 'next/router';
+import CommunityCard from '../common/CommunityCard';
+import { BoardArticle, BoardArticles } from '../../types/board-article/board-article';
+import { BoardArticlesInquiry } from '../../types/board-article/board-article.input';
+import { useMutation, useQuery } from '@apollo/client';
+import { LIKE_TARGET_BOARD_ARTICLE } from '../../../apollo/user/mutation';
+import { GET_BOARD_ARTICLES } from '../../../apollo/user/query';
+import { Messages } from '../../config';
+import { sweetMixinErrorAlert } from '../../sweetAlert';
 
-const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
+const MemberArticles: NextPage = ({ initialInput }: any) => {
 	const router = useRouter();
 	const [total, setTotal] = useState<number>(0);
 	const { memberId } = router.query;
-	const [searchFilter, setSearchFilter] =
-		useState<BoardArticlesInquiry>(initialInput);
+	const [searchFilter, setSearchFilter] = useState<BoardArticlesInquiry>(initialInput);
 	const [memberBoArticles, setMemberBoArticles] = useState<BoardArticle[]>([]);
 
 	/** APOLLO REQUESTS **/
 	const [likeTargetBoardArticle] = useMutation(LIKE_TARGET_BOARD_ARTICLE);
 
-	const {
-		loading: boardArticlesLoading,
-		data: boardArticlesData,
-		error: boardArticlesError,
-		refetch: boardArticlesRefetch,
-	} = useQuery(GET_BOARD_ARTICLES, {
-		fetchPolicy: "network-only",
-		errorPolicy: "all",
+	const { refetch: boardArticlesRefetch } = useQuery(GET_BOARD_ARTICLES, {
+		fetchPolicy: 'network-only',
+		errorPolicy: 'all',
 		variables: { input: searchFilter },
+		// Never fetch the site-wide list: wait until the member filter is applied.
+		skip: !searchFilter?.search?.memberId,
 		notifyOnNetworkStatusChange: true,
-		onCompleted: (data: T) => {
+		onCompleted: (data: { getBoardArticles?: BoardArticles }) => {
 			setMemberBoArticles(data?.getBoardArticles?.list ?? []);
 			setTotal(data?.getBoardArticles?.metaCounter?.[0]?.total ?? 0);
 		},
@@ -43,18 +37,16 @@ const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
 
 	/** LIFECYCLES **/
 	useEffect(() => {
-		if (memberId)
-			setSearchFilter({ ...initialInput, search: { memberId: memberId } });
-	}, [memberId]);
+		if (memberId) setSearchFilter({ ...initialInput, search: { memberId: memberId } });
+	}, [memberId, initialInput]);
 
 	/** HANDLERS **/
-	const paginationHandler = (e: T, value: number) => {
+	const paginationHandler = (_e: ChangeEvent<unknown>, value: number) => {
 		setSearchFilter({ ...searchFilter, page: value });
 	};
 
-	const likeArticleHandler = async (e: any, user: any, id: string) => {
+	const likeArticleHandler = async (user: any, id: string) => {
 		try {
-			e.stopPropagation();
 			if (!id) return;
 			if (!user._id) throw new Error(Messages.error2);
 
@@ -62,61 +54,63 @@ const MemberArticles: NextPage = ({ initialInput, ...props }: any) => {
 
 			await boardArticlesRefetch({ input: searchFilter });
 		} catch (err: any) {
-						sweetMixinErrorAlert(err.message).then();
+			sweetMixinErrorAlert(err.message).then();
 		}
 	};
 
 	return (
-			<div id="member-articles-page">
-				<Stack className="main-title-box">
-					<Stack className="right-box">
-						<Typography className="main-title">Articles</Typography>
-					</Stack>
+		<div id="member-articles-page">
+			<Stack className="main-title-box">
+				<Stack className="right-box">
+					<Typography className="main-title">Articles</Typography>
 				</Stack>
-				<Stack className="articles-list-box">
-					{memberBoArticles?.length === 0 && (
-						<div className={"no-data"}>
-							<img src="/img/icons/icoAlert.svg" alt="" />
-							<p>No Articles found!</p>
-						</div>
-					)}
-					{memberBoArticles?.map((boardArticle: BoardArticle) => {
-						return (
-							<CommunityCard
-								boardArticle={boardArticle}
-								key={boardArticle?._id}
-								size={"small"}
-								likeArticleHandler={likeArticleHandler}
-							/>
-						);
-					})}
-				</Stack>
-				{memberBoArticles?.length !== 0 && (
-					<Stack className="pagination-config">
-						<Stack className="pagination-box">
-							<Pagination
-								count={Math.ceil(total / searchFilter.limit) || 1}
-								page={searchFilter.page}
-								shape="circular"
-								color="primary"
-								onChange={paginationHandler}
-							/>
-						</Stack>
-						<Stack className="total-result">
-							<Typography>{total} property available</Typography>
-						</Stack>
-					</Stack>
+			</Stack>
+			<Stack className="articles-list-box">
+				{memberBoArticles?.length === 0 && (
+					<div className={'no-data'}>
+						<Image src="/img/icons/icoAlert.svg" alt="" width={56} height={56} />
+						<p>No Articles found!</p>
+					</div>
 				)}
-			</div>
-		);
+				{memberBoArticles?.map((boardArticle: BoardArticle) => {
+					return (
+						<CommunityCard
+							boardArticle={boardArticle}
+							key={boardArticle?._id}
+							size={'small'}
+							likeArticleHandler={likeArticleHandler}
+						/>
+					);
+				})}
+			</Stack>
+			{memberBoArticles?.length !== 0 && (
+				<Stack className="pagination-config">
+					<Stack className="pagination-box">
+						<Pagination
+							count={Math.ceil(total / searchFilter.limit) || 1}
+							page={searchFilter.page}
+							shape="circular"
+							color="primary"
+							onChange={paginationHandler}
+						/>
+					</Stack>
+					<Stack className="total-result">
+						<Typography>
+							{total} article{total !== 1 ? 's' : ''}
+						</Typography>
+					</Stack>
+				</Stack>
+			)}
+		</div>
+	);
 };
 
 MemberArticles.defaultProps = {
 	initialInput: {
 		page: 1,
 		limit: 6,
-		sort: "createdAt",
-		direction: "DESC",
+		sort: 'createdAt',
+		direction: 'DESC',
 		search: {},
 	},
 };

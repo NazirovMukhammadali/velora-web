@@ -21,8 +21,6 @@ describe('useCatalogQuery mapping (via heroSearch)', () => {
 
 	it('provides strip keys that catalogs sync after hydrate', () => {
 		expect(stripKeysForCatalog('/rentcar')).toEqual(expect.arrayContaining(['from', 'to', 'guests']));
-		expect(stripKeysForCatalog('/tours')).toEqual(
-			expect.arrayContaining(['from', 'to', 'guests', 'price']),
-		);
+		expect(stripKeysForCatalog('/tours')).toEqual(expect.arrayContaining(['from', 'to', 'guests', 'price']));
 	});
 });

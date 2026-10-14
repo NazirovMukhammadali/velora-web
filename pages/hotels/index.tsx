@@ -11,6 +11,7 @@ import { GET_HOTELS } from '../../apollo/user/query';
 import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
 import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
 import type { VeloraPackage } from '../../libs/types/package';
+import useTodayIso from '../../libs/hooks/useTodayIso';
 
 type PriceKey = 'any' | 'under100' | '100to200' | 'over200';
 
@@ -51,6 +52,7 @@ const inPriceRange = (price: number, range: string): boolean => {
 };
 
 const HotelsPage: NextPage = () => {
+	const today = useTodayIso();
 	const { filters, setFilter, setFilters, items, total, isInitialLoading } = usePackageCatalog<
 		VeloraPackage,
 		typeof HOTEL_FILTER_DEFAULTS
@@ -100,6 +102,7 @@ const HotelsPage: NextPage = () => {
 						<input
 							type="date"
 							value={filters.startDate}
+							min={today}
 							onChange={(event) => setFilter('startDate', event.target.value)}
 						/>
 					</label>
@@ -108,7 +111,7 @@ const HotelsPage: NextPage = () => {
 						<input
 							type="date"
 							value={filters.endDate}
-							min={filters.startDate || undefined}
+							min={filters.startDate || today}
 							onChange={(event) => setFilter('endDate', event.target.value)}
 						/>
 					</label>

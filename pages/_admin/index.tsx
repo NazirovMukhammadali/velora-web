@@ -1,16 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import type { NextPage } from 'next';
 import withAdminLayout from '../../libs/components/layout/LayoutAdmin';
-import { useRouter } from 'next/router';
+import AdminDashboard from '../../libs/components/admin/dashboard/AdminDashboard';
 
-const AdminHome: NextPage = (props: any) => {
-	const router = useRouter();
-
-	/** LIFECYCLES **/
-	useEffect(() => {
-		router.push('/_admin/users');
-	}, []);
-	return <></>;
-};
+const AdminHome: NextPage = () => <AdminDashboard />;
 
 export default withAdminLayout(AdminHome);

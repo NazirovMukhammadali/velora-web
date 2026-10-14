@@ -415,6 +415,10 @@ export const GET_FLIGHTS = gql`
 				flightNumber
 				departureAirport
 				arrivalAirport
+				departureTime
+				arrivalTime
+				cabinClass
+				availableSeats
 				basePrice
 				flightStatus
 			}
@@ -450,6 +454,7 @@ export const GET_HOTELS = gql`
 				hotelLocation
 				hotelPrice
 				hotelStars
+				hotelImages
 				hotelStatus
 			}
 			metaCounter {
@@ -486,6 +491,7 @@ export const GET_RENTCARS = gql`
 				transmission
 				seats
 				dailyPrice
+				carImages
 				rentcarStatus
 			}
 			metaCounter {

@@ -404,6 +404,27 @@ $velora-nav-height: 80px;
 	margin-top: 175px;
 }
 
+/* Mid-width desktops: keep longer translated labels (e.g. ru "Обслуживание") clear of the right-hand block. */
+@media (max-width: 1240px) {
+	.velora-navbar {
+		.velora-navbar-center {
+			gap: 20px;
+		}
+
+		.velora-navbar-link {
+			font-size: 14px;
+		}
+	}
+}
+
+@media (max-width: 1120px) {
+	.velora-navbar {
+		.velora-navbar-join-text {
+			display: none;
+		}
+	}
+}
+
 @media (max-width: 980px) {
 	.velora-navbar {
 		height: 72px;

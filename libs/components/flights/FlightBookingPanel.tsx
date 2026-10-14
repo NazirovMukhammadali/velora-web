@@ -1,13 +1,17 @@
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/router';
 import type { Flight } from '../../data/flights';
 import { formatPackagePrice } from '../../data/packages';
 import { createBookingId, saveLocalBooking } from '../../utils/bookingsStorage';
-import { flightBookingTotal } from '../../utils/bookingPanel';
+import { flightBookingTotal, isPastIsoDate } from '../../utils/bookingPanel';
+import useTodayIso from '../../hooks/useTodayIso';
+import { readTripParams } from '../../utils/heroSearch';
 import useAuth from '../../hooks/useAuth';
 
 const FLIGHT_IMAGE = 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=600&q=80';
+
+const MAX_PASSENGERS = 20;
 
 type FlightBookingPanelProps = {
 	flight: Flight;
@@ -20,6 +24,15 @@ const FlightBookingPanel = ({ flight }: FlightBookingPanelProps) => {
 	const [passengers, setPassengers] = useState(1);
 	const [submitting, setSubmitting] = useState(false);
 	const [dateError, setDateError] = useState('');
+	const minDate = useTodayIso();
+
+	// Prefill from hero / catalog search params (?startDate=&party=).
+	useEffect(() => {
+		if (!router.isReady) return;
+		const trip = readTripParams(router.query);
+		if (trip.startDate && !isPastIsoDate(trip.startDate)) setDate(trip.startDate);
+		if (trip.party) setPassengers(Math.min(MAX_PASSENGERS, Number(trip.party)));
+	}, [router.isReady, router.query]);
 
 	const loginHref = `/login?referrer=${encodeURIComponent(router.asPath)}`;
 
@@ -32,6 +45,10 @@ const FlightBookingPanel = ({ flight }: FlightBookingPanelProps) => {
 		}
 		if (!date) {
 			setDateError('Please select a departure date.');
+			return;
+		}
+		if (isPastIsoDate(date)) {
+			setDateError('Departure date cannot be in the past.');
 			return;
 		}
 		setDateError('');
@@ -86,6 +103,7 @@ const FlightBookingPanel = ({ flight }: FlightBookingPanelProps) => {
 				<input
 					type="date"
 					value={date}
+					min={minDate}
 					disabled={!isLoggedIn}
 					onChange={(e) => {
 						setDate(e.target.value);
@@ -114,7 +132,7 @@ const FlightBookingPanel = ({ flight }: FlightBookingPanelProps) => {
 						onChange={(e) => setPassengers(Number(e.target.value))}
 						aria-label="Passengers"
 					>
-						{Array.from({ length: 9 }, (_, i) => (
+						{Array.from({ length: MAX_PASSENGERS }, (_, i) => (
 							<option key={i + 1} value={i + 1}>
 								{i + 1}
 							</option>

@@ -4,6 +4,7 @@ import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
 import PackageCard from '../../libs/components/packages/PackageCard';
+import CatalogPagination from '../../libs/components/common/CatalogPagination';
 import { CatalogGridSkeleton } from '../../libs/components/common/CatalogCardSkeleton';
 import { getPackagesByType, matchesPackageSearch, sortPackages } from '../../libs/data/packages';
 import { mapToursToPackages } from '../../libs/data/packageApi';
@@ -12,6 +13,11 @@ import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
 import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
 import type { VeloraPackage } from '../../libs/types/package';
 import type { TourCategory } from '../../libs/data/tours';
+import useTodayIso from '../../libs/hooks/useTodayIso';
+import usePagedItems from '../../libs/hooks/usePagedItems';
+
+/** Two rows of the 4-column desktop grid. */
+const TOURS_PER_PAGE = 8;
 
 const TOUR_FILTER_DEFAULTS = {
 	location: '',
@@ -29,6 +35,7 @@ export const getStaticProps = async ({ locale }: any) => ({
 });
 
 const ToursPage: NextPage = () => {
+	const today = useTodayIso();
 	const { filters, setFilter, items, allItems, isInitialLoading } = usePackageCatalog<
 		VeloraPackage,
 		typeof TOUR_FILTER_DEFAULTS
@@ -56,6 +63,7 @@ const ToursPage: NextPage = () => {
 	}, [allItems]);
 
 	const activeCategory = filters.category;
+	const { page, setPage, pageItems } = usePagedItems(items, TOURS_PER_PAGE);
 
 	return (
 		<Stack className={'tours-page'}>
@@ -76,6 +84,7 @@ const ToursPage: NextPage = () => {
 						<input
 							type="date"
 							value={filters.startDate}
+							min={today}
 							onChange={(event) => setFilter('startDate', event.target.value)}
 						/>
 					</label>
@@ -84,7 +93,7 @@ const ToursPage: NextPage = () => {
 						<input
 							type="date"
 							value={filters.endDate}
-							min={filters.startDate || undefined}
+							min={filters.startDate || today}
 							onChange={(event) => setFilter('endDate', event.target.value)}
 						/>
 					</label>
@@ -138,11 +147,20 @@ const ToursPage: NextPage = () => {
 				) : items.length === 0 ? (
 					<div className={'tours-empty'}>No tours match your filters yet.</div>
 				) : (
-					<div className={'tour-grid'}>
-						{items.map((pkg) => (
-							<PackageCard key={pkg.id} pkg={pkg} />
-						))}
-					</div>
+					<>
+						<div className={'tour-grid'}>
+							{pageItems.map((pkg) => (
+								<PackageCard key={pkg.id} pkg={pkg} />
+							))}
+						</div>
+						<CatalogPagination
+							page={page}
+							pageSize={TOURS_PER_PAGE}
+							total={items.length}
+							label="tours"
+							onChange={setPage}
+						/>
+					</>
 				)}
 			</Stack>
 		</Stack>

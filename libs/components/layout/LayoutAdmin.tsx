@@ -1,184 +1,156 @@
 import type { ComponentType } from 'react';
 import React, { useEffect, useState } from 'react';
+import Head from 'next/head';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
-import MenuList from '../admin/AdminMenuList';
-import Toolbar from '@mui/material/Toolbar';
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
-import { Menu, MenuItem } from '@mui/material';
-import Drawer from '@mui/material/Drawer';
-import AppBar from '@mui/material/AppBar';
-import Avatar from '@mui/material/Avatar';
-import IconButton from '@mui/material/IconButton';
-import Divider from '@mui/material/Divider';
-import Typography from '@mui/material/Typography';
-import Tooltip from '@mui/material/Tooltip';
-import { logOut } from '../../auth';
-import useAuth from '../../hooks/useAuth';
-import { REACT_APP_API_URL } from '../../config';
-import { MemberType } from '../../enums/member.enum';
+import { Avatar, CircularProgress, Divider, IconButton, Menu, MenuItem, Tooltip } from '@mui/material';
+import { ThemeProvider } from '@mui/material/styles';
+import { ArrowSquareOut, List as ListIcon, SignOut, X } from 'phosphor-react';
+import AdminMenuList from '../admin/AdminMenuList';
+import { findAdminNavItem } from '../admin/adminNav';
+import { veloraAdminTheme } from '../admin/adminTheme';
 import ErrorBoundary from '../common/ErrorBoundary';
-const drawerWidth = 280;
+import { getJwtToken, logOut } from '../../auth';
+import useAuth from '../../hooks/useAuth';
+import { MemberType } from '../../enums/member.enum';
+import { resolveMemberImageUrl } from '../../utils/memberImage';
 
 const withAdminLayout = (Component: ComponentType) => {
-	return (props: object) => {
+	const AdminLayout = (props: object) => {
 		const router = useRouter();
-		const { user } = useAuth({ syncOnMount: true });
-		const [settingsState, setSettingsStateState] = useState(false);
-		const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-		const [openMenu, setOpenMenu] = useState(false);
-		const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-		const [title, setTitle] = useState('admin');
-		const [loading, setLoading] = useState(true);
+		const { user, authReady } = useAuth({ syncOnMount: true });
+		const [userAnchor, setUserAnchor] = useState<null | HTMLElement>(null);
+		const [sidebarOpen, setSidebarOpen] = useState(false);
+		const isAdmin = user?.memberType === MemberType.ADMIN;
+		const current = findAdminNavItem(router.pathname);
 
 		/** LIFECYCLES **/
 		useEffect(() => {
-			setLoading(false);
-		}, []);
-
-		useEffect(() => {
-			if (!loading && user.memberType !== MemberType.ADMIN) {
-				router.push('/').then();
+			if (!authReady || !router.isReady) return;
+			if (!getJwtToken() || !user?._id) {
+				void router.replace(`/login?referrer=${encodeURIComponent(router.asPath)}`);
+			} else if (!isAdmin) {
+				void router.replace('/');
 			}
-		}, [loading, user, router]);
+		}, [authReady, router, user?._id, isAdmin]);
+
+		// Close the mobile drawer after navigating.
+		useEffect(() => {
+			setSidebarOpen(false);
+		}, [router.pathname]);
 
 		/** HANDLERS **/
-		const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-			setAnchorElUser(event.currentTarget);
-		};
-
-		const handleCloseUserMenu = () => {
-			setAnchorElUser(null);
-		};
-
 		const logoutHandler = () => {
+			setUserAnchor(null);
 			logOut();
-			router.push('/').then();
+			void router.push('/');
 		};
 
-		if (!user || user?.memberType !== MemberType.ADMIN) return null;
+		const pageTitle = `${current?.label ?? 'Admin'} · Velora Admin`;
+
+		if (!authReady || !isAdmin) {
+			return (
+				<div className="va-gate">
+					<Head>
+						<title>Velora Admin</title>
+					</Head>
+					<CircularProgress size={28} />
+				</div>
+			);
+		}
 
 		return (
-			<main id="pc-wrap" className="admin">
-				<Box component={'div'} sx={{ display: 'flex' }}>
-					<AppBar
-						position="fixed"
-						sx={{
-							width: `calc(100% - ${drawerWidth}px)`,
-							ml: `${drawerWidth}px`,
-							boxShadow: 'rgb(100 116 139 / 12%) 0px 1px 4px',
-							background: 'none',
-						}}
-					>
-						<Toolbar>
-							<Tooltip title="Open settings">
-								<IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+			<ThemeProvider theme={veloraAdminTheme}>
+				<Head>
+					<title>{pageTitle}</title>
+				</Head>
+				<div id="pc-wrap" className={`velora-admin ${sidebarOpen ? 'is-sidebar-open' : ''}`}>
+					<aside className="va-sidebar">
+						<div className="va-sidebar__head">
+							<Link href="/_admin" className="va-brand" aria-label="Velora admin home">
+								<Image src="/img/logo/velora-mark.svg" alt="" aria-hidden width={34} height={34} priority />
+								<span className="va-brand__name">VELORA</span>
+								<span className="va-brand__tag">Admin</span>
+							</Link>
+							<IconButton className="va-sidebar__close" aria-label="Close menu" onClick={() => setSidebarOpen(false)}>
+								<X size={20} />
+							</IconButton>
+						</div>
+
+						<AdminMenuList onNavigate={() => setSidebarOpen(false)} />
+
+						<div className="va-sidebar__foot">
+							<Link href="/" className="va-sidebar__site" target="_blank" rel="noopener noreferrer">
+								<ArrowSquareOut size={18} />
+								<span>Open website</span>
+							</Link>
+						</div>
+					</aside>
+					<button
+						type="button"
+						className="va-scrim"
+						aria-label="Close menu"
+						tabIndex={sidebarOpen ? 0 : -1}
+						onClick={() => setSidebarOpen(false)}
+					/>
+
+					<div className="va-main">
+						<header className="va-topbar">
+							<IconButton className="va-topbar__burger" aria-label="Open menu" onClick={() => setSidebarOpen(true)}>
+								<ListIcon size={22} />
+							</IconButton>
+							<div className="va-topbar__title">
+								<h1>{current?.label ?? 'Admin'}</h1>
+								{current?.hint && <p>{current.hint}</p>}
+							</div>
+							<Tooltip title="Account">
+								<button type="button" className="va-topbar__user" onClick={(e) => setUserAnchor(e.currentTarget)}>
 									<Avatar
-										src={
-											user?.memberImage ? `${REACT_APP_API_URL}/${user?.memberImage}` : '/img/profile/defaultUser.svg'
-										}
+										src={resolveMemberImageUrl(user.memberImage)}
+										alt={user.memberNick}
+										sx={{ width: 36, height: 36 }}
 									/>
-								</IconButton>
+									<span className="va-topbar__user-text">
+										<strong>{user.memberFullName || user.memberNick}</strong>
+										<small>Administrator</small>
+									</span>
+								</button>
 							</Tooltip>
 							<Menu
-								sx={{ mt: '45px' }}
-								id="menu-appbar"
-								className={'pop-menu'}
-								anchorEl={anchorElUser}
-								anchorOrigin={{
-									vertical: 'top',
-									horizontal: 'right',
-								}}
-								keepMounted
-								transformOrigin={{
-									vertical: 'top',
-									horizontal: 'right',
-								}}
-								open={Boolean(anchorElUser)}
-								onClose={handleCloseUserMenu}
+								anchorEl={userAnchor}
+								open={Boolean(userAnchor)}
+								onClose={() => setUserAnchor(null)}
+								anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+								transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+								slotProps={{ paper: { className: 'va-user-menu' } }}
 							>
-								<Box
-									component={'div'}
-									onClick={handleCloseUserMenu}
-									sx={{
-										width: '200px',
-									}}
-								>
-									<Stack sx={{ px: '20px', my: '12px' }}>
-										<Typography variant={'h6'} component={'h6'} sx={{ mb: '4px' }}>
-											{user?.memberNick}
-										</Typography>
-										<Typography variant={'subtitle1'} component={'p'} color={'#757575'}>
-											{user?.memberPhone}
-										</Typography>
-									</Stack>
-									<Divider />
-									<Box component={'div'} sx={{ p: 1, py: '6px' }} onClick={logoutHandler}>
-										<MenuItem sx={{ px: '16px', py: '6px' }}>
-											<Typography variant={'subtitle1'} component={'span'}>
-												Logout
-											</Typography>
-										</MenuItem>
-									</Box>
-								</Box>
+								<div className="va-user-menu__head">
+									<strong>{user.memberNick}</strong>
+									{user.memberPhone && <small>{user.memberPhone}</small>}
+								</div>
+								<Divider />
+								<MenuItem component={Link} href="/" onClick={() => setUserAnchor(null)}>
+									<ArrowSquareOut size={18} /> Back to website
+								</MenuItem>
+								<MenuItem onClick={logoutHandler}>
+									<SignOut size={18} /> Log out
+								</MenuItem>
 							</Menu>
-						</Toolbar>
-					</AppBar>
+						</header>
 
-					<Drawer
-						sx={{
-							width: drawerWidth,
-							flexShrink: 0,
-							'& .MuiDrawer-paper': {
-								width: drawerWidth,
-								boxSizing: 'border-box',
-							},
-						}}
-						variant="permanent"
-						anchor="left"
-						className="aside"
-					>
-						<Toolbar sx={{ flexDirection: 'column', alignItems: 'flexStart' }}>
-							<Stack className={'logo-box'}>
-								<img src={'/img/logo/velora-logo.svg'} alt={'Velora'} />
-							</Stack>
-
-							<Stack
-								className="user"
-								direction={'row'}
-								alignItems={'center'}
-								sx={{
-									bgcolor: openMenu ? 'rgba(255, 255, 255, 0.04)' : 'none',
-									borderRadius: '8px',
-									px: '24px',
-									py: '11px',
-								}}
-							>
-								<Avatar
-									src={user?.memberImage ? `${REACT_APP_API_URL}/${user?.memberImage}` : '/img/profile/defaultUser.svg'}
-								/>
-								<Typography variant={'body2'} p={1} ml={1}>
-									{user?.memberNick} <br />
-									{user?.memberPhone}
-								</Typography>
-							</Stack>
-						</Toolbar>
-
-						<Divider />
-
-						<MenuList />
-					</Drawer>
-
-					<Box component={'div'} id="bunker" sx={{ flexGrow: 1 }}>
-						<ErrorBoundary>
-							{/* @ts-expect-error admin pages receive injected layout props */}
-							<Component {...props} setSnackbar={setSnackbar} setTitle={setTitle} />
-						</ErrorBoundary>
-					</Box>
-				</Box>
-			</main>
+						<main className="va-content">
+							<ErrorBoundary>
+								<Component {...props} />
+							</ErrorBoundary>
+						</main>
+					</div>
+				</div>
+			</ThemeProvider>
 		);
 	};
+
+	return AdminLayout;
 };
 
 export default withAdminLayout;

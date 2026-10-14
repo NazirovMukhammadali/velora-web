@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { VeloraPackage } from '../../types/package';
-import { formatPackagePrice, getPackageReviewsLabel } from '../../data/packages';
+import { formatPackagePrice, getPackageReviewsLabel, getRatingLabel } from '../../data/packages';
 import PackageBookingPanel from './PackageBookingPanel';
 import VeloraImage from '../common/VeloraImage';
 
@@ -28,8 +28,8 @@ const PackageDetailView = ({ pkg }: PackageDetailViewProps) => {
 		pkg.type === 'cars'
 			? ['Pickup', 'Cleanliness', 'Condition', 'Price', 'Support']
 			: pkg.type === 'hotels'
-				? ['Location', 'Amenities', 'Services', 'Price', 'Rooms']
-				: ['Guide', 'Itinerary', 'Value', 'Organization', 'Experience'];
+			? ['Location', 'Amenities', 'Services', 'Price', 'Rooms']
+			: ['Guide', 'Itinerary', 'Value', 'Organization', 'Experience'];
 
 	return (
 		<div className={'pkg-detail-page'}>
@@ -46,7 +46,7 @@ const PackageDetailView = ({ pkg }: PackageDetailViewProps) => {
 					<h1>{pkg.title}</h1>
 					<p className={'pkg-detail-location'}>📍 {pkg.location}</p>
 					<p className={'pkg-detail-rating'}>
-						★ {pkg.rating.toFixed(1)} ({reviewsLabel})
+						{pkg.reviewCount > 0 ? `★ ${pkg.rating.toFixed(1)} (${reviewsLabel})` : `★ ${reviewsLabel}`}
 					</p>
 				</div>
 				<div className={'pkg-detail-price-head'}>
@@ -65,9 +65,6 @@ const PackageDetailView = ({ pkg }: PackageDetailViewProps) => {
 				<div className={'pkg-gallery-side'}>
 					<div className={'pkg-gallery-thumb pkg-gallery-thumb--wide'}>
 						<PackageGalleryImage src={pkg.gallery[1]} alt="" fallback={pkg.image} />
-						<span className={'pkg-gallery-play'} aria-hidden>
-							▶
-						</span>
 					</div>
 					<div className={'pkg-gallery-row'}>
 						<div className={'pkg-gallery-thumb'}>
@@ -167,30 +164,29 @@ const PackageDetailView = ({ pkg }: PackageDetailViewProps) => {
 
 					<section className={'pkg-reviews'}>
 						<h2>Customer Reviews</h2>
-						<div className={'pkg-reviews-summary'}>
-							<div>
-								<strong>{pkg.rating.toFixed(1)}</strong>
-								<span>Excellent</span>
-								<em>Based on {pkg.reviewCount} reviews</em>
-							</div>
-							<div className={'pkg-review-bars'}>
-								{reviewLabels.map((label, i) => (
-									<div key={label}>
-										<span>{label}</span>
-										<div>
-											<i style={{ width: `${88 - i * 4}%` }} />
+						{pkg.reviewCount > 0 ? (
+							<div className={'pkg-reviews-summary'}>
+								<div>
+									<strong>{pkg.rating.toFixed(1)}</strong>
+									<span>{getRatingLabel(pkg.rating)}</span>
+									<em>Based on {reviewsLabel.toLowerCase()}</em>
+								</div>
+								<div className={'pkg-review-bars'}>
+									{reviewLabels.map((label) => (
+										<div key={label}>
+											<span>{label}</span>
+											<div>
+												<i style={{ width: `${Math.round((pkg.rating / 5) * 100)}%` }} />
+											</div>
 										</div>
-									</div>
-								))}
+									))}
+								</div>
 							</div>
-						</div>
-						<article className={'pkg-review-card'}>
-							<strong>Verified Velora traveler</strong>
-							<p>
-								Beautiful experience — booking was smooth and the package matched the description. Would
-								recommend for {pkg.location}.
+						) : (
+							<p className={'pkg-reviews-empty'}>
+								No reviews yet. Be the first to share your experience after your trip.
 							</p>
-						</article>
+						)}
 					</section>
 				</div>
 

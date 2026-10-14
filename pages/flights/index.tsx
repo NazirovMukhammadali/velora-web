@@ -1,4 +1,6 @@
 import React from 'react';
+import CatalogPagination from '../../libs/components/common/CatalogPagination';
+import usePagedItems from '../../libs/hooks/usePagedItems';
 import { NextPage } from 'next';
 import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -9,6 +11,7 @@ import { getFlights, mapBackendFlights, type Flight } from '../../libs/data/flig
 import { GET_FLIGHTS } from '../../apollo/user/query';
 import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
 import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
+import useTodayIso from '../../libs/hooks/useTodayIso';
 
 const FLIGHT_FILTER_DEFAULTS = {
 	from: '',
@@ -55,7 +58,10 @@ const matchesRoute = (flight: Flight, fromQuery: string, toQuery: string): boole
 	return matchFrom && matchTo;
 };
 
+const FLIGHTS_PER_PAGE = 8;
+
 const FlightsPage: NextPage = () => {
+	const today = useTodayIso();
 	const { filters, setFilter, items, total, isInitialLoading } = usePackageCatalog<
 		Flight,
 		typeof FLIGHT_FILTER_DEFAULTS
@@ -72,6 +78,7 @@ const FlightsPage: NextPage = () => {
 		filterItem: (flight, f) => matchesRoute(flight, f.from, f.to),
 		sortItems: sortFlights,
 	});
+	const { page, setPage, pageItems } = usePagedItems(items, FLIGHTS_PER_PAGE);
 
 	return (
 		<Stack className={'flights-page'}>
@@ -117,6 +124,7 @@ const FlightsPage: NextPage = () => {
 						<input
 							type="date"
 							value={filters.startDate}
+							min={today}
 							onChange={(event) => setFilter('startDate', event.target.value)}
 						/>
 					</label>
@@ -125,7 +133,7 @@ const FlightsPage: NextPage = () => {
 						<input
 							type="date"
 							value={filters.endDate}
-							min={filters.startDate || undefined}
+							min={filters.startDate || today}
 							onChange={(event) => setFilter('endDate', event.target.value)}
 						/>
 					</label>
@@ -165,7 +173,18 @@ const FlightsPage: NextPage = () => {
 				) : items.length === 0 ? (
 					<div className={'tours-empty'}>No flights match your search yet.</div>
 				) : (
-					items.map((flight) => <FlightCard key={flight.id} flight={flight} />)
+					<>
+						{pageItems.map((flight) => (
+							<FlightCard key={flight.id} flight={flight} />
+						))}
+						<CatalogPagination
+							page={page}
+							pageSize={FLIGHTS_PER_PAGE}
+							total={items.length}
+							label="flights"
+							onChange={setPage}
+						/>
+					</>
 				)}
 			</Stack>
 		</Stack>

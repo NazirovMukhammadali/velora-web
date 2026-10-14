@@ -1,5 +1,3 @@
-import { REACT_APP_API_URL } from '../config';
-
 export type Flight = {
 	id: string;
 	airline: string;
@@ -198,6 +196,42 @@ const durationBetween = (start?: string | null, end?: string | null): string | u
 	return `${Math.floor(mins / 60)}h ${mins % 60}m`;
 };
 
+/** IATA code → city, so hero searches by city name ("London") match API flights stored as "LHR". */
+const AIRPORT_CITIES: Record<string, string> = {
+	AUH: 'Abu Dhabi',
+	BCN: 'Barcelona',
+	CDG: 'Paris',
+	DOH: 'Doha',
+	DXB: 'Dubai',
+	FCO: 'Rome',
+	FRA: 'Frankfurt',
+	ICN: 'Seoul',
+	IST: 'Istanbul',
+	JFK: 'New York',
+	LHR: 'London',
+	NRT: 'Tokyo',
+	SFO: 'San Francisco',
+	SIN: 'Singapore',
+	SYD: 'Sydney',
+	TAS: 'Tashkent',
+};
+
+export const airportCity = (code: string): string => AIRPORT_CITIES[code?.trim().toUpperCase()] ?? code;
+
+/** Every known airport as a search suggestion: picks the city name, matches on the IATA code too. */
+export const AIRPORT_SUGGESTIONS = Object.entries(AIRPORT_CITIES).map(([code, city]) => ({
+	value: city,
+	hint: code,
+	keywords: [code],
+}));
+
+const CABIN_LABELS: Record<string, string> = {
+	ECONOMY: 'Economy',
+	PREMIUM_ECONOMY: 'Premium Economy',
+	BUSINESS: 'Business',
+	FIRST: 'First',
+};
+
 type BackendFlight = {
 	_id: string;
 	airline: string;
@@ -206,34 +240,28 @@ type BackendFlight = {
 	arrivalAirport: string;
 	departureTime?: string;
 	arrivalTime?: string;
+	cabinClass?: string;
 	basePrice: number;
 };
 
-/** Map a backend flight to the Flight model (times are only present on the detail query). */
+/** Map a backend flight to the Flight model. */
 export const mapBackendFlight = (flight: BackendFlight): Flight => ({
 	id: flight._id,
 	airline: flight.airline,
 	airlineCode: flight.airline?.slice(0, 2).toUpperCase() || 'VA',
 	flightNumber: flight.flightNumber,
-	fromCity: flight.departureAirport,
+	fromCity: airportCity(flight.departureAirport),
 	fromAirport: flight.departureAirport,
-	toCity: flight.arrivalAirport,
+	toCity: airportCity(flight.arrivalAirport),
 	toAirport: flight.arrivalAirport,
 	departureTime: toClock(flight.departureTime),
 	arrivalTime: toClock(flight.arrivalTime),
 	durationLabel: durationBetween(flight.departureTime, flight.arrivalTime),
 	stops: 0,
-	cabinClass: 'Economy',
+	cabinClass: CABIN_LABELS[flight.cabinClass ?? ''] ?? 'Economy',
 	basePrice: flight.basePrice,
 	baggage: '1 × 23kg checked',
 	refundable: false,
 });
 
 export const mapBackendFlights = (list?: BackendFlight[] | null): Flight[] => (list ?? []).map(mapBackendFlight);
-
-/** Reserved for future airline logo assets served by the API. */
-export const resolveAirlineLogo = (path?: string | null): string | null => {
-	if (!path) return null;
-	if (/^https?:\/\//.test(path)) return path;
-	return `${REACT_APP_API_URL}/${path.replace(/^\/+/, '')}`;
-};

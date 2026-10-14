@@ -12,6 +12,18 @@ export const resolvePackageImage = (path?: string | null): string => {
 	return `${REACT_APP_API_URL}/${path.replace(/^\/+/, '')}`;
 };
 
+/** Detail pages render a 4-image mosaic; pad short API galleries with generated images. */
+const fillGallery = (images: string[], fallback: string[]): string[] => {
+	if (images.length === 0) return fallback;
+	const target = Math.max(4, images.length);
+	const padded = [...images];
+	for (const src of fallback) {
+		if (padded.length >= target) break;
+		if (!padded.includes(src)) padded.push(src);
+	}
+	return padded;
+};
+
 type BackendTour = {
 	_id: string;
 	tourTitle: string;
@@ -39,7 +51,8 @@ export const mapTourToPackage = (tour: BackendTour): VeloraPackage => {
 		priceAmount: tour.tourPrice,
 		priceUnit: '/ Person',
 		rating: 4.7,
-		reviewCount: tour.tourSoldCount ?? 0,
+		// The API has no review data yet; sold count is not a review count.
+		reviewCount: 0,
 		image: images[0] ?? FALLBACK_IMAGE,
 		category: 'Tour',
 		planDays: days,
@@ -50,13 +63,12 @@ export const mapTourToPackage = (tour: BackendTour): VeloraPackage => {
 
 	return {
 		...pkg,
-		gallery: images.length > 0 ? images : pkg.gallery,
+		gallery: fillGallery(images, pkg.gallery),
 		about: tour.tourDesc?.trim() ? tour.tourDesc : pkg.about,
 	};
 };
 
-export const mapToursToPackages = (list?: BackendTour[] | null): VeloraPackage[] =>
-	(list ?? []).map(mapTourToPackage);
+export const mapToursToPackages = (list?: BackendTour[] | null): VeloraPackage[] => (list ?? []).map(mapTourToPackage);
 
 type BackendHotel = {
 	_id: string;
@@ -100,7 +112,7 @@ export const mapHotelToPackage = (hotel: BackendHotel): VeloraPackage => {
 
 	return {
 		...pkg,
-		gallery: images.length > 0 ? images : pkg.gallery,
+		gallery: fillGallery(images, pkg.gallery),
 		about: hotel.hotelDesc?.trim() ? hotel.hotelDesc : pkg.about,
 		locationNote: hotel.hotelAddress?.trim()
 			? `${hotel.hotelName} is located at ${hotel.hotelAddress}. Use the map below for directions and nearby points of interest.`
@@ -111,8 +123,7 @@ export const mapHotelToPackage = (hotel: BackendHotel): VeloraPackage => {
 export const mapHotelsToPackages = (list?: BackendHotel[] | null): VeloraPackage[] =>
 	(list ?? []).map(mapHotelToPackage);
 
-const CAR_FALLBACK_IMAGE =
-	'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80';
+const CAR_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80';
 
 const CAR_EXTRAS: PackageExtra[] = [
 	{ id: 'insurance', label: 'Full coverage insurance', price: 18 },
@@ -160,7 +171,7 @@ export const mapRentcarToPackage = (rentcar: BackendRentcar): VeloraPackage => {
 
 	return {
 		...pkg,
-		gallery: images.length > 0 ? images : [CAR_FALLBACK_IMAGE, ...pkg.gallery.slice(1)],
+		gallery: fillGallery(images, [CAR_FALLBACK_IMAGE, ...pkg.gallery.slice(1)]),
 		about: rentcar.carDesc?.trim() ? rentcar.carDesc : pkg.about,
 		experienceType: category,
 		groupSize: `${seats} Seats`,

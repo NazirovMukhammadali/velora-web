@@ -98,7 +98,9 @@ const PackageDetailPage: NextPage = () => {
 		<>
 			<SeoHead
 				title={pkg.title}
-				description={`Book ${pkg.title} in ${pkg.location}. From ${formatPackagePrice(pkg.priceAmount)} ${pkg.priceUnit}. View gallery, reviews, and reserve on Velora.`}
+				description={`Book ${pkg.title} in ${pkg.location}. From ${formatPackagePrice(pkg.priceAmount)} ${
+					pkg.priceUnit
+				}. View gallery, reviews, and reserve on Velora.`}
 			/>
 			<Stack className={'pkg-detail-wrap'}>
 				<PackageDetailView pkg={pkg} />

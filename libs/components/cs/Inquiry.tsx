@@ -17,12 +17,7 @@ const Inquiry = () => {
 	const [content, setContent] = useState('');
 	const [formError, setFormError] = useState('');
 
-	const {
-		data,
-		loading,
-		error,
-		refetch,
-	} = useQuery(GET_MY_INQUIRIES, {
+	const { data, loading, error, refetch } = useQuery(GET_MY_INQUIRIES, {
 		skip: !authReady || !isLoggedIn,
 		fetchPolicy: 'network-only',
 		variables: {

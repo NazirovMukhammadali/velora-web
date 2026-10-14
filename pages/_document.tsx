@@ -8,10 +8,7 @@ export default function Document() {
 				<link rel="icon" type="image/svg+xml" href="/img/logo/velora-mark.svg" />
 
 				{/* SEO */}
-				<meta
-					name="keyword"
-					content={'velora, velora-web, travel booking, flights, hotels, rentcar, tours'}
-				/>
+				<meta name="keyword" content={'velora, velora-web, travel booking, flights, hotels, rentcar, tours'} />
 				<meta
 					name={'description'}
 					content={

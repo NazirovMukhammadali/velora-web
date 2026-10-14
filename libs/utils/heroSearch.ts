@@ -221,3 +221,26 @@ export const stripKeysForCatalog = (route: HeroCatalogRoute): string[] => {
 			return [];
 	}
 };
+
+export type TripParams = { startDate: string; endDate: string; party: string };
+
+/** Validated trip dates / party size from a catalog or detail URL (guests is an alias of party). */
+export const readTripParams = (query: ParsedUrlQuery): TripParams => {
+	const start = readQueryString(query, 'startDate');
+	const end = readQueryString(query, 'endDate');
+	const startDate = isValidIsoDate(start) ? start : '';
+	let endDate = isValidIsoDate(end) ? end : '';
+	if (startDate && endDate && endDate < startDate) endDate = '';
+	const party =
+		normalizePartyParam(readQueryString(query, 'party')) || normalizePartyParam(readQueryString(query, 'guests'));
+	return { startDate, endDate, party };
+};
+
+/** Append the trip params present in `query` to a detail href so booking panels can prefill. */
+export const withTripParams = (href: string, query: ParsedUrlQuery): string => {
+	const trip = readTripParams(query);
+	const params = Object.entries(trip).filter(([, value]) => value);
+	if (params.length === 0) return href;
+	const qs = params.map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&');
+	return `${href}${href.includes('?') ? '&' : '?'}${qs}`;
+};

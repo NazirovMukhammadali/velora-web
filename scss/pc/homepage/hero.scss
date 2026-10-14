@@ -3,6 +3,8 @@
 #pc-wrap .header-main--immersive,
 #mobile-wrap .header-main--immersive {
 	position: relative;
+	/* Above .main-after-hero (z-index 3) so the search suggestions can drop over the next section. */
+	z-index: 4;
 	width: 100%;
 	margin-top: 0;
 	padding: 0;
@@ -265,5 +267,61 @@
 @media (prefers-reduced-motion: reduce) {
 	.velora-hero-backdrop {
 		transition: none;
+	}
+}
+
+/* Location suggestions dropdown (hero search) */
+.suggest-input {
+	position: relative;
+
+	input {
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	&__list {
+		position: absolute;
+		top: calc(100% + 6px);
+		left: 0;
+		z-index: 30;
+		min-width: 100%;
+		width: max-content;
+		max-width: 320px;
+		max-height: 300px;
+		margin: 0;
+		padding: 6px;
+		overflow-y: auto;
+		list-style: none;
+		border: 1px solid #e3e6f0;
+		border-radius: 12px;
+		background: #ffffff;
+		box-shadow: 0 16px 36px rgba(24, 26, 32, 0.14);
+
+		li {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: 16px;
+			padding: 10px 12px;
+			border-radius: 8px;
+			cursor: pointer;
+			font-family: $font;
+			font-size: 13px;
+
+			&.is-active {
+				background: rgba(91, 61, 245, 0.08);
+			}
+		}
+	}
+
+	&__value {
+		color: $velora-text-main;
+		font-weight: 600;
+	}
+
+	&__hint {
+		color: #8a90a2;
+		font-size: 12px;
+		font-weight: 600;
 	}
 }

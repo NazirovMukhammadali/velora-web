@@ -1,7 +1,14 @@
 import React from 'react';
 import { NextPage } from 'next';
 import withLayoutBasic from '../../libs/components/layout/LayoutBasic';
+import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { Stack, Box } from '@mui/material';
+
+export const getStaticProps = async ({ locale }: any) => ({
+	props: {
+		...(await serverSideTranslations(locale, ['common'])),
+	},
+});
 
 const About: NextPage = () => {
 	return (
@@ -13,8 +20,8 @@ const About: NextPage = () => {
 					</Stack>
 					<Stack className={'right'}>
 						<p>
-							Velora brings tours, hotels, flights, and car rentals together in one place — with clear pricing,
-							verified local experts, and flexible add-ons. No hidden fees, no guesswork.
+							Velora brings tours, hotels, flights, and car rentals together in one place — with clear pricing, verified
+							local experts, and flexible add-ons. No hidden fees, no guesswork.
 							<br />
 							<br />
 							From a weekend city break to a multi-week adventure, our team curates experiences that put comfort and

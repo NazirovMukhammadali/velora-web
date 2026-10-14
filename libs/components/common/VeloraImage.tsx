@@ -11,6 +11,8 @@ type VeloraImageProps = {
 	className?: string;
 	sizes?: string;
 	priority?: boolean;
+	/** Skip the Next image optimizer (e.g. user avatars from arbitrary hosts). */
+	unoptimized?: boolean;
 };
 
 const VeloraImage = ({
@@ -23,6 +25,7 @@ const VeloraImage = ({
 	className = 'velora-img',
 	sizes,
 	priority = false,
+	unoptimized = false,
 }: VeloraImageProps) => {
 	const [currentSrc, setCurrentSrc] = useState(src);
 
@@ -44,6 +47,7 @@ const VeloraImage = ({
 				sizes={sizes ?? '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw'}
 				onError={handleError}
 				priority={priority}
+				unoptimized={unoptimized}
 			/>
 		);
 	}
@@ -58,6 +62,7 @@ const VeloraImage = ({
 			sizes={sizes}
 			onError={handleError}
 			priority={priority}
+			unoptimized={unoptimized}
 		/>
 	);
 };

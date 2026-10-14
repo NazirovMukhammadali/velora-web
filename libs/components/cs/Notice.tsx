@@ -99,11 +99,7 @@ const Notice = () => {
 											if (e.key === 'Enter' || e.key === ' ') openNotice(ele._id);
 										}}
 									>
-										{isEvent ? (
-											<div>event</div>
-										) : (
-											<span className={'notice-number'}>{rowNumber}</span>
-										)}
+										{isEvent ? <div>event</div> : <span className={'notice-number'}>{rowNumber}</span>}
 										<span className={'notice-title'}>{ele.noticeTitle}</span>
 										<span className={'notice-date'}>{formatDate(ele.createdAt, 'dd.MM.yyyy')}</span>
 									</div>

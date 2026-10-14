@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import type { VeloraPackage } from '../../types/package';
 import { formatPackagePrice, getPackageReviewsLabel, packageDetailHref } from '../../data/packages';
 import { isPackageFavorite, togglePackageFavorite } from '../../utils/favoritesStorage';
 import VeloraImage from '../common/VeloraImage';
+import { withTripParams } from '../../utils/heroSearch';
 
 const PinIcon = () => (
 	<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -16,10 +18,7 @@ const PinIcon = () => (
 
 const ClockIcon = () => (
 	<svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
-		<path
-			d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm1 10.59 3.3 3.3-1.42 1.42L11 13.41V7h2z"
-			fill="currentColor"
-		/>
+		<path d="M12 2a10 10 0 1010 10A10 10 0 0012 2zm1 10.59 3.3 3.3-1.42 1.42L11 13.41V7h2z" fill="currentColor" />
 	</svg>
 );
 
@@ -37,7 +36,8 @@ type PackageCardProps = {
 };
 
 const PackageCard = ({ pkg }: PackageCardProps) => {
-	const href = packageDetailHref(pkg.type, pkg.id);
+	const router = useRouter();
+	const href = withTripParams(packageDetailHref(pkg.type, pkg.id), router.query);
 	const reviewsLabel = getPackageReviewsLabel(pkg.reviewCount);
 	const [liked, setLiked] = useState(false);
 

@@ -1,220 +1,258 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Avatar, Box, Stack } from "@mui/material";
-import SendIcon from "@mui/icons-material/Send";
-import Badge from "@mui/material/Badge";
-import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
-import MarkChatUnreadIcon from "@mui/icons-material/MarkChatUnread";
-import { useRouter } from "next/router";
-import ScrollableFeed from "react-scrollable-feed";
-import { RippleBadge } from "../../scss/MaterialTheme/styled";
-import { useReactiveVar } from "@apollo/client";
-import { socketVar, userVar } from "../../apollo/store";
-import { Member } from "../types/member/member";
-import { Messages, REACT_APP_API_URL } from "../config";
-import { sweetErrorAlert } from "../sweetAlert";
+import React, { useEffect, useRef, useState } from 'react';
+import { useMutation } from '@apollo/client';
+import { ArrowUp, Sparkle, Trash, X } from 'phosphor-react';
+import { ASK_TRAVEL_ASSISTANT } from '../../apollo/user/mutation';
+import RobotMark from './assistant/RobotMark';
+import SourceCard from './assistant/SourceCard';
+import type { AssistantMessage, AssistantReply } from '../types/assistant/assistant';
+import { ASSISTANT_PROMPT_MAX, assistantErrorText, parseAssistantText, toHistory } from '../utils/assistant';
 
-const NewMessage = (type: any) => {
-	if (type === "right") {
-		return (
-			<Box
-				component={"div"}
-				flexDirection={"row"}
-				style={{ display: "flex" }}
-				alignItems={"flex-end"}
-				justifyContent={"flex-end"}
-				sx={{ m: "10px 0px" }}
-			>
-				<div className={"msg_right"}></div>
-			</Box>
-		);
-	} else {
-		return (
-			<Box
-				flexDirection={"row"}
-				style={{ display: "flex" }}
-				sx={{ m: "10px 0px" }}
-				component={"div"}
-			>
-				<Avatar alt={"jonik"} src={"/img/profile/defaultUser.svg"} />
-				<div className={"msg_left"}></div>
-			</Box>
-		);
+const STORAGE_KEY = 'velora-ai-chat';
+const STARTER_PROMPTS = [
+	'Hotels in Seoul under $150',
+	'Tours in Samarkand',
+	'Flights from Tashkent to Istanbul',
+	'Show my bookings',
+];
+
+const newId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+const loadMessages = (): AssistantMessage[] => {
+	try {
+		const raw = window.sessionStorage.getItem(STORAGE_KEY);
+		const parsed = raw ? JSON.parse(raw) : [];
+		return Array.isArray(parsed) ? parsed.slice(-30) : [];
+	} catch {
+		return [];
 	}
 };
 
-interface MessagePayload {
-	event: string;
-	text: string;
-	memberData: Member;
-}
-
-interface InfoPayload {
-	event: string;
-	totalClients: number;
-	memberData: Member;
-	action: string;
-}
-
+/**
+ * Velora AI travel assistant: floating robot button + chat panel wired to the
+ * askTravelAssistant mutation. Conversation lives in sessionStorage (per tab) and the
+ * last turns are sent back as history — the API itself is stateless.
+ */
 const Chat = () => {
-	const chatContentRef = useRef<HTMLDivElement>(null);
-	const [messagesList, setMessagesList] = useState<MessagePayload[]>([]);
-	const [onlineUsers, setOnlineUsers] = useState<number>(0);
-	const textInput = useRef(null);
-	const [messageInput, setMessageInput] = useState<string>("");
 	const [open, setOpen] = useState(false);
-	const [openButton, setOpenButton] = useState(false);
-	const router = useRouter();
-	const user = useReactiveVar(userVar);
-	const socket = useReactiveVar(socketVar);
+	const [messages, setMessages] = useState<AssistantMessage[]>([]);
+	const [input, setInput] = useState('');
+	const listRef = useRef<HTMLDivElement>(null);
+	const inputRef = useRef<HTMLTextAreaElement>(null);
+
+	const [askAssistant, { loading }] = useMutation<{ askTravelAssistant: AssistantReply }>(ASK_TRAVEL_ASSISTANT, {
+		context: { skipGlobalErrorAlert: true },
+	});
 
 	/** LIFECYCLES **/
-	useEffect(() => {
-		if (!socket) return;
-
-		socket.onmessage = (msg) => {
-			const data = JSON.parse(msg.data);
-
-			switch (data.event) {
-				case "info":
-					const newInfo: InfoPayload = data;
-					setOnlineUsers(newInfo.totalClients);
-					break;
-				case "getMessages":
-					const list: MessagePayload[] = data.list;
-					setMessagesList(list);
-					break;
-				case "message":
-					const newMessage: MessagePayload = data;
-					messagesList.push(newMessage);
-					setMessagesList([...messagesList]);
-					break;
-			}
-		};
-	}, [socket, messagesList]);
+	useEffect(() => setMessages(loadMessages()), []);
 
 	useEffect(() => {
-		const timeoutId = setTimeout(() => {
-			setOpenButton(true);
-		}, 100);
-		return () => clearTimeout(timeoutId);
-	}, []);
+		try {
+			window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messages.slice(-30)));
+		} catch {
+			/* storage unavailable (private mode) — keep the chat in memory only */
+		}
+	}, [messages]);
 
 	useEffect(() => {
-		setOpenButton(false);
-	}, [router.pathname]);
+		listRef.current?.scrollTo({ top: listRef.current.scrollHeight, behavior: 'smooth' });
+	}, [messages, loading, open]);
+
+	useEffect(() => {
+		if (open) inputRef.current?.focus();
+	}, [open]);
+
+	// Close on Escape.
+	useEffect(() => {
+		if (!open) return;
+		const onKey = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false);
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	}, [open]);
 
 	/** HANDLERS **/
-	const handleOpenChat = () => {
-		setOpen((prevState) => !prevState);
-	};
+	const send = async (raw: string) => {
+		const text = raw.trim().slice(0, ASSISTANT_PROMPT_MAX);
+		if (text.length < 2 || loading) return;
 
-	const getInputMessageHandler = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement>) => {
-			const text = e.target.value;
-			setMessageInput(text);
-		},
-		[messageInput]
-	);
+		const history = toHistory(messages);
+		setMessages((prev) => [...prev, { id: newId(), role: 'user', text }]);
+		setInput('');
 
-	const getKeyHandler = (e: React.KeyboardEvent) => {
 		try {
-			if (e.key == "Enter") {
-				onClickHandler();
-			}
-		} catch {
-			/* ignore key handler errors */
+			const { data } = await askAssistant({ variables: { input: { prompt: text, history } } });
+			const reply = data?.askTravelAssistant;
+			if (!reply) throw new Error('empty reply');
+			setMessages((prev) => [
+				...prev,
+				{
+					id: newId(),
+					role: 'assistant',
+					text: reply.answer,
+					aiPowered: reply.aiPowered,
+					category: reply.category,
+					sources: reply.sources ?? [],
+					suggestions: reply.suggestions ?? [],
+				},
+			]);
+		} catch (err) {
+			setMessages((prev) => [...prev, { id: newId(), role: 'assistant', text: assistantErrorText(err), error: true }]);
 		}
 	};
 
-	const onClickHandler = () => {
-		if (!messageInput) sweetErrorAlert(Messages.error4);
-		else if (socket) {
-			socket.send(JSON.stringify({ event: "message", data: messageInput }));
-			setMessageInput("");
-		}
-	};
+	const lastAssistant = [...messages].reverse().find((m) => m.role === 'assistant');
+	const suggestions =
+		!loading && lastAssistant?.role === 'assistant' && !lastAssistant.error ? lastAssistant.suggestions ?? [] : [];
+	const lastIsAi = lastAssistant?.role === 'assistant' && lastAssistant.aiPowered;
 
 	return (
-		<Stack className="chatting">
-			{openButton ? (
-				<button className="chat-button" onClick={handleOpenChat}>
-					{open ? <CloseFullscreenIcon /> : <MarkChatUnreadIcon />}
-				</button>
-			) : null}
-			<Stack className={`chat-frame ${open ? "open" : ""}`}>
-				<Box className={"chat-top"} component={"div"}>
-					<div style={{ fontFamily: "Nunito" }}>Online Chat</div>
-					<RippleBadge
-						style={{ margin: "-18px 0 0 21px" }}
-						badgeContent={onlineUsers}
-					/>
-				</Box>
-				<Box
-					className={"chat-content"}
-					id="chat-content"
-					ref={chatContentRef}
-					component={"div"}
-				>
-					<ScrollableFeed>
-						<Stack className={"chat-main"}>
-							<Box
-								flexDirection={"row"}
-								style={{ display: "flex" }}
-								sx={{ m: "10px 0px" }}
-								component={"div"}
-							>
-								<div className={"welcome"}>Welcome to Live chat!</div>
-							</Box>
-							{messagesList.map((ele: MessagePayload) => {
-								const { text, memberData } = ele;
-								const memberImage = memberData?.memberImage
-									? `${REACT_APP_API_URL}/${memberData.memberImage}`
-									: `/img/profile/defaulUser.svg`;
-
-								return memberData?._id === user?._id ? (
-									<Box
-										component={"div"}
-										flexDirection={"row"}
-										style={{ display: "flex" }}
-										alignItems={"flex-end"}
-										justifyContent={"flex-end"}
-										sx={{ m: "10px 0px" }}
-									>
-										<div className={"msg-right"}>{text}</div>
-									</Box>
-								) : (
-									<Box
-										flexDirection={"row"}
-										style={{ display: "flex" }}
-										sx={{ m: "10px 0px" }}
-										component={"div"}
-									>
-										<Avatar alt={"jonik"} src={memberImage} />
-										<div className={"msg-left"}>{text}</div>
-									</Box>
-								);
-							})}
-
-							<></>
-						</Stack>
-					</ScrollableFeed>
-				</Box>
-				<Box className={"chat-bott"} component={"div"}>
-					<input
-						type={"text"}
-						name={"message"}
-						className={"msg-input"}
-						placeholder={"Type message"}
-						value={messageInput}
-						onChange={getInputMessageHandler}
-						onKeyDown={getKeyHandler}
-					/>
-					<button className={"send-msg-btn"} onClick={onClickHandler}>
-						<SendIcon style={{ color: "#fff" }} />
+		<div className={`ai-assistant ${open ? 'is-open' : ''}`}>
+			<section
+				className="ai-panel"
+				role="dialog"
+				aria-label="Velora AI assistant"
+				aria-hidden={!open}
+				{...(!open ? { inert: '' } : {})}
+			>
+				<header className="ai-panel__head">
+					<span className="ai-panel__avatar">
+						<RobotMark size={30} />
+					</span>
+					<div className="ai-panel__title">
+						<strong>Velora AI</strong>
+						<small>
+							<span className={`ai-dot ${lastAssistant && !lastIsAi ? 'is-faq' : ''}`} />
+							{lastAssistant && !lastIsAi ? 'Quick-help mode' : 'Travel assistant · online'}
+						</small>
+					</div>
+					{messages.length > 0 && (
+						<button
+							type="button"
+							className="ai-icon-btn"
+							aria-label="Clear conversation"
+							title="Clear conversation"
+							onClick={() => setMessages([])}
+						>
+							<Trash size={18} />
+						</button>
+					)}
+					<button type="button" className="ai-icon-btn" aria-label="Close assistant" onClick={() => setOpen(false)}>
+						<X size={18} />
 					</button>
-				</Box>
-			</Stack>
-		</Stack>
+				</header>
+
+				<div className="ai-panel__list" ref={listRef} aria-live="polite">
+					{messages.length === 0 && (
+						<div className="ai-welcome">
+							<RobotMark size={56} className="ai-welcome__robot" />
+							<h3>Hi! I&apos;m your Velora travel assistant.</h3>
+							<p>Ask me about tours, hotels, rental cars or flights — I&apos;ll search live prices for you.</p>
+						</div>
+					)}
+
+					{messages.map((message) =>
+						message.role === 'user' ? (
+							<div key={message.id} className="ai-msg ai-msg--user">
+								<p>{message.text}</p>
+							</div>
+						) : (
+							<div
+								key={message.id}
+								className={`ai-msg ai-msg--bot ${message.error ? 'is-error' : ''} ${
+									message.sources?.length ? 'has-sources' : ''
+								}`}
+							>
+								{!message.error && (
+									<span className={`ai-badge ${message.aiPowered ? 'ai-badge--ai' : 'ai-badge--faq'}`}>
+										{message.aiPowered ? (
+											<>
+												<Sparkle size={12} weight="fill" /> AI answer
+											</>
+										) : (
+											'Quick help · FAQ'
+										)}
+									</span>
+								)}
+								<p>
+									{parseAssistantText(message.text).map((segment, index) =>
+										segment.bold ? <strong key={index}>{segment.text}</strong> : segment.text,
+									)}
+								</p>
+								{message.sources && message.sources.length > 0 && (
+									<div className="ai-sources">
+										{message.sources.map((source) => (
+											<SourceCard key={source.url} source={source} onOpen={() => setOpen(false)} />
+										))}
+									</div>
+								)}
+							</div>
+						),
+					)}
+
+					{loading && (
+						<div className="ai-msg ai-msg--bot ai-typing" aria-label="Assistant is typing">
+							<span />
+							<span />
+							<span />
+						</div>
+					)}
+				</div>
+
+				{(messages.length === 0 ? STARTER_PROMPTS : suggestions).length > 0 && (
+					<div className="ai-chips">
+						{(messages.length === 0 ? STARTER_PROMPTS : suggestions).map((prompt) => (
+							<button key={prompt} type="button" onClick={() => void send(prompt)} disabled={loading}>
+								{prompt}
+							</button>
+						))}
+					</div>
+				)}
+
+				<form
+					className="ai-composer"
+					onSubmit={(event) => {
+						event.preventDefault();
+						void send(input);
+					}}
+				>
+					<textarea
+						ref={inputRef}
+						rows={1}
+						value={input}
+						maxLength={ASSISTANT_PROMPT_MAX}
+						placeholder="Ask about trips, prices, bookings…"
+						aria-label="Message"
+						onChange={(event) => setInput(event.target.value)}
+						onKeyDown={(event) => {
+							if (event.key === 'Enter' && !event.shiftKey) {
+								event.preventDefault();
+								void send(input);
+							}
+						}}
+					/>
+					<button type="submit" className="ai-send" aria-label="Send" disabled={loading || input.trim().length < 2}>
+						<ArrowUp size={18} weight="bold" />
+					</button>
+				</form>
+				{input.length > ASSISTANT_PROMPT_MAX * 0.8 && (
+					<span className="ai-counter">
+						{input.length}/{ASSISTANT_PROMPT_MAX}
+					</span>
+				)}
+			</section>
+
+			<button
+				type="button"
+				className="ai-fab"
+				aria-label={open ? 'Close Velora AI assistant' : 'Open Velora AI assistant'}
+				aria-expanded={open}
+				onClick={() => setOpen((prev) => !prev)}
+			>
+				<span className="ai-fab__ring" aria-hidden="true" />
+				{open ? <X size={24} weight="bold" color="#ffffff" /> : <RobotMark size={36} className="ai-fab__robot" />}
+				{!open && <span className="ai-fab__label">Ask AI</span>}
+			</button>
+		</div>
 	);
 };
 

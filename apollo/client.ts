@@ -1,24 +1,26 @@
-import { useMemo } from "react";
-import {
-	ApolloClient,
-	ApolloLink,
-	InMemoryCache,
-	split,
-	from,
-	NormalizedCacheObject,
-	HttpLink,
-} from "@apollo/client";
-import createUploadLink from "apollo-upload-client/public/createUploadLink.js";
-import { WebSocketLink } from "@apollo/client/link/ws";
-import { getMainDefinition } from "@apollo/client/utilities";
-import { onError } from "@apollo/client/link/error";
-import { ServerError } from "@apollo/client/link/utils";
-import { getJwtToken } from "../libs/auth/token";
-import { userVar, socketVar } from "./store";
-import { sweetErrorAlert } from "../libs/sweetAlert";
-import { API_GRAPHQL_URL, API_WS_URL } from "../libs/config";
+import { useMemo } from 'react';
+import { ApolloClient, ApolloLink, InMemoryCache, split, from, NormalizedCacheObject, HttpLink } from '@apollo/client';
+import createUploadLink from 'apollo-upload-client/public/createUploadLink.js';
+import { WebSocketLink } from '@apollo/client/link/ws';
+import { getMainDefinition } from '@apollo/client/utilities';
+import { onError } from '@apollo/client/link/error';
+import { ServerError } from '@apollo/client/link/utils';
+import { getJwtToken } from '../libs/auth/token';
+import { userVar, socketVar } from './store';
+import { sweetErrorAlert } from '../libs/sweetAlert';
+import { API_GRAPHQL_URL, API_WS_URL } from '../libs/config';
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
+
+/** Operations whose callers report errors themselves (see libs/auth). */
+const SELF_HANDLED_OPERATIONS = new Set(['Signup', 'Login']);
+
+const SESSION_ERROR_PATTERNS = ['not authenticated', 'jwt expired', 'invalid token', 'jwt malformed'];
+
+const isSessionErrorMessage = (message: string): boolean => {
+	const lower = message.toLowerCase();
+	return SESSION_ERROR_PATTERNS.some((pattern) => lower.includes(pattern));
+};
 let handlingUnauthorized = false;
 
 function getHeaders(): Record<string, string> {
@@ -30,22 +32,22 @@ function getHeaders(): Record<string, string> {
 
 /** Clear session on 401 without importing logOut (avoids circular auth ↔ apollo deps). */
 function handleUnauthorized(): void {
-	if (typeof window === "undefined" || handlingUnauthorized) return;
+	if (typeof window === 'undefined' || handlingUnauthorized) return;
 	handlingUnauthorized = true;
 
-	localStorage.removeItem("accessToken");
-	window.localStorage.setItem("logout", Date.now().toString());
+	localStorage.removeItem('accessToken');
+	window.localStorage.setItem('logout', Date.now().toString());
 	userVar({
-		_id: "",
-		memberType: "",
-		memberStatus: "",
-		memberAuthType: "",
-		memberPhone: "",
-		memberNick: "",
-		memberFullName: "",
-		memberImage: "",
-		memberAddress: "",
-		memberDesc: "",
+		_id: '',
+		memberType: '',
+		memberStatus: '',
+		memberAuthType: '',
+		memberPhone: '',
+		memberNick: '',
+		memberFullName: '',
+		memberImage: '',
+		memberAddress: '',
+		memberDesc: '',
 		memberRank: 0,
 		memberArticles: 0,
 		memberPoints: 0,
@@ -56,7 +58,7 @@ function handleUnauthorized(): void {
 	});
 
 	const path = window.location.pathname;
-	if (!path.startsWith("/login") && !path.startsWith("/register")) {
+	if (!path.startsWith('/login') && !path.startsWith('/register')) {
 		const referrer = encodeURIComponent(window.location.pathname + window.location.search);
 		window.location.href = `/login?referrer=${referrer}`;
 	} else {
@@ -72,7 +74,7 @@ class AppWebSocket {
 		socketVar(this.socket);
 	}
 
-	send(data: string | ArrayBuffer | SharedArrayBuffer | Blob | ArrayBufferView) {
+	send(data: Parameters<WebSocket['send']>[0]) {
 		this.socket.send(data);
 	}
 
@@ -82,7 +84,7 @@ class AppWebSocket {
 }
 
 function createIsomorphicLink(): ApolloLink {
-	if (typeof window === "undefined") {
+	if (typeof window === 'undefined') {
 		return new HttpLink({ uri: API_GRAPHQL_URL });
 	}
 
@@ -110,29 +112,26 @@ function createIsomorphicLink(): ApolloLink {
 		webSocketImpl: AppWebSocket,
 	});
 
-	const errorLink = onError(({ graphQLErrors, networkError }) => {
+	const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
 		if (graphQLErrors) {
-			graphQLErrors.forEach(({ message, path, extensions }) => {
-				const operationName = Array.isArray(path) ? String(path[0] ?? "") : "";
-				const authHandled =
-					operationName === "signup" ||
-					operationName === "login" ||
-					operationName === "changePassword";
+			// The API's formatError strips `path`/`extensions`, so rely on the client-side
+			// operation name and an opt-out context flag for callers that show their own alert.
+			const authHandled = SELF_HANDLED_OPERATIONS.has(operation.operationName);
+			const silent = Boolean(operation.getContext()?.skipGlobalErrorAlert);
 
-				const code = String(extensions?.code ?? "");
-				if (code === "UNAUTHENTICATED" || message.toLowerCase().includes("not authenticated")) {
+			graphQLErrors.forEach(({ message, extensions }) => {
+				const code = String(extensions?.code ?? '');
+				if (code === 'UNAUTHENTICATED' || isSessionErrorMessage(message)) {
 					handleUnauthorized();
 					return;
 				}
 
-				if (!authHandled) sweetErrorAlert(message);
+				if (!authHandled && !silent) sweetErrorAlert(message);
 			});
 		}
 
 		const statusCode =
-			networkError && "statusCode" in networkError
-				? (networkError as ServerError).statusCode
-				: undefined;
+			networkError && 'statusCode' in networkError ? (networkError as ServerError).statusCode : undefined;
 
 		if (statusCode === 401) {
 			handleUnauthorized();
@@ -142,7 +141,7 @@ function createIsomorphicLink(): ApolloLink {
 	const splitLink = split(
 		({ query }) => {
 			const definition = getMainDefinition(query);
-			return definition.kind === "OperationDefinition" && definition.operation === "subscription";
+			return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
 		},
 		wsLink,
 		authLink.concat(uploadLink),
@@ -153,7 +152,7 @@ function createIsomorphicLink(): ApolloLink {
 
 function createApolloClient() {
 	return new ApolloClient({
-		ssrMode: typeof window === "undefined",
+		ssrMode: typeof window === 'undefined',
 		link: createIsomorphicLink(),
 		cache: new InMemoryCache(),
 		resolvers: {},
@@ -163,7 +162,7 @@ function createApolloClient() {
 export function initializeApollo(initialState: NormalizedCacheObject | null = null) {
 	const _apolloClient = apolloClient ?? createApolloClient();
 	if (initialState) _apolloClient.cache.restore(initialState);
-	if (typeof window === "undefined") return _apolloClient;
+	if (typeof window === 'undefined') return _apolloClient;
 	if (!apolloClient) apolloClient = _apolloClient;
 	return _apolloClient;
 }

@@ -40,13 +40,11 @@ export const ROUTE_SEO: Record<string, RouteSeo> = {
 	},
 	'/package/detail': {
 		title: 'Package Details',
-		description:
-			'Full itinerary, photo gallery, reviews, and booking for tours, hotels, and rental cars on Velora.',
+		description: 'Full itinerary, photo gallery, reviews, and booking for tours, hotels, and rental cars on Velora.',
 	},
 	'/flights/detail': {
 		title: 'Flight Details',
-		description:
-			'Schedule, fare breakdown, baggage rules, and passenger booking for your selected flight on Velora.',
+		description: 'Schedule, fare breakdown, baggage rules, and passenger booking for your selected flight on Velora.',
 	},
 	'/agent': {
 		title: 'Travel Agents',

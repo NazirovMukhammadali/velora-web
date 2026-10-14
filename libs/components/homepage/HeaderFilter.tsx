@@ -11,6 +11,13 @@ import {
 	validateHeroSearch,
 	type HeroSearchForm,
 } from '../../utils/heroSearch';
+import useTodayIso from '../../hooks/useTodayIso';
+import { useQuery } from '@apollo/client';
+import SuggestInput from '../common/SuggestInput';
+import { GET_HOTELS, GET_RENTCARS } from '../../../apollo/user/query';
+import { DEFAULT_CATALOG_VARIABLES } from '../../hooks/usePackageCatalog';
+import { AIRPORT_SUGGESTIONS } from '../../data/flights';
+import { citySuggestions, type Suggestion } from '../../utils/suggestions';
 
 type SearchTabConfig = {
 	key: SearchTabKey;
@@ -70,6 +77,7 @@ const EMPTY_FORM: HeroSearchForm = {
 };
 
 const HeaderFilter = () => {
+	const today = useTodayIso();
 	const router = useRouter();
 	const { t } = useTranslation('common');
 	const [activeTab, setActiveTab] = useState<SearchTabKey>('hotel');
@@ -80,10 +88,7 @@ const HeaderFilter = () => {
 
 	const slides = HERO_BACKGROUNDS[activeTab];
 
-	const activeConfig = useMemo(
-		() => TAB_CONFIG.find((item) => item.key === activeTab) ?? TAB_CONFIG[0],
-		[activeTab],
-	);
+	const activeConfig = useMemo(() => TAB_CONFIG.find((item) => item.key === activeTab) ?? TAB_CONFIG[0], [activeTab]);
 
 	useEffect(() => {
 		const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -131,6 +136,30 @@ const HeaderFilter = () => {
 
 	const isFlights = activeTab === 'flights';
 
+	// Location suggestions come from the live catalog (same cached queries as /hotels and /rentcar).
+	const { data: hotelData } = useQuery(GET_HOTELS, {
+		variables: DEFAULT_CATALOG_VARIABLES,
+		skip: activeTab !== 'hotel',
+		errorPolicy: 'all',
+	});
+	const { data: carData } = useQuery(GET_RENTCARS, {
+		variables: DEFAULT_CATALOG_VARIABLES,
+		skip: activeTab !== 'rentcar',
+		errorPolicy: 'all',
+	});
+	const locationSuggestions: Suggestion[] = useMemo(() => {
+		if (activeTab === 'hotel') {
+			return citySuggestions(
+				(hotelData?.getHotels?.list ?? []).map((hotel: { hotelLocation?: string }) => hotel.hotelLocation),
+				['hotel', 'hotels'],
+			);
+		}
+		return citySuggestions(
+			(carData?.getRentcars?.list ?? []).map((car: { carLocation?: string }) => car.carLocation),
+			['car', 'cars'],
+		);
+	}, [activeTab, hotelData, carData]);
+
 	return (
 		<section className="velora-hero" aria-label="Travel search">
 			<div className="velora-hero-backdrops" aria-hidden="true">
@@ -166,37 +195,34 @@ const HeaderFilter = () => {
 							<>
 								<div className="field-group location">
 									<label htmlFor="hero-from">{t('From')}</label>
-									<input
+									<SuggestInput
 										id="hero-from"
-										type="text"
 										value={form.from}
 										placeholder={t('City or airport')}
-										onChange={(event) => handleField('from', event.target.value)}
-										autoComplete="off"
+										suggestions={AIRPORT_SUGGESTIONS}
+										onChange={(value) => handleField('from', value)}
 									/>
 								</div>
 								<div className="field-group location">
 									<label htmlFor="hero-to">{t('To')}</label>
-									<input
+									<SuggestInput
 										id="hero-to"
-										type="text"
 										value={form.to}
 										placeholder={t('City or airport')}
-										onChange={(event) => handleField('to', event.target.value)}
-										autoComplete="off"
+										suggestions={AIRPORT_SUGGESTIONS.filter((option) => option.value !== form.from.trim())}
+										onChange={(value) => handleField('to', value)}
 									/>
 								</div>
 							</>
 						) : (
 							<div className="field-group location">
 								<label htmlFor="hero-location">{t(activeConfig.locationLabelKey)}</label>
-								<input
+								<SuggestInput
 									id="hero-location"
-									type="text"
 									value={form.location}
 									placeholder={t(activeConfig.locationPlaceholderKey)}
-									onChange={(event) => handleField('location', event.target.value)}
-									autoComplete="off"
+									suggestions={locationSuggestions}
+									onChange={(value) => handleField('location', value)}
 								/>
 							</div>
 						)}
@@ -207,6 +233,7 @@ const HeaderFilter = () => {
 								id="hero-start-date"
 								type="date"
 								value={form.startDate}
+								min={today}
 								onChange={(event) => handleField('startDate', event.target.value)}
 							/>
 						</div>
@@ -217,7 +244,7 @@ const HeaderFilter = () => {
 								id="hero-end-date"
 								type="date"
 								value={form.endDate}
-								min={form.startDate || undefined}
+								min={form.startDate || today}
 								onChange={(event) => handleField('endDate', event.target.value)}
 							/>
 						</div>

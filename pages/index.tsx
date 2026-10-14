@@ -6,6 +6,7 @@ import TourPackages from '../libs/components/homepage/TourPackages';
 import TravelShowcaseVideo from '../libs/components/homepage/TravelShowcaseVideo';
 import TravelExperts from '../libs/components/homepage/TravelExperts';
 import PopularDestinations from '../libs/components/homepage/PopularDestinations';
+import LatestNews from '../libs/components/homepage/LatestNews';
 
 export const getStaticProps = async ({ locale }: any) => ({
 	props: {
@@ -13,12 +14,14 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
+/** Browse first (packages, destinations), then inspiration, trust (experts) and fresh content. */
 const Home: NextPage = () => (
 	<Stack className={'home-page'}>
 		<TourPackages />
+		<PopularDestinations />
 		<TravelShowcaseVideo />
 		<TravelExperts />
-		<PopularDestinations />
+		<LatestNews />
 	</Stack>
 );
 

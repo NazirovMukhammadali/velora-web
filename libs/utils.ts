@@ -3,8 +3,7 @@ import { sweetMixinErrorAlert } from './sweetAlert';
 
 type MutateFn = (options: { variables: { input: string } }) => Promise<unknown>;
 
-const errorMessage = (err: unknown): string =>
-	err instanceof Error ? err.message : 'Something went wrong';
+const errorMessage = (err: unknown): string => (err instanceof Error ? err.message : 'Something went wrong');
 
 export const formatterStr = (value: number | undefined): string => {
 	return numeral(value).format('0,0') != '0' ? numeral(value).format('0,0') : '';

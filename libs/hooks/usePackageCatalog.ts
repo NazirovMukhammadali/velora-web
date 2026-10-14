@@ -3,8 +3,11 @@ import { useQuery, type DocumentNode, type OperationVariables } from '@apollo/cl
 import useCatalogQuery, { type UseCatalogQueryOptions } from './useCatalogQuery';
 
 /** Default list query variables shared by every catalog (page 1, newest first). */
+// `search` is required by every catalog inquiry on the API; without it the request is rejected
+// and the page silently falls back to the static catalog. Filtering happens client-side, so
+// fetch the whole active catalog in one page.
 export const DEFAULT_CATALOG_VARIABLES: OperationVariables = {
-	input: { page: 1, limit: 24, sort: 'createdAt', direction: 'DESC' },
+	input: { page: 1, limit: 100, sort: 'createdAt', direction: 'DESC', search: {} },
 };
 
 type CatalogFilters = Record<string, string>;
@@ -15,12 +18,7 @@ type CatalogFilters = Record<string, string>;
  * @template TData  Raw GraphQL query result.
  * @template TRaw  Raw backend node type before mapping.
  */
-export type UsePackageCatalogConfig<
-	TItem,
-	TFilters extends CatalogFilters,
-	TData = Record<string, any>,
-	TRaw = any,
-> = {
+export type UsePackageCatalogConfig<TItem, TFilters extends CatalogFilters, TData = Record<string, any>, TRaw = any> = {
 	/** GraphQL list query (e.g. GET_TOURS). */
 	query: DocumentNode;
 	/** Pick the raw list off the query result. */
@@ -46,12 +44,9 @@ export type UsePackageCatalogConfig<
  * Apollo query → API-first mapping with static fallback → URL-synced filters →
  * filter → sort → loading/empty flags. Pages stay thin and only own their toolbar JSX.
  */
-export function usePackageCatalog<
-	TItem,
-	TFilters extends CatalogFilters,
-	TData = Record<string, any>,
-	TRaw = any,
->(config: UsePackageCatalogConfig<TItem, TFilters, TData, TRaw>) {
+export function usePackageCatalog<TItem, TFilters extends CatalogFilters, TData = Record<string, any>, TRaw = any>(
+	config: UsePackageCatalogConfig<TItem, TFilters, TData, TRaw>,
+) {
 	const { data, loading } = useQuery<TData>(config.query, {
 		fetchPolicy: 'cache-and-network',
 		errorPolicy: 'all',

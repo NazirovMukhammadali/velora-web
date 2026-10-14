@@ -26,10 +26,8 @@ const nextConfig = {
 	eslint: {
 		ignoreDuringBuilds: true,
 	},
-	// Full-project `tsc` currently hangs in this workspace; focused checks cover changed paths.
-	// Remove when project-wide `yarn typecheck` completes reliably.
 	typescript: {
-		ignoreBuildErrors: true,
+		ignoreBuildErrors: false,
 	},
 	images: {
 		remotePatterns,
@@ -42,8 +40,7 @@ const nextConfig = {
 	},
 	env: {
 		REACT_APP_API_URL: process.env.REACT_APP_API_URL ?? process.env.NEXT_PUBLIC_API_URL,
-		REACT_APP_API_GRAPHQL_URL:
-			process.env.REACT_APP_API_GRAPHQL_URL ?? process.env.NEXT_PUBLIC_API_GRAPHQL_URL,
+		REACT_APP_API_GRAPHQL_URL: process.env.REACT_APP_API_GRAPHQL_URL ?? process.env.NEXT_PUBLIC_API_GRAPHQL_URL,
 		REACT_APP_API_WS: process.env.REACT_APP_API_WS ?? process.env.NEXT_PUBLIC_API_WS_URL,
 	},
 };

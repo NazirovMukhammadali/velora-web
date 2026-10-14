@@ -29,7 +29,7 @@
 				}
 			}
 		}
-		
+
 		.right-wrap {
 			width: 100%;
 			height: auto;
@@ -57,7 +57,9 @@
 				border: 1px solid #eee;
 				border-radius: 4px;
 			}
-			.btn-flex { margin-top: 40px; }
+			.btn-flex {
+				margin-top: 40px;
+			}
 		}
 		.css-guvl2y-MuiButtonBase-root-MuiButton-root {
 			background: #87cdf9;
@@ -65,13 +67,15 @@
 				fill: #000000;
 			}
 		}
-		.toastui-editor-popup-body { padding: 20px; }
+		.toastui-editor-popup-body {
+			padding: 20px;
+		}
 		.youtube-input {
 			padding: 8px 16px;
 			border: 1px solid #ddd;
 		}
 		.youtube-div {
-			display:flex;
+			display: flex;
 			flex-direction: column;
 		}
 		.toastui-editor-defaultUI button {

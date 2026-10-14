@@ -1,4 +1,6 @@
 import React from 'react';
+import CatalogPagination from '../../libs/components/common/CatalogPagination';
+import usePagedItems from '../../libs/hooks/usePagedItems';
 import { NextPage } from 'next';
 import { Stack } from '@mui/material';
 import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
@@ -11,6 +13,7 @@ import { GET_RENTCARS } from '../../apollo/user/query';
 import usePackageCatalog from '../../libs/hooks/usePackageCatalog';
 import { HERO_PARTY_MAX, HERO_PARTY_MIN, stripKeysForCatalog } from '../../libs/utils/heroSearch';
 import type { VeloraPackage } from '../../libs/types/package';
+import useTodayIso from '../../libs/hooks/useTodayIso';
 
 type PriceKey = 'any' | 'under75' | '75to150' | 'over150';
 type CategoryKey = 'all' | 'compact' | 'suv' | 'sedan' | 'luxury' | 'electric';
@@ -84,7 +87,11 @@ const matchesCategory = (car: VeloraPackage, category: string): boolean => {
 	}
 };
 
+/** Two rows of the 4-column desktop grid. */
+const CARS_PER_PAGE = 8;
+
 const RentcarPage: NextPage = () => {
+	const today = useTodayIso();
 	const { filters, setFilter, items, total, isInitialLoading } = usePackageCatalog<
 		VeloraPackage,
 		typeof RENTCAR_FILTER_DEFAULTS
@@ -99,9 +106,12 @@ const RentcarPage: NextPage = () => {
 			stripQueryKeys: stripKeysForCatalog('/rentcar'),
 		},
 		filterItem: (car, f) =>
-			matchesPackageSearch(car, f.location) && inPriceRange(car.priceAmount, f.price) && matchesCategory(car, f.category),
+			matchesPackageSearch(car, f.location) &&
+			inPriceRange(car.priceAmount, f.price) &&
+			matchesCategory(car, f.category),
 		sortItems: sortPackages,
 	});
+	const { page, setPage, pageItems } = usePagedItems(items, CARS_PER_PAGE);
 
 	return (
 		<Stack className={'tours-page rentcar-page'}>
@@ -133,6 +143,7 @@ const RentcarPage: NextPage = () => {
 						<input
 							type="date"
 							value={filters.startDate}
+							min={today}
 							onChange={(event) => setFilter('startDate', event.target.value)}
 						/>
 					</label>
@@ -141,7 +152,7 @@ const RentcarPage: NextPage = () => {
 						<input
 							type="date"
 							value={filters.endDate}
-							min={filters.startDate || undefined}
+							min={filters.startDate || today}
 							onChange={(event) => setFilter('endDate', event.target.value)}
 						/>
 					</label>
@@ -207,11 +218,20 @@ const RentcarPage: NextPage = () => {
 				) : items.length === 0 ? (
 					<div className={'tours-empty'}>No cars match your filters yet.</div>
 				) : (
-					<div className={'tour-grid'}>
-						{items.map((pkg) => (
-							<PackageCard key={pkg.id} pkg={pkg} />
-						))}
-					</div>
+					<>
+						<div className={'tour-grid'}>
+							{pageItems.map((pkg) => (
+								<PackageCard key={pkg.id} pkg={pkg} />
+							))}
+						</div>
+						<CatalogPagination
+							page={page}
+							pageSize={CARS_PER_PAGE}
+							total={items.length}
+							label="cars"
+							onChange={setPage}
+						/>
+					</>
 				)}
 			</Stack>
 		</Stack>

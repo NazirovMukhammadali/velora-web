@@ -1,4 +1,6 @@
-import { getJwtToken, setJwtToken, clearJwtToken } from '../libs/auth/token';
+import { getJwtToken, setJwtToken, clearJwtToken, isJwtExpired } from '../libs/auth/token';
+
+const makeJwt = (payload: object) => `header.${Buffer.from(JSON.stringify(payload)).toString('base64url')}.sig`;
 
 const memory = new Map<string, string>();
 
@@ -33,5 +35,22 @@ describe('auth token helpers', () => {
 		expect(getJwtToken()).toBe('token-abc');
 		clearJwtToken();
 		expect(getJwtToken()).toBe('');
+	});
+
+	it('detects expired tokens and drops them from storage', () => {
+		const nowSec = Math.floor(Date.now() / 1000);
+		const expired = makeJwt({ _id: 'a', exp: nowSec - 60 });
+		const valid = makeJwt({ _id: 'a', exp: nowSec + 3600 });
+
+		expect(isJwtExpired(expired)).toBe(true);
+		expect(isJwtExpired(valid)).toBe(false);
+		expect(isJwtExpired('not-a-jwt')).toBe(false);
+
+		setJwtToken(expired);
+		expect(getJwtToken()).toBe('');
+		expect(memory.has('accessToken')).toBe(false);
+
+		setJwtToken(valid);
+		expect(getJwtToken()).toBe(valid);
 	});
 });

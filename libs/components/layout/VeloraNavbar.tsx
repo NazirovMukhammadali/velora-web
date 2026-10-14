@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useTranslation } from 'next-i18next';
@@ -10,7 +11,10 @@ import { Logout } from '@mui/icons-material';
 import { CaretDown } from 'phosphor-react';
 import { logOut } from '../../auth';
 import useAuth from '../../hooks/useAuth';
-import { REACT_APP_API_URL } from '../../config';
+import { resolveMemberImageUrl } from '../../utils/memberImage';
+import VeloraImage from '../common/VeloraImage';
+
+const DEFAULT_AVATAR = '/img/profile/defaultUser.svg';
 
 type VeloraNavbarProps = {
 	overlay?: boolean;
@@ -79,21 +83,12 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 	const { user } = useAuth({ syncOnMount: true });
 	const { t } = useTranslation('common');
 	const router = useRouter();
-	const [lang, setLang] = useState('en');
+	// The active locale lives in the URL (/kr/..., /ru/...); localStorage only remembers the choice.
+	const lang = router.locale ?? 'en';
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [langAnchor, setLangAnchor] = useState<null | HTMLElement>(null);
 	const [userAnchor, setUserAnchor] = useState<null | HTMLElement>(null);
 	const [scrolled, setScrolled] = useState(false);
-
-	useEffect(() => {
-		const stored = localStorage.getItem('locale');
-		if (stored) {
-			setLang(stored);
-		} else {
-			localStorage.setItem('locale', 'en');
-			setLang('en');
-		}
-	}, [router]);
 
 	useEffect(() => {
 		const onScroll = () => setScrolled(window.scrollY > 16);
@@ -113,7 +108,6 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 
 	const langChoice = useCallback(
 		async (locale: string) => {
-			setLang(locale);
 			localStorage.setItem('locale', locale);
 			setLangAnchor(null);
 			await router.push(router.asPath, router.asPath, { locale });
@@ -183,7 +177,15 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 							<span />
 						</button>
 						<Link href="/" className="velora-navbar-brand" aria-label="Velora home">
-							<img className="velora-navbar-brand-mark" src="/img/logo/velora-mark.svg" alt="" aria-hidden />
+							<Image
+								className="velora-navbar-brand-mark"
+								src="/img/logo/velora-mark.svg"
+								alt=""
+								aria-hidden
+								width={38}
+								height={38}
+								priority
+							/>
 							<span className="velora-navbar-brand-name">VELORA</span>
 						</Link>
 					</div>
@@ -209,13 +211,14 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 									onClick={(e) => setUserAnchor(e.currentTarget)}
 									aria-label={t('Account menu')}
 								>
-									<img
-										src={
-											user.memberImage
-												? `${REACT_APP_API_URL}/${user.memberImage}`
-												: '/img/profile/defaultUser.svg'
-										}
+									<VeloraImage
+										src={resolveMemberImageUrl(user.memberImage)}
+										fallback={DEFAULT_AVATAR}
 										alt=""
+										width={42}
+										height={42}
+										className="velora-navbar-avatar-img"
+										unoptimized
 									/>
 								</button>
 								<Menu
@@ -255,21 +258,21 @@ const VeloraNavbar = ({ overlay = false, contrast = false }: VeloraNavbarProps) 
 							onClick={(e) => setLangAnchor(e.currentTarget)}
 							aria-label={t('Change language')}
 						>
-							<img src={flagSrc} alt="" width={24} height={17} />
+							<Image src={flagSrc} alt="" width={24} height={17} />
 							<CaretDown size={14} weight="fill" aria-hidden />
 						</button>
 
 						<LangMenu anchorEl={langAnchor} open={Boolean(langAnchor)} onClose={() => setLangAnchor(null)}>
 							<MenuItem onClick={() => langChoice('en')}>
-								<img className="img-flag" src="/img/flag/langen.png" alt="" width={24} height={17} />
+								<Image className="img-flag" src="/img/flag/langen.png" alt="" width={24} height={17} />
 								English
 							</MenuItem>
 							<MenuItem onClick={() => langChoice('kr')}>
-								<img className="img-flag" src="/img/flag/langkr.png" alt="" width={24} height={17} />
+								<Image className="img-flag" src="/img/flag/langkr.png" alt="" width={24} height={17} />
 								Korean
 							</MenuItem>
 							<MenuItem onClick={() => langChoice('ru')}>
-								<img className="img-flag" src="/img/flag/langru.png" alt="" width={24} height={17} />
+								<Image className="img-flag" src="/img/flag/langru.png" alt="" width={24} height={17} />
 								Russian
 							</MenuItem>
 						</LangMenu>

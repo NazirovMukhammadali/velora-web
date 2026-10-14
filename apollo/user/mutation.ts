@@ -297,3 +297,25 @@ export const CREATE_HOTEL_BOOKING = gql`
 		}
 	}
 `;
+
+/**************************
+ *      AI ASSISTANT      *
+ *************************/
+
+export const ASK_TRAVEL_ASSISTANT = gql`
+	mutation AskTravelAssistant($input: ChatbotPromptInput!) {
+		askTravelAssistant(input: $input) {
+			answer
+			category
+			aiPowered
+			suggestions
+			sources {
+				type
+				title
+				url
+				priceUsd
+				image
+			}
+		}
+	}
+`;

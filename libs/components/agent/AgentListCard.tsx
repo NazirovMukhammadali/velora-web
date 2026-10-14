@@ -27,8 +27,7 @@ const AgentListCard = ({ agent, likeCount, liked = false, onLike }: AgentListCar
 	const badgeLabel = `${tourCount} ${tourCount === 1 ? 'tour' : 'tours'}`;
 	const views = agent.memberViews ?? 0;
 	const likes = likeCount ?? agent.memberLikes ?? 0;
-	const rating =
-		agent.memberRank && agent.memberRank > 0 ? (agent.memberRank / 10).toFixed(1) : null;
+	const rating = agent.memberRank && agent.memberRank > 0 ? (agent.memberRank / 10).toFixed(1) : null;
 
 	return (
 		<article className="agent-portrait-card">
@@ -66,11 +65,7 @@ const AgentListCard = ({ agent, likeCount, liked = false, onLike }: AgentListCar
 								onLike?.();
 							}}
 						>
-							{liked ? (
-								<FavoriteIcon sx={{ fontSize: 18 }} />
-							) : (
-								<FavoriteBorderIcon sx={{ fontSize: 18 }} />
-							)}
+							{liked ? <FavoriteIcon sx={{ fontSize: 18 }} /> : <FavoriteBorderIcon sx={{ fontSize: 18 }} />}
 							<em>{likes}</em>
 						</button>
 					</div>

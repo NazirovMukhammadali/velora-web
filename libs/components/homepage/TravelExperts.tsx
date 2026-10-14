@@ -1,61 +1,32 @@
 import React from 'react';
 import Link from 'next/link';
+import { useQuery } from '@apollo/client';
+import { Skeleton } from '@mui/material';
 import VeloraImage from '../common/VeloraImage';
+import { GET_AGENTS } from '../../../apollo/user/query';
+import type { Member } from '../../types/member/member';
+import { getAgentLocationLabel, resolveMemberImageUrl } from '../../utils/memberImage';
 
-type TravelExpert = {
-	name: string;
-	role: string;
-	rating: string;
-	tours: string;
-	image: string;
+const EXPERTS_LIMIT = 6;
+const DEFAULT_AVATAR = '/img/profile/defaultUser.svg';
+
+/** Most-viewed agents from the live directory; each card opens that agent's real profile. */
+const EXPERTS_VARIABLES = {
+	input: { page: 1, limit: EXPERTS_LIMIT, sort: 'memberViews', direction: 'DESC', search: {} },
 };
 
-const experts: TravelExpert[] = [
-	{
-		name: 'Adam Ferguson',
-		role: 'Mountains & Trekking',
-		rating: '4.9',
-		tours: '32 tours',
-		image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=80',
-	},
-	{
-		name: 'Sara Jameson',
-		role: 'City Tours & Culture',
-		rating: '4.8',
-		tours: '28 tours',
-		image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80',
-	},
-	{
-		name: 'Liam O.Brien',
-		role: 'Beach & Islands',
-		rating: '4.9',
-		tours: '40 tours',
-		image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80',
-	},
-	{
-		name: 'Nora Park',
-		role: 'Family Adventures',
-		rating: '4.7',
-		tours: '21 tours',
-		image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=80',
-	},
-	{
-		name: 'Carlos Rivera',
-		role: 'Food & Wine Trails',
-		rating: '4.9',
-		tours: '35 tours',
-		image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80',
-	},
-	{
-		name: 'Mei Tanaka',
-		role: 'Heritage & Temples',
-		rating: '4.8',
-		tours: '26 tours',
-		image: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?auto=format&fit=crop&w=400&q=80',
-	},
-];
-
 const TravelExperts = () => {
+	const { data, loading } = useQuery<{ getAgents?: { list: Member[] } }>(GET_AGENTS, {
+		fetchPolicy: 'cache-and-network',
+		errorPolicy: 'all',
+		variables: EXPERTS_VARIABLES,
+	});
+
+	const experts = data?.getAgents?.list ?? [];
+
+	// Nothing to show (API down / no agents yet): hide the section instead of linking to missing profiles.
+	if (!loading && experts.length === 0) return null;
+
 	return (
 		<section className={'travel-experts-section'}>
 			<div className={'experts-head'}>
@@ -68,22 +39,45 @@ const TravelExperts = () => {
 			</div>
 
 			<div className={'experts-grid'}>
-				{experts.map((expert) => (
-					<article className={'expert-card'} key={expert.name}>
-						<div className={'expert-avatar'}>
-							<VeloraImage src={expert.image} alt={expert.name} fill sizes="112px" />
-						</div>
-						<h3>{expert.name}</h3>
-						<p>{expert.role}</p>
-						<div className={'expert-meta'}>
-							<span className={'rating'}>★ {expert.rating}</span>
-							<span className={'tours'}>{expert.tours}</span>
-						</div>
-						<Link href={'/agent'} className={'expert-cta-link'}>
-							View Profile
-						</Link>
-					</article>
-				))}
+				{experts.length === 0
+					? Array.from({ length: EXPERTS_LIMIT }, (_, index) => (
+							<article className={'expert-card'} key={`skeleton-${index}`} aria-hidden>
+								<Skeleton variant="circular" width={112} height={112} sx={{ mx: 'auto' }} />
+								<Skeleton width="60%" sx={{ mx: 'auto', mt: 2 }} />
+								<Skeleton width="40%" sx={{ mx: 'auto' }} />
+							</article>
+					  ))
+					: experts.map((agent) => {
+							const name = agent.memberFullName || agent.memberNick;
+							const tours = agent.memberProperties ?? 0;
+							return (
+								<article className={'expert-card'} key={agent._id}>
+									<div className={'expert-avatar'}>
+										<VeloraImage
+											src={resolveMemberImageUrl(agent.memberImage)}
+											fallback={DEFAULT_AVATAR}
+											alt={name}
+											fill
+											sizes="112px"
+										/>
+									</div>
+									<h3>{name}</h3>
+									<p>{getAgentLocationLabel(agent.memberNick, agent.memberAddress)}</p>
+									<div className={'expert-meta'}>
+										<span className={'rating'}>♥ {agent.memberLikes ?? 0}</span>
+										<span className={'tours'}>
+											{tours} {tours === 1 ? 'tour' : 'tours'}
+										</span>
+									</div>
+									<Link
+										href={{ pathname: '/agent/detail', query: { agentId: agent._id } }}
+										className={'expert-cta-link'}
+									>
+										View Profile
+									</Link>
+								</article>
+							);
+					  })}
 			</div>
 		</section>
 	);

@@ -2,7 +2,22 @@ import type { PackageExtra, PackagePlanDay, PackageType, VeloraPackage } from '.
 
 export type PackageSeed = Omit<
 	VeloraPackage,
-	'gallery' | 'about' | 'highlights' | 'included' | 'excluded' | 'plan' | 'locationNote' | 'mapQuery' | 'durationLabel' | 'experienceType' | 'groupSize' | 'languages' | 'extras' | 'timeSlots' | 'youthPrice' | 'childPrice'
+	| 'gallery'
+	| 'about'
+	| 'highlights'
+	| 'included'
+	| 'excluded'
+	| 'plan'
+	| 'locationNote'
+	| 'mapQuery'
+	| 'durationLabel'
+	| 'experienceType'
+	| 'groupSize'
+	| 'languages'
+	| 'extras'
+	| 'timeSlots'
+	| 'youthPrice'
+	| 'childPrice'
 > & {
 	planDays?: number;
 	mapCity?: string;
@@ -36,8 +51,8 @@ export const enrich = (seed: PackageSeed): VeloraPackage => {
 		seed.type === 'tours'
 			? { unit: 'experience', verb: 'tour', group: '25 People' }
 			: seed.type === 'hotels'
-				? { unit: 'stay', verb: 'stay', group: '2–6 Guests' }
-				: { unit: 'rental', verb: 'rental', group: '5 Seats' };
+			? { unit: 'stay', verb: 'stay', group: '2–6 Guests' }
+			: { unit: 'rental', verb: 'rental', group: '5 Seats' };
 
 	return {
 		...seed,
@@ -73,8 +88,8 @@ export const enrich = (seed: PackageSeed): VeloraPackage => {
 			seed.type === 'cars'
 				? 'Per day'
 				: seed.type === 'hotels'
-					? seed.subtitle
-					: `${days} ${days === 1 ? 'Day' : 'Days'}`,
+				? seed.subtitle
+				: `${days} ${days === 1 ? 'Day' : 'Days'}`,
 		experienceType:
 			seed.type === 'hotels' ? 'Boutique Stay' : seed.type === 'cars' ? 'Car Rental' : seed.category ?? 'Adventure',
 		groupSize: typeCopy.group,
@@ -481,9 +496,24 @@ const CAR_SEEDS: PackageSeed[] = [
 export const PACKAGES: VeloraPackage[] = [...TOUR_SEEDS, ...HOTEL_SEEDS, ...CAR_SEEDS].map(enrich);
 
 export const PACKAGE_TABS = [
-	{ key: 'tours' as PackageType, label: 'Popular Tours', eyebrow: 'Most Popular Tour Packages', headline: 'Something Amazing Waiting For You' },
-	{ key: 'hotels' as PackageType, label: 'Popular Hotels', eyebrow: 'Most Booked Stays', headline: 'Stay In Comfort, Wake Up Inspired' },
-	{ key: 'cars' as PackageType, label: 'Popular Cars', eyebrow: 'Top Rental Cars', headline: 'Drive The Trip Of Your Dreams' },
+	{
+		key: 'tours' as PackageType,
+		label: 'Popular Tours',
+		eyebrow: 'Most Popular Tour Packages',
+		headline: 'Something Amazing Waiting For You',
+	},
+	{
+		key: 'hotels' as PackageType,
+		label: 'Popular Hotels',
+		eyebrow: 'Most Booked Stays',
+		headline: 'Stay In Comfort, Wake Up Inspired',
+	},
+	{
+		key: 'cars' as PackageType,
+		label: 'Popular Cars',
+		eyebrow: 'Top Rental Cars',
+		headline: 'Drive The Trip Of Your Dreams',
+	},
 ];
 
 export const formatPackagePrice = (amount: number) => `$${amount.toLocaleString('en-US')}`;
@@ -492,12 +522,18 @@ export const packageDetailHref = (type: PackageType, id: string) => `/package/de
 
 export const getPackagesByType = (type: PackageType) => PACKAGES.filter((p) => p.type === type);
 
-export const getPackage = (type: PackageType, id: string) =>
-	PACKAGES.find((p) => p.type === type && p.id === id);
+export const getPackage = (type: PackageType, id: string) => PACKAGES.find((p) => p.type === type && p.id === id);
 
 export const getPackageReviewsLabel = (count: number) => {
-	if (count >= 100) return `${Math.round(count / 10)} Reviews`;
-	return `${Math.max(4, Math.round(count / 15))} Reviews`;
+	if (!count || count < 1) return 'No reviews yet';
+	return `${count} Review${count === 1 ? '' : 's'}`;
+};
+
+export const getRatingLabel = (rating: number) => {
+	if (rating >= 4.5) return 'Excellent';
+	if (rating >= 4) return 'Very good';
+	if (rating >= 3) return 'Good';
+	return 'Fair';
 };
 
 /** Shared free-text match across a package title and location (case-insensitive). */

@@ -76,9 +76,35 @@ export const useCatalogQuery = <T extends Record<string, string>>(
 	const debounceMsRef = useRef(options.debounceMs ?? 400);
 	debounceMsRef.current = options.debounceMs ?? 400;
 	const [filters, setFilters] = useState<T>(defaultFilters);
+	const filtersRef = useRef<T>(defaultFilters);
 	const [ready, setReady] = useState(false);
 	const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 	const hydratingRef = useRef(false);
+
+	const commitFilters = useCallback((next: T) => {
+		filtersRef.current = next;
+		setFilters(next);
+	}, []);
+
+	const filtersFromQuery = useCallback((query: ParsedUrlQuery): T => {
+		const defaults = defaultsRef.current;
+		const next = { ...defaults };
+
+		for (const key of Object.keys(defaults) as (keyof T)[]) {
+			const value = queryValue(query, key as string);
+			if (value) {
+				next[key] = value as T[keyof T];
+			}
+		}
+
+		if (applyHeroMappingRef.current) {
+			Object.assign(next, mapHeroQueryToFilters(query, defaults));
+		}
+		if (mapQueryRef.current) {
+			Object.assign(next, mapQueryRef.current(query));
+		}
+		return next;
+	}, []);
 
 	const syncUrl = useCallback(
 		(next: T) => {
@@ -102,23 +128,8 @@ export const useCatalogQuery = <T extends Record<string, string>>(
 		if (!router.isReady || ready) return;
 
 		hydratingRef.current = true;
-		const next = { ...defaultFilters };
-
-		for (const key of Object.keys(defaultFilters) as (keyof T)[]) {
-			const value = queryValue(router.query, key as string);
-			if (value) {
-				next[key] = value as T[keyof T];
-			}
-		}
-
-		if (applyHeroMappingRef.current) {
-			Object.assign(next, mapHeroQueryToFilters(router.query, defaultFilters));
-		}
-		if (mapQueryRef.current) {
-			Object.assign(next, mapQueryRef.current(router.query));
-		}
-
-		setFilters(next);
+		const next = filtersFromQuery(router.query);
+		commitFilters(next);
 		setReady(true);
 
 		// Clean invalid/stripped params from the address bar once after hydrate.
@@ -126,7 +137,22 @@ export const useCatalogQuery = <T extends Record<string, string>>(
 			hydratingRef.current = false;
 			syncUrl(next);
 		});
-	}, [router.isReady, router.query, defaultFilters, ready, syncUrl]);
+	}, [router.isReady, router.query, ready, syncUrl, filtersFromQuery, commitFilters]);
+
+	// Re-sync when the URL changes from outside (navbar link, Back/Forward, shared link).
+	useEffect(() => {
+		if (!ready || !router.isReady || hydratingRef.current || debounceRef.current) return;
+
+		const defaults = defaultsRef.current;
+		const keys = trackedKeys(defaults, stripQueryKeysRef.current);
+		const fromState = serializeTrackedQuery(
+			buildUrlQuery(router.query, filtersRef.current, defaults, stripQueryKeysRef.current),
+			keys,
+		);
+		if (fromState === serializeTrackedQuery(router.query, keys)) return;
+
+		commitFilters(filtersFromQuery(router.query));
+	}, [ready, router.isReady, router.query, filtersFromQuery, commitFilters]);
 
 	useEffect(
 		() => () => {
@@ -137,32 +163,38 @@ export const useCatalogQuery = <T extends Record<string, string>>(
 
 	const setFilter = useCallback(
 		<K extends keyof T>(key: K, value: T[K]) => {
-			setFilters((prev) => {
-				const next = { ...prev, [key]: value };
-				const debounceKeys = debounceKeysRef.current ?? [];
+			const next = { ...filtersRef.current, [key]: value };
+			commitFilters(next);
 
-				if (debounceKeys.includes(key)) {
-					if (debounceRef.current) clearTimeout(debounceRef.current);
-					debounceRef.current = setTimeout(() => syncUrl(next), debounceMsRef.current);
-				} else {
-					syncUrl(next);
-				}
+			if (debounceRef.current) {
+				clearTimeout(debounceRef.current);
+				debounceRef.current = undefined;
+			}
 
-				return next;
-			});
+			if ((debounceKeysRef.current ?? []).includes(key)) {
+				// Sync whatever the filters are when the timer fires, not a stale snapshot.
+				debounceRef.current = setTimeout(() => {
+					debounceRef.current = undefined;
+					syncUrl(filtersRef.current);
+				}, debounceMsRef.current);
+			} else {
+				syncUrl(next);
+			}
 		},
-		[syncUrl],
+		[syncUrl, commitFilters],
 	);
 
 	const setFiltersPatch = useCallback(
 		(patch: Partial<T>) => {
-			setFilters((prev) => {
-				const next = { ...prev, ...patch };
-				syncUrl(next);
-				return next;
-			});
+			if (debounceRef.current) {
+				clearTimeout(debounceRef.current);
+				debounceRef.current = undefined;
+			}
+			const next = { ...filtersRef.current, ...patch };
+			commitFilters(next);
+			syncUrl(next);
 		},
-		[syncUrl],
+		[syncUrl, commitFilters],
 	);
 
 	return { filters, setFilter, setFilters: setFiltersPatch, ready };

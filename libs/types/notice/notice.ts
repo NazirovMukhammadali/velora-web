@@ -9,6 +9,7 @@ export interface Notice {
 	memberId: string;
 	createdAt: Date | string;
 	updatedAt: Date | string;
+	memberData?: { _id: string; memberNick?: string; memberFullName?: string; memberImage?: string } | null;
 }
 
 export interface Notices {

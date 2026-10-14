@@ -1,13 +1,7 @@
 import { MemberAuthType, MemberStatus, MemberType } from '../enums/member.enum';
 import type { Member } from '../types/member/member';
 
-export type AgentSpecialty =
-	| 'All'
-	| 'City & Culture'
-	| 'Mountains'
-	| 'Beach & Islands'
-	| 'Food & Wine'
-	| 'Family';
+export type AgentSpecialty = 'All' | 'City & Culture' | 'Mountains' | 'Beach & Islands' | 'Food & Wine' | 'Family';
 
 export type ShowcaseAgent = {
 	id: string;
@@ -162,8 +156,7 @@ export const SHOWCASE_AGENTS: ShowcaseAgent[] = [
 export const getShowcaseAgentById = (id: string): ShowcaseAgent | undefined =>
 	SHOWCASE_AGENTS.find((agent) => agent.id === id);
 
-export const isShowcaseAgentId = (id: string): boolean =>
-	SHOWCASE_AGENTS.some((agent) => agent.id === id);
+export const isShowcaseAgentId = (id: string): boolean => SHOWCASE_AGENTS.some((agent) => agent.id === id);
 
 export const showcaseAgentToMember = (agent: ShowcaseAgent): Member =>
 	({
@@ -189,7 +182,7 @@ export const showcaseAgentToMember = (agent: ShowcaseAgent): Member =>
 		createdAt: new Date(agent.createdAt),
 		updatedAt: new Date(agent.createdAt),
 		meLiked: [],
-	}) as Member;
+	} as Member);
 
 export type AgentSortKey = 'recent' | 'rating' | 'tours' | 'likes' | 'name';
 
@@ -223,9 +216,7 @@ export const filterShowcaseAgents = (
 			result = [...result].sort((a, b) => a.memberFullName.localeCompare(b.memberFullName));
 			break;
 		default:
-			result = [...result].sort(
-				(a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-			);
+			result = [...result].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 	}
 
 	return result;

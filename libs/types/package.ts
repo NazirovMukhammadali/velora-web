@@ -55,6 +55,8 @@ export type StoredBooking = {
 	location: string;
 	image: string;
 	date: string;
+	/** Check-out / drop-off date for stays and car rentals. */
+	endDate?: string;
 	time: string;
 	adults: number;
 	youth: number;

@@ -1,10 +1,7 @@
 import { REACT_APP_API_URL } from '../config';
 
 /** Resolve member avatar — supports uploads path, absolute URL, or site-relative path. */
-export const resolveMemberImageUrl = (
-	memberImage?: string | null,
-	apiBase: string = REACT_APP_API_URL,
-): string => {
+export const resolveMemberImageUrl = (memberImage?: string | null, apiBase: string = REACT_APP_API_URL): string => {
 	if (!memberImage?.trim()) return '/img/profile/defaultUser.svg';
 	const src = memberImage.trim();
 	if (src.startsWith('http://') || src.startsWith('https://')) return src;

@@ -17,14 +17,21 @@ const PopularDestinations = () => {
 
 			<div className={'destinations-grid'}>
 				{POPULAR_DESTINATIONS.map((d) => (
-					<Link href={'/tours'} key={d.slug} className={'destination-card'} scroll={true}>
-						<div className={'destination-card-image'}>
-							<VeloraImage src={d.image} alt={d.name} fill sizes="(max-width: 768px) 100vw, 25vw" />
-							<span className={'destination-badge'}>
-								{d.tourCount.toString().padStart(2, '0')} tours
-							</span>
+					<Link
+						href={`/tours?location=${encodeURIComponent(d.name)}`}
+						key={d.slug}
+						className={'destination-card'}
+						scroll={true}
+					>
+						<div className={'destination-card-inner'}>
+							<div className={'destination-card-image'}>
+								<div className={'destination-card-photo'}>
+									<VeloraImage src={d.image} alt={d.name} fill sizes="(max-width: 768px) 100vw, 25vw" />
+								</div>
+								<span className={'destination-badge'}>{d.tourCount.toString().padStart(2, '0')} Tours</span>
+							</div>
+							<h3>{d.name}</h3>
 						</div>
-						<h3>{d.name}</h3>
 					</Link>
 				))}
 			</div>

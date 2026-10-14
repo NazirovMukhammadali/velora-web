@@ -1,11 +1,18 @@
-import React, { SyntheticEvent, useState } from 'react';
+import React, { SyntheticEvent, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@apollo/client';
 import MuiAccordion, { AccordionProps } from '@mui/material/Accordion';
 import { AccordionDetails, Box, Stack, Typography } from '@mui/material';
 import MuiAccordionSummary, { AccordionSummaryProps } from '@mui/material/AccordionSummary';
 import { styled } from '@mui/material/styles';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
+import { GET_NOTICES } from '../../../apollo/user/query';
+import { NoticeCategory } from '../../enums/notice.enum';
+import type { Notice } from '../../types/notice/notice';
 
 type FaqCategory = 'booking' | 'payment' | 'staysTours' | 'flights' | 'cancellations' | 'other';
+
+/** FAQs published from the admin panel (NoticeCategory.FAQ) get their own leading tab. */
+type FaqTabKey = FaqCategory | 'live';
 
 interface FaqItem {
 	id: string;
@@ -65,8 +72,7 @@ const FAQ_DATA: Record<FaqCategory, FaqItem[]> = {
 		{
 			id: 'payment-02',
 			subject: 'Is my payment information secure?',
-			content:
-				'Yes. We use industry-standard encryption and never store raw card details on our servers.',
+			content: 'Yes. We use industry-standard encryption and never store raw card details on our servers.',
 		},
 		{
 			id: 'payment-03',
@@ -241,13 +247,51 @@ const AccordionSummary = styled((props: AccordionSummaryProps) => (
 }));
 
 const Faq = () => {
-	const [category, setCategory] = useState<FaqCategory>('booking');
+	const [category, setCategory] = useState<FaqTabKey>('booking');
 	const [expanded, setExpanded] = useState<string | false>(FAQ_DATA.booking[0]?.id ?? false);
 
+	const { data } = useQuery(GET_NOTICES, {
+		fetchPolicy: 'cache-and-network',
+		errorPolicy: 'all',
+		variables: {
+			input: {
+				page: 1,
+				limit: 50,
+				sort: 'createdAt',
+				direction: 'DESC',
+				search: { noticeCategory: NoticeCategory.FAQ },
+			},
+		},
+	});
+
+	const liveFaqs: FaqItem[] = useMemo(
+		() =>
+			((data?.getNotices?.list ?? []) as Notice[]).map((notice) => ({
+				id: notice._id,
+				subject: notice.noticeTitle,
+				content: notice.noticeContent,
+			})),
+		[data],
+	);
+
+	const tabs: { key: FaqTabKey; label: string }[] = useMemo(
+		() => (liveFaqs.length > 0 ? [{ key: 'live' as const, label: 'Latest' }, ...FAQ_TABS] : FAQ_TABS),
+		[liveFaqs.length],
+	);
+
+	const itemsFor = (key: FaqTabKey): FaqItem[] => (key === 'live' ? liveFaqs : FAQ_DATA[key]);
+
+	// Open the admin-published FAQs first once they arrive.
+	useEffect(() => {
+		if (liveFaqs.length === 0) return;
+		setCategory('live');
+		setExpanded(liveFaqs[0].id);
+	}, [liveFaqs]);
+
 	/** HANDLERS **/
-	const changeCategoryHandler = (next: FaqCategory) => {
+	const changeCategoryHandler = (next: FaqTabKey) => {
 		setCategory(next);
-		setExpanded(FAQ_DATA[next][0]?.id ?? false);
+		setExpanded(itemsFor(next)[0]?.id ?? false);
 	};
 
 	const handleChange = (panel: string) => (_event: SyntheticEvent, isExpanded: boolean) => {
@@ -257,7 +301,7 @@ const Faq = () => {
 	return (
 		<Stack className={'faq-content'}>
 			<Box className={'categories'} component={'div'}>
-				{FAQ_TABS.map((tab) => (
+				{tabs.map((tab) => (
 					<div
 						key={tab.key}
 						className={category === tab.key ? 'active' : ''}
@@ -268,7 +312,7 @@ const Faq = () => {
 				))}
 			</Box>
 			<Box className={'wrap'} component={'div'}>
-				{FAQ_DATA[category].map((ele) => (
+				{itemsFor(category).map((ele) => (
 					<Accordion expanded={expanded === ele.id} onChange={handleChange(ele.id)} key={ele.id}>
 						<AccordionSummary id={`${ele.id}-header`} className="question" aria-controls={`${ele.id}-content`}>
 							<Typography className="badge" variant={'h4'}>

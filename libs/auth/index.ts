@@ -1,15 +1,14 @@
-import decodeJWT from "jwt-decode";
-import { initializeApollo } from "../../apollo/client";
-import { userVar } from "../../apollo/store";
-import { CustomJwtPayload } from "../types/customJwtPayload";
-import { sweetMixinErrorAlert } from "../sweetAlert";
-import { LOGIN, SIGN_UP } from "../../apollo/user/mutation";
-import { clearJwtToken, setJwtToken } from "./token";
+import decodeJWT from 'jwt-decode';
+import { initializeApollo } from '../../apollo/client';
+import { userVar } from '../../apollo/store';
+import { CustomJwtPayload } from '../types/customJwtPayload';
+import { sweetMixinErrorAlert } from '../sweetAlert';
+import { LOGIN, SIGN_UP } from '../../apollo/user/mutation';
+import { clearJwtToken, setJwtToken } from './token';
 
-export type PublicSignupMemberType = "USER" | "AGENT";
+export type PublicSignupMemberType = 'USER' | 'AGENT';
 
-export { getJwtToken, setJwtToken } from "./token";
-
+export { getJwtToken, setJwtToken } from './token';
 
 /**
  * Surface readable auth / signup validation failures to the user.
@@ -17,22 +16,22 @@ export { getJwtToken, setJwtToken } from "./token";
  */
 const reportAuthError = async (err: unknown): Promise<void> => {
 	const graphQLErrors =
-		err && typeof err === "object" && "graphQLErrors" in err
-			? ((err as { graphQLErrors?: Array<{ message?: string }> }).graphQLErrors ?? [])
+		err && typeof err === 'object' && 'graphQLErrors' in err
+			? (err as { graphQLErrors?: Array<{ message?: string }> }).graphQLErrors ?? []
 			: [];
 	const graphQLMessages: string[] = graphQLErrors
 		.map((item) => item?.message)
 		.filter((message: string | undefined): message is string => Boolean(message));
 
 	if (graphQLMessages.length > 0) {
-		const graphQLMessage = graphQLMessages.join(" ");
+		const graphQLMessage = graphQLMessages.join(' ');
 
-		if (graphQLMessage.includes("login and password") || graphQLMessage.includes("Wrong password")) {
-			await sweetMixinErrorAlert("Please check your password again");
+		if (graphQLMessage.includes('login and password') || graphQLMessage.includes('Wrong password')) {
+			await sweetMixinErrorAlert('Please check your password again');
 			return;
 		}
-		if (graphQLMessage.toLowerCase().includes("blocked")) {
-			await sweetMixinErrorAlert("User has been blocked!");
+		if (graphQLMessage.toLowerCase().includes('blocked')) {
+			await sweetMixinErrorAlert('User has been blocked!');
 			return;
 		}
 
@@ -40,14 +39,12 @@ const reportAuthError = async (err: unknown): Promise<void> => {
 		return;
 	}
 
-	if (err && typeof err === "object" && "networkError" in err && (err as { networkError?: unknown }).networkError) {
-		await sweetMixinErrorAlert(
-			"Cannot reach the server. Please make sure the backend is running."
-		);
+	if (err && typeof err === 'object' && 'networkError' in err && (err as { networkError?: unknown }).networkError) {
+		await sweetMixinErrorAlert('Cannot reach the server. Please make sure the backend is running.');
 		return;
 	}
 
-	await sweetMixinErrorAlert("Something went wrong. Please try again.");
+	await sweetMixinErrorAlert('Something went wrong. Please try again.');
 };
 
 export const logIn = async (nick: string, password: string): Promise<void> => {
@@ -72,7 +69,7 @@ const requestJwtToken = async ({
 		const result = await apolloClient.mutate({
 			mutation: LOGIN,
 			variables: { input: { memberNick: nick, memberPassword: password } },
-			fetchPolicy: "network-only",
+			fetchPolicy: 'network-only',
 		});
 
 		const { accessToken } = result?.data?.login;
@@ -80,7 +77,7 @@ const requestJwtToken = async ({
 		return { jwtToken: accessToken };
 	} catch (err: unknown) {
 		await reportAuthError(err);
-		throw new Error("token error");
+		throw new Error('token error');
 	}
 };
 
@@ -88,11 +85,11 @@ export const signUp = async (
 	nick: string,
 	password: string,
 	phone: string,
-	type: PublicSignupMemberType
+	type: PublicSignupMemberType,
 ): Promise<void> => {
-	if (type !== "USER" && type !== "AGENT") {
-		await sweetMixinErrorAlert("Public signup allows only Traveler or Agent.");
-		throw new Error("invalid signup member type");
+	if (type !== 'USER' && type !== 'AGENT') {
+		await sweetMixinErrorAlert('Public signup allows only Traveler or Agent.');
+		throw new Error('invalid signup member type');
 	}
 
 	const { jwtToken } = await requestSignUpJwtToken({
@@ -132,7 +129,7 @@ const requestSignUpJwtToken = async ({
 					memberType: type,
 				},
 			},
-			fetchPolicy: "network-only",
+			fetchPolicy: 'network-only',
 		});
 
 		const { accessToken } = result?.data?.signup;
@@ -140,13 +137,13 @@ const requestSignUpJwtToken = async ({
 		return { jwtToken: accessToken };
 	} catch (err: unknown) {
 		await reportAuthError(err);
-		throw new Error("token error");
+		throw new Error('token error');
 	}
 };
 
 export const updateStorage = ({ jwtToken }: { jwtToken: string }) => {
 	setJwtToken(jwtToken);
-	window.localStorage.setItem("login", Date.now().toString());
+	window.localStorage.setItem('login', Date.now().toString());
 };
 
 export const updateUserInfo = (jwtToken: string) => {
@@ -154,19 +151,19 @@ export const updateUserInfo = (jwtToken: string) => {
 
 	const claims = decodeJWT<CustomJwtPayload>(jwtToken);
 	userVar({
-		_id: claims._id ?? "",
-		memberType: claims.memberType ?? "",
-		memberStatus: claims.memberStatus ?? "",
+		_id: claims._id ?? '',
+		memberType: claims.memberType ?? '',
+		memberStatus: claims.memberStatus ?? '',
 		memberAuthType: claims.memberAuthType,
-		memberPhone: claims.memberPhone ?? "",
-		memberNick: claims.memberNick ?? "",
-		memberFullName: claims.memberFullName ?? "",
+		memberPhone: claims.memberPhone ?? '',
+		memberNick: claims.memberNick ?? '',
+		memberFullName: claims.memberFullName ?? '',
 		memberImage:
 			claims.memberImage === null || claims.memberImage === undefined
-				? "/img/profile/defaultUser.svg"
+				? '/img/profile/defaultUser.svg'
 				: `${claims.memberImage}`,
-		memberAddress: claims.memberAddress ?? "",
-		memberDesc: claims.memberDesc ?? "",
+		memberAddress: claims.memberAddress ?? '',
+		memberDesc: claims.memberDesc ?? '',
 		memberRank: claims.memberRank,
 		memberArticles: claims.memberArticles,
 		memberPoints: claims.memberPoints,
@@ -186,21 +183,24 @@ export const logOut = () => {
 
 const deleteStorage = () => {
 	clearJwtToken();
-	window.localStorage.setItem("logout", Date.now().toString());
+	window.localStorage.setItem('logout', Date.now().toString());
 };
+
+/** Reset the in-memory user without touching storage (used for cross-tab logout). */
+export const clearUserInfo = () => deleteUserInfo();
 
 const deleteUserInfo = () => {
 	userVar({
-		_id: "",
-		memberType: "",
-		memberStatus: "",
-		memberAuthType: "",
-		memberPhone: "",
-		memberNick: "",
-		memberFullName: "",
-		memberImage: "",
-		memberAddress: "",
-		memberDesc: "",
+		_id: '',
+		memberType: '',
+		memberStatus: '',
+		memberAuthType: '',
+		memberPhone: '',
+		memberNick: '',
+		memberFullName: '',
+		memberImage: '',
+		memberAddress: '',
+		memberDesc: '',
 		memberRank: 0,
 		memberArticles: 0,
 		memberPoints: 0,

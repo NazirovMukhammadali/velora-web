@@ -30,6 +30,24 @@ export const getStaticProps = async ({ locale }: any) => ({
 	},
 });
 
+const plural = (count: number, word: string) => `${count} ${word}${count !== 1 ? 's' : ''}`;
+
+const describeLocalBooking = (booking: StoredBooking): string => {
+	const dates = booking.endDate ? `${booking.date} → ${booking.endDate}` : booking.date;
+	switch (booking.packageType) {
+		case 'hotels':
+			return `${dates} · ${plural(booking.adults, 'room')}`;
+		case 'cars':
+			return dates;
+		case 'flights':
+			return [dates, booking.time, plural(booking.adults, 'passenger')].filter(Boolean).join(' · ');
+		default: {
+			const travellers = booking.adults + booking.youth + booking.children;
+			return [dates, booking.time, plural(travellers, 'traveller')].filter(Boolean).join(' · ');
+		}
+	}
+};
+
 const BookingsPage: NextPage = () => {
 	const router = useRouter();
 	const { t } = useTranslation('common');
@@ -57,8 +75,8 @@ const BookingsPage: NextPage = () => {
 
 	useEffect(() => {
 		if (!isAuthorized) return;
-		const all = getLocalBookings();
-		setLocalBookings(all.filter((b) => b.packageType !== 'hotels'));
+		// API hotel/tour bookings live on the server; everything stored locally is device-only.
+		setLocalBookings(getLocalBookings());
 	}, [router.query.booked, isAuthorized]);
 
 	const tourBookings: ApiBooking[] = tourData?.getMyTourBookings?.list ?? [];
@@ -94,10 +112,7 @@ const BookingsPage: NextPage = () => {
 								<div>
 									<Typography fontWeight={700}>{booking.title}</Typography>
 									<Typography variant="body2">{booking.location}</Typography>
-									<Typography variant="body2">
-										{booking.date} · {booking.time} · {booking.adults} adult
-										{booking.adults !== 1 ? 's' : ''}
-									</Typography>
+									<Typography variant="body2">{describeLocalBooking(booking)}</Typography>
 									<Typography variant="body2" className="velora-booking-price">
 										{formatPackagePrice(booking.total)} · {booking.status}
 									</Typography>
@@ -109,8 +124,7 @@ const BookingsPage: NextPage = () => {
 
 				{(tourError || hotelError) && (
 					<Typography color="text.secondary">
-						Unable to load some server bookings right now. Package bookings stored on this device still appear
-						above.
+						Unable to load some server bookings right now. Package bookings stored on this device still appear above.
 					</Typography>
 				)}
 
@@ -126,8 +140,8 @@ const BookingsPage: NextPage = () => {
 									{t('Status')}: {booking.bookingStatus}
 								</Typography>
 								<Typography variant="body2">
-									{formatDate(booking.checkInDate, 'dd.MM.yyyy')} →{' '}
-									{formatDate(booking.checkOutDate, 'dd.MM.yyyy')} · {booking.quantity ?? 1} room
+									{formatDate(booking.checkInDate, 'dd.MM.yyyy')} → {formatDate(booking.checkOutDate, 'dd.MM.yyyy')} ·{' '}
+									{booking.quantity ?? 1} room
 									{(booking.quantity ?? 1) !== 1 ? 's' : ''}
 								</Typography>
 								<Typography variant="body2">

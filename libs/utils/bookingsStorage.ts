@@ -20,5 +20,4 @@ export const saveLocalBooking = (booking: StoredBooking): void => {
 	window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list.slice(0, 50)));
 };
 
-export const createBookingId = (): string =>
-	`vb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+export const createBookingId = (): string => `vb_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;

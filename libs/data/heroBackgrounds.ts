@@ -10,8 +10,8 @@ export const HERO_BACKGROUNDS: Record<SearchTabKey, string[]> = {
 	],
 	flights: [
 		'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1600&q=80',
-		'https://images.unsplash.com/photo-1540962351504-030700000000?auto=format&fit=crop&w=1600&q=80',
-		'https://images.unsplash.com/photo-1464037868146-7907a1ece4f3?auto=format&fit=crop&w=1600&q=80',
+		'https://images.unsplash.com/photo-1488085061387-422e29b40080?auto=format&fit=crop&w=1600&q=80',
+		'https://images.unsplash.com/photo-1529074963764-98f45c47344b?auto=format&fit=crop&w=1600&q=80',
 	],
 	rentcar: [
 		'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1600&q=80',
