@@ -4,6 +4,7 @@
 
 This repository is the web client (`velora-web`). It talks to the **Velora GraphQL API** (`velora-api`, NestJS) and stays fully browsable thanks to a curated static fallback when the API is unavailable.
 
+[![CI](https://img.shields.io/github/actions/workflow/status/NazirovMukhammadali/velora-web/ci.yml?branch=develop&label=CI)](https://github.com/NazirovMukhammadali/velora-web/actions/workflows/ci.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
@@ -63,7 +64,7 @@ This repository is the web client (`velora-web`). It talks to the **Velora Graph
 |---------|------------|
 | Package management | Yarn (`yarn.lock`) for the web client, npm (`package-lock.json`) for the API |
 | Code quality | ESLint, Prettier; Husky + lint-staged pre-commit checks (API) |
-| CI | GitHub Actions on the API (lint, build, unit and integration tests) |
+| CI | GitHub Actions on both repos — web: typecheck, lint, build, unit tests (Node 18); API: lint, build, unit and integration tests |
 | Operations | `/health` endpoint (API and MongoDB status), persistent uploads volume (`UPLOADS_DIR` → `/uploads`) |
 
 ---
