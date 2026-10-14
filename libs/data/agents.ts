@@ -156,8 +156,6 @@ export const SHOWCASE_AGENTS: ShowcaseAgent[] = [
 export const getShowcaseAgentById = (id: string): ShowcaseAgent | undefined =>
 	SHOWCASE_AGENTS.find((agent) => agent.id === id);
 
-export const isShowcaseAgentId = (id: string): boolean => SHOWCASE_AGENTS.some((agent) => agent.id === id);
-
 export const showcaseAgentToMember = (agent: ShowcaseAgent): Member =>
 	({
 		_id: agent.id,

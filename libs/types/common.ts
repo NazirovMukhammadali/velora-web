@@ -1,4 +1,4 @@
-import type { ChangeEvent, SyntheticEvent } from 'react';
+import type { ChangeEvent } from 'react';
 
 /**
  * Loose alias kept for backward compatibility with legacy Nestar components.
@@ -12,9 +12,6 @@ export type T = any;
 /** DOM change-event aliases for typed form handlers (replaces `e: any`). */
 export type InputChangeEvent = ChangeEvent<HTMLInputElement>;
 export type SelectChangeEvent = ChangeEvent<HTMLSelectElement>;
-export type TextAreaChangeEvent = ChangeEvent<HTMLTextAreaElement>;
-export type FormSubmitEvent = SyntheticEvent<HTMLFormElement>;
-
 /** Pagination counter returned by Nestar list queries. */
 export interface MetaCounter {
 	total: number;

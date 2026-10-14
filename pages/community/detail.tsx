@@ -24,7 +24,6 @@ import { serverSideTranslations } from 'next-i18next/serverSideTranslations';
 import { BoardArticle } from '../../libs/types/board-article/board-article';
 import { CREATE_COMMENT, LIKE_TARGET_BOARD_ARTICLE, UPDATE_COMMENT } from '../../apollo/user/mutation';
 import { GET_BOARD_ARTICLE, GET_COMMENTS } from '../../apollo/user/query';
-import { Message } from '../../libs/enums/common.enum';
 import { sweetConfirmAlert, sweetMixinErrorAlert, sweetMixinSuccessAlert } from '../../libs/sweetAlert';
 import { Messages, REACT_APP_API_URL } from '../../libs/config';
 import { CommentUpdate } from '../../libs/types/comment/comment.update';
@@ -55,13 +54,9 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 		...initialInput,
 	});
 	const [memberImage, setMemberImage] = useState<string>('/img/community/articleImg.png');
-	const [anchorEl, setAnchorEl] = useState<any | null>(null);
-	const open = Boolean(anchorEl);
-	const id = open ? 'simple-popover' : undefined;
 	const [openBackdrop, setOpenBackdrop] = useState<boolean>(false);
 	const [updatedComment, setUpdatedComment] = useState<string>('');
 	const [updatedCommentId, setUpdatedCommentId] = useState<string>('');
-	const [likeLoading, setLikeLoading] = useState<boolean>(false);
 	const [boardArticle, setBoardArticle] = useState<BoardArticle>();
 
 	/** APOLLO REQUESTS **/
@@ -69,12 +64,7 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 	const [createComment] = useMutation(CREATE_COMMENT);
 	const [updateComment] = useMutation(UPDATE_COMMENT);
 
-	const {
-		loading: boardArticleLoading,
-		data: boardArticleData,
-		error: boardArticleError,
-		refetch: boardArticleRefetch,
-	} = useQuery(GET_BOARD_ARTICLE, {
+	const { refetch: boardArticleRefetch } = useQuery(GET_BOARD_ARTICLE, {
 		fetchPolicy: 'network-only',
 		variables: { input: articleId },
 		skip: !articleId,
@@ -86,12 +76,7 @@ const CommunityDetail: NextPage = ({ initialInput, ...props }: T) => {
 			}
 		},
 	});
-	const {
-		loading: getComentsLoading,
-		data: getComentsData,
-		error: getComentsError,
-		refetch: getComentsRefetch,
-	} = useQuery(GET_COMMENTS, {
+	const { refetch: getComentsRefetch } = useQuery(GET_COMMENTS, {
 		fetchPolicy: 'cache-and-network',
 		variables: {
 			input: searchFilter,

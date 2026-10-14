@@ -1,14 +1,12 @@
 import { useMemo } from 'react';
-import { ApolloClient, ApolloLink, InMemoryCache, split, from, NormalizedCacheObject, HttpLink } from '@apollo/client';
+import { ApolloClient, ApolloLink, InMemoryCache, from, NormalizedCacheObject, HttpLink } from '@apollo/client';
 import createUploadLink from 'apollo-upload-client/public/createUploadLink.js';
-import { WebSocketLink } from '@apollo/client/link/ws';
-import { getMainDefinition } from '@apollo/client/utilities';
 import { onError } from '@apollo/client/link/error';
 import { ServerError } from '@apollo/client/link/utils';
 import { getJwtToken } from '../libs/auth/token';
-import { userVar, socketVar } from './store';
+import { userVar } from './store';
 import { sweetErrorAlert } from '../libs/sweetAlert';
-import { API_GRAPHQL_URL, API_WS_URL } from '../libs/config';
+import { API_GRAPHQL_URL } from '../libs/config';
 
 let apolloClient: ApolloClient<NormalizedCacheObject>;
 
@@ -66,23 +64,6 @@ function handleUnauthorized(): void {
 	}
 }
 
-class AppWebSocket {
-	private socket: WebSocket;
-
-	constructor(url: string) {
-		this.socket = new WebSocket(`${url}?token=${getJwtToken()}`);
-		socketVar(this.socket);
-	}
-
-	send(data: Parameters<WebSocket['send']>[0]) {
-		this.socket.send(data);
-	}
-
-	close() {
-		this.socket.close();
-	}
-}
-
 function createIsomorphicLink(): ApolloLink {
 	if (typeof window === 'undefined') {
 		return new HttpLink({ uri: API_GRAPHQL_URL });
@@ -101,16 +82,6 @@ function createIsomorphicLink(): ApolloLink {
 	const uploadLink = createUploadLink({
 		uri: API_GRAPHQL_URL,
 	}) as unknown as ApolloLink;
-
-	const wsLink = new WebSocketLink({
-		uri: API_WS_URL,
-		options: {
-			reconnect: false,
-			timeout: 30000,
-			connectionParams: () => ({ headers: getHeaders() }),
-		},
-		webSocketImpl: AppWebSocket,
-	});
 
 	const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
 		if (graphQLErrors) {
@@ -138,16 +109,7 @@ function createIsomorphicLink(): ApolloLink {
 		}
 	});
 
-	const splitLink = split(
-		({ query }) => {
-			const definition = getMainDefinition(query);
-			return definition.kind === 'OperationDefinition' && definition.operation === 'subscription';
-		},
-		wsLink,
-		authLink.concat(uploadLink),
-	);
-
-	return from([errorLink, splitLink]);
+	return from([errorLink, authLink, uploadLink]);
 }
 
 function createApolloClient() {

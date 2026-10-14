@@ -21,12 +21,7 @@ const MemberMenu = (props: MemberMenuProps) => {
 	const { memberId } = router.query;
 
 	/** APOLLO REQUESTS **/
-	const {
-		loading: getMemberLoading,
-		data: getMemberData,
-		error: getMemberFollowingsError,
-		refetch: getMemberRefetch,
-	} = useQuery(GET_MEMBER, {
+	const { refetch: getMemberRefetch } = useQuery(GET_MEMBER, {
 		fetchPolicy: 'network-only',
 		variables: { input: memberId },
 		skip: !memberId,

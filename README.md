@@ -20,7 +20,7 @@
 | **Agents** | Agent directory and profile pages with reviews |
 | **Community** | Articles, comments, and member profiles |
 | **Auth** | JWT login/register, `useAuth()` hook, protected my-page & admin routes |
-| **UX** | Error boundaries, skeleton loaders, toast notifications (notistack) |
+| **UX** | Error boundaries, skeleton loaders, SweetAlert2 dialogs, Velora AI travel assistant widget |
 | **i18n** | English, Korean, Russian via `next-i18next` |
 | **SEO** | Per-route `<title>` and meta descriptions; dynamic detail metadata |
 | **Mobile** | Responsive CSS — hero banners and layouts adapt without user-agent splitting |
@@ -37,7 +37,7 @@
 | Backend | Nestar GraphQL API (NestJS) — typically `http://127.0.0.1:3003/graphql` |
 | i18n | `next-i18next` |
 | Images | `next/image` with `remotePatterns` (Unsplash + API host) |
-| Notifications | `notistack` |
+| Notifications | `sweetalert2` |
 
 ---
 
@@ -81,7 +81,6 @@ Copy `.env.example` to `.env` and adjust if your API runs elsewhere:
 ```env
 NEXT_PUBLIC_API_URL=http://127.0.0.1:3003
 NEXT_PUBLIC_API_GRAPHQL_URL=http://127.0.0.1:3003/graphql
-NEXT_PUBLIC_API_WS_URL=ws://127.0.0.1:3003/graphql
 ```
 
 Legacy `REACT_APP_*` names are also supported for backward compatibility.
@@ -103,7 +102,7 @@ Legacy `REACT_APP_*` names are also supported for backward compatibility.
 pages/                  # Next.js routes
 libs/
   components/           # UI (layout, homepage, packages, flights, …)
-  hooks/                # useAuth, useCatalogQuery, useToast, …
+  hooks/                # useAuth, useCatalogQuery, usePagedItems, …
   data/                 # Static catalogs + API mappers
   config/               # SEO and app config
 apollo/                 # GraphQL client, queries, store

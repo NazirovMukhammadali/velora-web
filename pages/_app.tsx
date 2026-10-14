@@ -2,7 +2,6 @@ import type { AppProps } from 'next/app';
 import { ThemeProvider, createTheme, ThemeOptions } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import React, { useEffect, useMemo } from 'react';
-import { SnackbarProvider } from 'notistack';
 import { light } from '../scss/MaterialTheme';
 import { ApolloProvider } from '@apollo/client';
 import { useApollo } from '../apollo/client';
@@ -38,15 +37,9 @@ const App = ({ Component, pageProps }: AppProps) => {
 	return (
 		<ThemeProvider theme={theme}>
 			<CssBaseline />
-			<SnackbarProvider
-				maxSnack={3}
-				autoHideDuration={4000}
-				anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-			>
-				<ApolloProvider client={client}>
-					<Component {...pageProps} />
-				</ApolloProvider>
-			</SnackbarProvider>
+			<ApolloProvider client={client}>
+				<Component {...pageProps} />
+			</ApolloProvider>
 		</ThemeProvider>
 	);
 };

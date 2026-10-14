@@ -20,17 +20,6 @@ export const sweetTopSuccessAlert = async (msg: string, duration: number = 2000)
 	});
 };
 
-export const sweetContactAlert = async (msg: string, duration: number = 10000) => {
-	await Swal.fire({
-		title: msg,
-		showClass: {
-			popup: 'animate__bounceIn',
-		},
-		showConfirmButton: false,
-		timer: duration,
-	}).then();
-};
-
 export const sweetConfirmAlert = (msg: string) => {
 	return new Promise(async (resolve, reject) => {
 		await Swal.fire({
@@ -43,23 +32,6 @@ export const sweetConfirmAlert = (msg: string) => {
 			showConfirmButton: true,
 			confirmButtonColor: '#e92C28',
 			cancelButtonColor: '#bdbdbd',
-		}).then((response) => {
-			if (response?.isConfirmed) resolve(true);
-			else resolve(false);
-		});
-	});
-};
-
-export const sweetLoginConfirmAlert = (msg: string) => {
-	return new Promise(async (resolve, reject) => {
-		await Swal.fire({
-			text: msg,
-			showCancelButton: true,
-			showConfirmButton: true,
-			color: '#212121',
-			confirmButtonColor: '#e92C28',
-			cancelButtonColor: '#bdbdbd',
-			confirmButtonText: 'Login',
 		}).then((response) => {
 			if (response?.isConfirmed) resolve(true);
 			else resolve(false);
@@ -92,10 +64,6 @@ export const sweetMixinSuccessAlert = async (msg: string, duration: number = 200
 		showConfirmButton: false,
 		timer: duration,
 	});
-};
-
-export const sweetBasicAlert = async (text: string) => {
-	Swal.fire(text);
 };
 
 export const sweetErrorHandlingForAdmin = async (err: any) => {

@@ -45,7 +45,7 @@ Flights, Hotels, RentCar, Bookings — faqat bosh sahifa hero qidiruvida (tablar
 ### Rejimlar
 
 - **Bosh sahifa:** `<VeloraNavbar overlay />` — `LayoutHome.tsx`, fon ustida qorong‘u shaffaf bar, scroll da biroz qotadi
-- **Boshqa sahifalar:** `<VeloraNavbar contrast />` — `LayoutBasic` / `LayoutFull`
+- **Boshqa sahifalar:** `<VeloraNavbar contrast />` — `LayoutBasic`
 - **Sticky:** `position: fixed`, `#top` spacer (overlay da height: 0, contrast da 80px)
 
 ### Auth sahifalar
@@ -122,9 +122,8 @@ Quyidagilarni **tartib bilan**, yuqoridagi qoidalarga rioya qilib bajaring:
 |--------|------|
 | Navbar | `libs/components/layout/VeloraNavbar.tsx`, `scss/pc/layout/navbar.scss` |
 | Bosh layout | `libs/components/layout/LayoutHome.tsx` |
-| Ichki layout | `libs/components/layout/LayoutBasic.tsx`, `LayoutFull.tsx` |
+| Ichki layout | `libs/components/layout/LayoutBasic.tsx` |
 | Hero qidiruv | `libs/components/homepage/HeaderFilter.tsx`, `scss/pc/homepage/hero.scss` |
-| Eski Top (re-export) | `libs/components/Top.tsx` → `VeloraNavbar` |
 | Global SCSS import | `scss/pc/main.scss` (navbar.scss, hero.scss import qilingan) |
 | Auth stillar | `scss/pc/account/join.scss` |
 

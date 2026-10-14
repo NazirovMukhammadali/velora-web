@@ -1,7 +1,6 @@
 import { makeVar } from '@apollo/client';
 
 import { CustomJwtPayload } from '../libs/types/customJwtPayload';
-export const themeVar = makeVar({});
 
 export const userVar = makeVar<CustomJwtPayload>({
 	_id: '',
@@ -22,6 +21,3 @@ export const userVar = makeVar<CustomJwtPayload>({
 	memberWarnings: 0,
 	memberBlocks: 0,
 });
-
-// Real socket assigned when Apollo client opens the GraphQL WS connection.
-export const socketVar = makeVar<WebSocket | null>(null);

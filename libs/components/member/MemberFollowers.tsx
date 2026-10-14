@@ -29,12 +29,7 @@ const MemberFollowers = (props: MemberFollowsProps) => {
 	const user = useReactiveVar(userVar);
 
 	/** APOLLO REQUESTS **/
-	const {
-		loading: getMemberFollowersLoading,
-		data: getMemberFollowersData,
-		error: getMemberFollowersError,
-		refetch: getMemberFollowersRefetch,
-	} = useQuery(GET_MEMBER_FOLLOWERS, {
+	const { refetch: getMemberFollowersRefetch } = useQuery(GET_MEMBER_FOLLOWERS, {
 		fetchPolicy: 'network-only',
 		errorPolicy: 'all',
 		variables: { input: followInquiry },

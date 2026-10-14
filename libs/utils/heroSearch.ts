@@ -140,9 +140,6 @@ export const routeForSearchTab = (tab: SearchTabKey): HeroCatalogRoute => {
 	}
 };
 
-/** Shared hero keys every catalog may inherit from shared/bookmarked URLs. */
-export const HERO_SHARED_FILTER_KEYS = ['location', 'from', 'to', 'startDate', 'endDate', 'party', 'guests'] as const;
-
 export const readQueryString = (query: ParsedUrlQuery, key: string): string => {
 	const value = query[key];
 	if (typeof value === 'string') return value;
